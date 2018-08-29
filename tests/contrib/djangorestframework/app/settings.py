@@ -107,9 +107,11 @@ DATADOG_TRACE = {
 }
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAdminUser',
-    ],
-
-    'EXCEPTION_HANDLER': 'app.exceptions.custom_exception_handler'
+    # 'DEFAULT_AUTHENTICATION_CLASSES': (
+    #     'rest_framework.authentication.TokenAuthentication',
+    # ),
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.AllowAny',
+    # ],
+    # 'EXCEPTION_HANDLER': 'app.exceptions.custom_exception_handler'
 }
