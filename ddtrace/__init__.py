@@ -1,4 +1,4 @@
-from .install import patch, patch_all
+from .monkey import patch, patch_all
 from .pin import Pin
 from .settings import Config
 from .span import Span
