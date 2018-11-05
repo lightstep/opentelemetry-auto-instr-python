@@ -1,13 +1,11 @@
 import unittest
-import requests
 
-from requests import Session
 from requests.exceptions import MissingSchema
 from nose.tools import eq_, assert_raises
 
 from ddtrace import config
 from ddtrace.ext import http, errors
-from ddtrace.contrib.requests import patch, unpatch
+from ddtrace.contrib.requests import patch
 
 from tests.opentracer.utils import init_tracer
 from ...util import override_global_tracer
@@ -19,18 +17,18 @@ URL_200 = 'http://{}/status/200'.format(SOCKET)
 URL_500 = 'http://{}/status/500'.format(SOCKET)
 
 
+patch()
+
+
 class BaseRequestTestCase(unittest.TestCase):
     """Create a traced Session, patching during the setUp and
     unpatching after the tearDown
     """
     def setUp(self):
-        patch()
+        from requests import Session
         self.tracer = get_dummy_tracer()
         self.session = Session()
         setattr(self.session, 'datadog_tracer', self.tracer)
-
-    def tearDown(self):
-        unpatch()
 
 
 class TestRequests(BaseRequestTestCase):
@@ -71,28 +69,6 @@ class TestRequests(BaseRequestTestCase):
             eq_(s.get_tag(http.METHOD), 'GET')
             eq_(s.get_tag(http.STATUS_CODE), '200')
 
-    def test_untraced_request(self):
-        # ensure the unpatch removes tracing
-        unpatch()
-        untraced = Session()
-
-        out = untraced.get(URL_200)
-        eq_(out.status_code, 200)
-        # validation
-        spans = self.tracer.writer.pop()
-        eq_(len(spans), 0)
-
-    def test_double_patch(self):
-        # ensure that double patch doesn't duplicate instrumentation
-        patch()
-        session = Session()
-        setattr(session, 'datadog_tracer', self.tracer)
-
-        out = session.get(URL_200)
-        eq_(out.status_code, 200)
-        spans = self.tracer.writer.pop()
-        eq_(len(spans), 1)
-
     def test_200(self):
         out = self.session.get(URL_200)
         eq_(out.status_code, 200)
@@ -108,6 +84,7 @@ class TestRequests(BaseRequestTestCase):
     def test_requests_module_200(self):
         # ensure the requests API is instrumented even without
         # using a `Session` directly
+        import requests
         with override_global_tracer(self.tracer):
             out = requests.get(URL_200)
             eq_(out.status_code, 200)
