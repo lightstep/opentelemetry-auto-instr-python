@@ -17,9 +17,6 @@ URL_200 = 'http://{}/status/200'.format(SOCKET)
 URL_500 = 'http://{}/status/500'.format(SOCKET)
 
 
-patch()
-
-
 class BaseRequestTestCase(unittest.TestCase):
     """Create a traced Session, patching during the setUp and
     unpatching after the tearDown
@@ -29,6 +26,7 @@ class BaseRequestTestCase(unittest.TestCase):
         self.tracer = get_dummy_tracer()
         self.session = Session()
         setattr(self.session, 'datadog_tracer', self.tracer)
+        patch()
 
 
 class TestRequests(BaseRequestTestCase):
