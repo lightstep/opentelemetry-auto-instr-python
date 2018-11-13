@@ -1,5 +1,6 @@
 import logging
 import math
+import os
 import random
 import sys
 import time
@@ -7,8 +8,11 @@ import traceback
 
 from .compat import StringIO, stringify, iteritems, numeric_types
 from .ext import errors
+from .utils.importlib import func_name
 
 
+MODULE_BLACKLIST = ()
+DDTRACE_ROOT = os.path.abspath(os.path.dirname(__file__))
 log = logging.getLogger(__name__)
 
 
@@ -314,3 +318,112 @@ class Span(object):
 def _new_id():
     """Generate a random trace_id or span_id"""
     return random.getrandbits(64)
+
+
+class AutoSpan(Span):
+    """Subclass of :class:`ddtrace.span.Span` which will automatically create child spans"""
+    __slots__ = [
+        '_previous_profile',
+        '_max_depth',
+        '_current_depth',
+        '_spans',
+        '_skip_until',
+    ]
+
+    def __init__(self, *args, max_depth=6, **kwargs):
+        super(AutoSpan, self).__init__(*args, **kwargs)
+
+        self._current_depth = 0
+        self._spans = []
+        self._max_depth = max_depth
+        self._skip_until = None
+
+        # Save current profiler so we can reset later
+        # DEV: `sys.getprofile()` may return `None` if none is set, which is fine for `sys.setprofile()` later
+        self._previous_profile = sys.getprofile()
+
+        # Setup our profiler
+        sys.setprofile(self._auto_tracer)
+
+    def _auto_tracer(self, frame, event, args):
+        code = frame.f_code
+        name = code.co_name
+        filename = code.co_filename
+
+        # Skip any ddtrace internal frames
+        if filename.startswith(DDTRACE_ROOT):
+            return
+
+        if event in ('call', 'c_call'):
+            self._current_depth += 1
+
+            # Ignore anything beyond our max depth
+            if self._current_depth > self._max_depth:
+                return
+
+            # Skip frames until the skipped frame returns
+            if self._skip_until:
+                return
+
+            mod_name = None
+            # We get the same frame if they call a built-in function, but the `args` is the C function
+            if event == 'c_call':
+                name = func_name(args)
+                mod_name = getattr(args, '__module__', None)
+            elif name in frame.f_globals and getattr(frame.f_globals[name], '__code__', None) is code:
+                func = frame.f_globals.get(name)
+                if func:
+                    mod_name = getattr(func, '__module__', None)
+                    name = func_name(func)
+            else:
+                # Try to see if the function name belongs to a class/object in the globals
+                for obj in frame.f_globals.values():
+                    if name not in getattr(obj, '__dict__', ()):
+                        continue
+
+                    func = obj.__dict__[name]
+                    if func and getattr(func, '__code__', None) is code:
+                        mod_name = getattr(func, '__module__', None)
+                        name = '{}.{}'.format(func_name(obj), name)
+                        break
+
+            # TODO: Check if this module is blacklisted
+            if mod_name in MODULE_BLACKLIST:
+                self._skip_until = frame
+                return
+
+            # Start a new span
+            span = self._tracer.trace(name=name)
+            span.set_tag('python.filename', filename)
+            span.set_tag('python.lineno', frame.f_lineno)
+            self._spans.append(span)
+
+        elif event in ('return', 'c_return', 'c_exception'):
+            # Return quickly if there are no spans or current depth is 0
+            if not self._spans or not self._current_depth:
+                return
+
+            # Decrement current depth
+            self._current_depth -= 1
+
+            # Return early if depth is deeper than the depth of spans we have
+            if self._current_depth >= len(self._spans):
+                return
+
+            # Reset skipping when our skipped frame returns
+            if self._skip_until is frame:
+                self._skip_until = None
+                return
+
+            # Close out the span
+            span = self._spans.pop()
+            # DEV: `sys.exc_info()` will be `(None, None, None)` if there is no exception
+            span.set_exc_info(*sys.exc_info())
+            span.finish()
+
+    def finish(self, *args, **kwargs):
+        # Reset previous profiler
+        # DEV: `sys.setprofile(None)` disables profiling here
+        sys.setprofile(self._previous_profile)
+
+        super(AutoSpan, self).finish(*args, **kwargs)

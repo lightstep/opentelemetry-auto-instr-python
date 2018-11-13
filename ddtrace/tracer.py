@@ -7,7 +7,7 @@ from .provider import DefaultContextProvider
 from .context import Context
 from .sampler import AllSampler, RateSampler, RateByServiceSampler
 from .writer import AgentWriter
-from .span import Span
+from .span import AutoSpan, Span
 from .constants import FILTERS_KEY, SAMPLE_RATE_METRIC_KEY
 from . import compat
 from .ext.priority import AUTO_REJECT, AUTO_KEEP
@@ -134,7 +134,7 @@ class Tracer(object):
         if wrap_executor is not None:
             self._wrap_executor = wrap_executor
 
-    def start_span(self, name, child_of=None, service=None, resource=None, span_type=None):
+    def start_span(self, name, child_of=None, service=None, resource=None, span_type=None, **kwargs):
         """
         Return a span that will trace an operation called `name`. This method allows
         parenting using the ``child_of`` kwarg. If it's missing, the newly created span is a
@@ -160,6 +160,9 @@ class Tracer(object):
             context = tracer.get_call_context()
             span = tracer.start_span("web.worker", child_of=context)
         """
+        # Determine which type of span to create
+        SpanCls = AutoSpan if kwargs.get('_auto') else Span
+
         if child_of is not None:
             # retrieve if the span is a child_of a Span or a of Context
             child_of_context = isinstance(child_of, Context)
@@ -183,7 +186,7 @@ class Tracer(object):
             if parent:
                 service = service or parent.service
 
-            span = Span(
+            span = SpanCls(
                 self,
                 name,
                 trace_id=trace_id,
@@ -200,7 +203,7 @@ class Tracer(object):
 
         else:
             # this is the root span of a new trace
-            span = Span(
+            span = SpanCls(
                 self,
                 name,
                 service=service,
@@ -239,7 +242,7 @@ class Tracer(object):
 
         return span
 
-    def trace(self, name, service=None, resource=None, span_type=None):
+    def trace(self, name, service=None, resource=None, span_type=None, **kwargs):
         """
         Return a span that will trace an operation called `name`. The context that created
         the span as well as the span parenting, are automatically handled by the tracing
@@ -283,6 +286,7 @@ class Tracer(object):
             service=service,
             resource=resource,
             span_type=span_type,
+            **kwargs,
         )
 
     def current_root_span(self):
