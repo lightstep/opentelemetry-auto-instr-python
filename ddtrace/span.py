@@ -330,12 +330,13 @@ class AutoSpan(Span):
         '_skip_until',
     ]
 
-    def __init__(self, *args, max_depth=6, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(AutoSpan, self).__init__(*args, **kwargs)
 
         self._current_depth = 0
         self._spans = []
-        self._max_depth = max_depth
+        # TODO: Make this configurable
+        self._max_depth = 6
         self._skip_until = None
 
         # Save current profiler so we can reset later

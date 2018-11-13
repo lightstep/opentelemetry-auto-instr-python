@@ -286,7 +286,8 @@ class Tracer(object):
             service=service,
             resource=resource,
             span_type=span_type,
-            **kwargs,
+            # DEV: We cannot put a trailing comma after `**kwargs` :/
+            **kwargs
         )
 
     def current_root_span(self):
