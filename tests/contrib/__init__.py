@@ -34,8 +34,22 @@ class PatchMixin(object):
         reload(module)
 
     def module_imported(self, modname):
-        """Returns whether the module, given its name is imported."""
+        """
+        Returns whether a module is imported or not.
+        """
         return modname in sys.modules
+
+    def assert_module_imported(self, modname):
+        """
+        Asserts that the module, given its name is imported.
+        """
+        assert self.module_imported(modname), '{} module not imported'.format(modname)
+
+    def assert_module_not_imported(self, modname):
+        """
+        Asserts that the module, given its name is not imported.
+        """
+        assert not self.module_imported(modname), '{} module is imported'.format(modname)
 
     def delete_module(self, module):
         delete_module(module)
