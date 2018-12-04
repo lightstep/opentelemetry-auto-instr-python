@@ -28,6 +28,6 @@ with require_modules(required_modules) as missing_modules:
     # We were able to find at least one of the required modules
     if set(missing_modules) != set(required_modules):
         from .transport import get_traced_transport
-        from .patch import patch
+        from .patch import patch, _patch
 
-        __all__ = ['get_traced_transport', 'patch']
+        __all__ = ['get_traced_transport', 'patch', '_patch']
