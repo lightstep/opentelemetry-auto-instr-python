@@ -1,5 +1,6 @@
 from importlib import import_module
 
+from elasticsearch import TransportError
 from wrapt import wrap_function_wrapper as _w
 
 from .quantize import quantize
@@ -72,7 +73,7 @@ def _get_perform_request(elasticsearch):
 
             try:
                 result = func(*args, **kwargs)
-            except elasticsearch.exceptions.TransportError as e:
+            except TransportError as e:
                 span.set_tag(http.STATUS_CODE, getattr(e, 'status_code', 500))
                 raise
 
