@@ -58,7 +58,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e '{py27,py34,py35,py36}-tracer' --result-json /tmp/tracer.results
+      - run: tox -e '{py27,py34,py35,py36,py37}-tracer' --result-json /tmp/tracer.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -72,11 +72,11 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e '{py27,py34,py35,py36}-opentracer' --result-json /tmp/opentracer.results
-      - run: tox -e '{py34,py35,py36}-opentracer_asyncio' --result-json /tmp/opentracer-asyncio.results
-      - run: tox -e '{py34,py35,py36}-opentracer_tornado-tornado{40,41,42,43,44}' --result-json /tmp/opentracer-tornado.results
+      - run: tox -e '{py27,py34,py35,py36,py37}-opentracer' --result-json /tmp/opentracer.results
+      - run: tox -e '{py34,py35,py36,py37}-opentracer_asyncio' --result-json /tmp/opentracer-asyncio.results
+      - run: tox -e '{py34,py35,py36,py37}-opentracer_tornado-tornado{40,41,42,43,44}' --result-json /tmp/opentracer-tornado.results
       - run: tox -e '{py27}-opentracer_gevent-gevent{10}' --result-json /tmp/opentracer-gevent.1.results
-      - run: tox -e '{py27,py34,py35,py36}-opentracer_gevent-gevent{11,12}' --result-json /tmp/opentracer-gevent.2.results
+      - run: tox -e '{py27,py34,py35,py36,py37}-opentracer_gevent-gevent{11,12}' --result-json /tmp/opentracer-gevent.2.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -102,7 +102,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e '{py27,py34,py35,py36}-integration' --result-json /tmp/integration.results
+      - run: tox -e '{py27,py34,py35,py36,py37}-integration' --result-json /tmp/integration.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -118,7 +118,7 @@ jobs:
       - checkout
       - *restore_cache_step
       - run: tox -e 'futures_contrib-{py27}-futures{30,31,32}' --result-json /tmp/futures.1.results
-      - run: tox -e 'futures_contrib-{py34,py35,py36}' --result-json /tmp/futures.2.results
+      - run: tox -e 'futures_contrib-{py34,py35,py36,py37}' --result-json /tmp/futures.2.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -134,7 +134,7 @@ jobs:
       - checkout
       - *restore_cache_step
       - run: tox -e 'boto_contrib-{py27,py34}-boto' --result-json /tmp/boto.1.results
-      - run: tox -e 'botocore_contrib-{py27,py34,py35,py36}-botocore' --result-json /tmp/boto.2.results
+      - run: tox -e 'botocore_contrib-{py27,py34,py35,py36,py37}-botocore' --result-json /tmp/boto.2.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -151,7 +151,7 @@ jobs:
     resource_class: *resource_class
     steps:
       - checkout
-      - run: tox -e '{py27,py34,py35,py36}-ddtracerun' --result-json /tmp/ddtracerun.results
+      - run: tox -e '{py27,py34,py35,py36,py37}-ddtracerun' --result-json /tmp/ddtracerun.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -164,7 +164,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e '{py27,py34,py35,py36}-test_utils' --result-json /tmp/test_utils.results
+      - run: tox -e '{py27,py34,py35,py36,py37}-test_utils' --result-json /tmp/test_utils.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -178,7 +178,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'asyncio_contrib-{py34,py35,py36}' --result-json /tmp/asyncio.results
+      - run: tox -e 'asyncio_contrib-{py34,py35,py36,py37}' --result-json /tmp/asyncio.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -206,8 +206,8 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'aiohttp_contrib-{py34,py35,py36}-aiohttp{12,13,20,21,22}-aiohttp_jinja{012,013}-yarl' --result-json /tmp/aiohttp.1.results
-      - run: tox -e 'aiohttp_contrib-{py34,py35,py36}-aiohttp{23}-aiohttp_jinja{015}-yarl10' --result-json /tmp/aiohttp.2.results
+      - run: tox -e 'aiohttp_contrib-{py34,py35,py36,py37}-aiohttp{12,13,20,21,22}-aiohttp_jinja{012,013}-yarl' --result-json /tmp/aiohttp.1.results
+      - run: tox -e 'aiohttp_contrib-{py34,py35,py36,py37}-aiohttp{23}-aiohttp_jinja{015}-yarl10' --result-json /tmp/aiohttp.2.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -222,7 +222,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'tornado_contrib-{py27,py34,py35,py36}-tornado{40,41,42,43,44,45}' --result-json /tmp/tornado.1.results
+      - run: tox -e 'tornado_contrib-{py27,py34,py35,py36,py37}-tornado{40,41,42,43,44,45}' --result-json /tmp/tornado.1.results
       - run: tox -e 'tornado_contrib-{py27}-tornado{40,41,42,43,44,45}-futures{30,31,32}' --result-json /tmp/tornado.2.results
       - persist_to_workspace:
           root: /tmp
@@ -238,7 +238,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'bottle_contrib{,_autopatch}-{py27,py34,py35,py36}-bottle{11,12}-webtest' --result-json /tmp/bottle.results
+      - run: tox -e 'bottle_contrib{,_autopatch}-{py27,py34,py35,py36,py37}-bottle{11,12}-webtest' --result-json /tmp/bottle.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -260,7 +260,7 @@ jobs:
       - checkout
       - *restore_cache_step
       - run: tox -e wait cassandra
-      - run: tox -e 'cassandra_contrib-{py27,py34,py35,py36}-cassandra{35,36,37,38,315}' --result-json /tmp/cassandra.results
+      - run: tox -e 'cassandra_contrib-{py27,py34,py35,py36,py37}-cassandra{35,36,37,38,315}' --result-json /tmp/cassandra.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -277,7 +277,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'celery_contrib-{py27,py34,py35,py36}-celery{31,40,41,42}-redis{210}' --result-json /tmp/celery.results
+      - run: tox -e 'celery_contrib-{py27,py34,py35,py36,py37}-celery{31,40,41,42}-redis{210}' --result-json /tmp/celery.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -292,10 +292,10 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: TOX_SKIP_DIST=False tox -e 'elasticsearch_contrib-{py27,py34,py35,py36}-elasticsearch{16,17,18,23,24,51,52,53,54,63}' --result-json /tmp/elasticsearch.results
-      - run: TOX_SKIP_DIST=False tox -e 'elasticsearch_contrib-{py27,py34,py35,py36}-elasticsearch1{100}' --result-json /tmp/elasticsearch1.results
-      - run: TOX_SKIP_DIST=False tox -e 'elasticsearch_contrib-{py27,py34,py35,py36}-elasticsearch2{50}' --result-json /tmp/elasticsearch2.results
-      - run: TOX_SKIP_DIST=False tox -e 'elasticsearch_contrib-{py27,py34,py35,py36}-elasticsearch5{50}' --result-json /tmp/elasticsearch5.results
+      - run: TOX_SKIP_DIST=False tox -e 'elasticsearch_contrib-{py27,py34,py35,py36,py37}-elasticsearch{16,17,18,23,24,51,52,53,54,63}' --result-json /tmp/elasticsearch.results
+      - run: TOX_SKIP_DIST=False tox -e 'elasticsearch_contrib-{py27,py34,py35,py36,py37}-elasticsearch1{100}' --result-json /tmp/elasticsearch1.results
+      - run: TOX_SKIP_DIST=False tox -e 'elasticsearch_contrib-{py27,py34,py35,py36,py37}-elasticsearch2{50}' --result-json /tmp/elasticsearch2.results
+      - run: TOX_SKIP_DIST=False tox -e 'elasticsearch_contrib-{py27,py34,py35,py36,py37}-elasticsearch5{50}' --result-json /tmp/elasticsearch5.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -312,7 +312,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'falcon_contrib{,_autopatch}-{py27,py34,py35,py36}-falcon{10,11,12,13,14}' --result-json /tmp/falcon.results
+      - run: tox -e 'falcon_contrib{,_autopatch}-{py27,py34,py35,py36,py37}-falcon{10,11,12,13,14}' --result-json /tmp/falcon.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -333,10 +333,10 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'django_contrib{,_autopatch}-{py27,py34,py35,py36}-django{18,111}-djangopylibmc06-djangoredis45-pylibmc-redis{210}-memcached' --result-json /tmp/django.1.results
-      - run: tox -e 'django_drf_contrib-{py27,py34,py35,py36}-django{111}-djangorestframework{34,37,38}' --result-json /tmp/django.2.results
-      - run: tox -e 'django_contrib{,_autopatch}-{py34,py35,py36}-django{200}-djangopylibmc06-djangoredis45-pylibmc-redis{210}-memcached' --result-json /tmp/django.3.results
-      - run: tox -e 'django_drf_contrib-{py34,py35,py36}-django{200}-djangorestframework{37,38}' --result-json /tmp/django.4.results
+      - run: tox -e 'django_contrib{,_autopatch}-{py27,py34,py35,py36,py37}-django{18,111}-djangopylibmc06-djangoredis45-pylibmc-redis{210}-memcached' --result-json /tmp/django.1.results
+      - run: tox -e 'django_drf_contrib-{py27,py34,py35,py36,py37}-django{111}-djangorestframework{34,37,38}' --result-json /tmp/django.2.results
+      - run: tox -e 'django_contrib{,_autopatch}-{py34,py35,py36,py37}-django{200}-djangopylibmc06-djangoredis45-pylibmc-redis{210}-memcached' --result-json /tmp/django.3.results
+      - run: tox -e 'django_drf_contrib-{py34,py35,py36,py37}-django{200}-djangorestframework{37,38}' --result-json /tmp/django.4.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -355,12 +355,12 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'flask_contrib-{py27,py34,py35,py36}-flask{010,011,012,10}-blinker' --result-json /tmp/flask.1.results
-      - run: TOX_SKIP_DIST=False tox -e 'flask_contrib_autopatch-{py27,py34,py35,py36}-flask{010,011,012,10}-blinker' --result-json /tmp/flask.2.results
+      - run: tox -e 'flask_contrib-{py27,py34,py35,py36,py37}-flask{010,011,012,10}-blinker' --result-json /tmp/flask.1.results
+      - run: TOX_SKIP_DIST=False tox -e 'flask_contrib_autopatch-{py27,py34,py35,py36,py37}-flask{010,011,012,10}-blinker' --result-json /tmp/flask.2.results
       - run: tox -e 'flask_contrib-{py27}-flask{09}-blinker' --result-json /tmp/flask.3.results
       - run: TOX_SKIP_DIST=False tox -e 'flask_contrib_autopatch-{py27}-flask{09}-blinker' --result-json /tmp/flask.4.results
-      - run: tox -e 'flask_cache_contrib-{py27,py34,py35,py36}-flask{010,011,012}-flaskcache{013}-memcached-redis{210}-blinker' --result-json /tmp/flask.5.results
-      - run: TOX_SKIP_DIST=False tox -e 'flask_cache_contrib_autopatch-{py27,py34,py35,py36}-flask{010,011,012}-flaskcache{013}-memcached-redis{210}-blinker' --result-json /tmp/flask.6.results
+      - run: tox -e 'flask_cache_contrib-{py27,py34,py35,py36,py37}-flask{010,011,012}-flaskcache{013}-memcached-redis{210}-blinker' --result-json /tmp/flask.5.results
+      - run: TOX_SKIP_DIST=False tox -e 'flask_cache_contrib_autopatch-{py27,py34,py35,py36,py37}-flask{010,011,012}-flaskcache{013}-memcached-redis{210}-blinker' --result-json /tmp/flask.6.results
       - run: tox -e 'flask_cache_contrib-{py27}-flask{010,011}-flaskcache{012}-memcached-redis{210}-blinker' --result-json /tmp/flask.7.results
       - run: TOX_SKIP_DIST=False tox -e 'flask_cache_contrib_autopatch-{py27}-flask{010,011}-flaskcache{012}-memcached-redis{210}-blinker' --result-json /tmp/flask.8.results
       - persist_to_workspace:
@@ -383,7 +383,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'gevent_contrib-{py27,py34,py35,py36}-gevent{11,12,13}' --result-json /tmp/gevent.1.results
+      - run: tox -e 'gevent_contrib-{py27,py34,py35,py36,py37}-gevent{11,12,13}' --result-json /tmp/gevent.1.results
       - run: tox -e 'gevent_contrib-{py27}-gevent{10}' --result-json /tmp/gevent.2.results
       - persist_to_workspace:
           root: /tmp
@@ -399,7 +399,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'httplib_contrib-{py27,py34,py35,py36}' --result-json /tmp/httplib.results
+      - run: tox -e 'httplib_contrib-{py27,py34,py35,py36,py37}' --result-json /tmp/httplib.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -413,7 +413,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'grpc_contrib-{py27,py34,py35,py36}-grpc' --result-json /tmp/grpc.results
+      - run: tox -e 'grpc_contrib-{py27,py34,py35,py36,py37}-grpc' --result-json /tmp/grpc.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -427,7 +427,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'molten_contrib-{py36}-molten{070,072}' --result-json /tmp/molten.results
+      - run: tox -e 'molten_contrib-{py36,py37}-molten{070,072}' --result-json /tmp/molten.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -448,7 +448,7 @@ jobs:
       - checkout
       - *restore_cache_step
       - run: tox -e 'wait' mysql
-      - run: tox -e 'mysql_contrib-{py27,py34,py35,py36}-mysqlconnector{21}' --result-json /tmp/mysqlconnector.results
+      - run: tox -e 'mysql_contrib-{py27,py34,py35,py36,py37}-mysqlconnector{21}' --result-json /tmp/mysqlconnector.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -469,7 +469,7 @@ jobs:
       - checkout
       - *restore_cache_step
       - run: tox -e 'wait' mysql
-      - run: tox -e 'mysqldb_contrib-{py27,py34,py35,py36}-mysqlclient{13}' --result-json /tmp/mysqlpython.results
+      - run: tox -e 'mysqldb_contrib-{py27,py34,py35,py36,py37}-mysqlclient{13}' --result-json /tmp/mysqlpython.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -511,7 +511,7 @@ jobs:
       - checkout
       - *restore_cache_step
       - run: tox -e 'wait' mysql
-      - run: tox -e 'pymysql_contrib-{py27,py34,py35,py36}-pymysql{07,08,09}' --result-json /tmp/pymysql.results
+      - run: tox -e 'pymysql_contrib-{py27,py34,py35,py36,py37}-pymysql{07,08,09}' --result-json /tmp/pymysql.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -526,7 +526,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'pylibmc_contrib-{py27,py34,py35,py36}-pylibmc{140,150}' --result-json /tmp/pylibmc.results
+      - run: tox -e 'pylibmc_contrib-{py27,py34,py35,py36,py37}-pylibmc{140,150}' --result-json /tmp/pylibmc.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -541,7 +541,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'pymemcache_contrib{,_autopatch}-{py27,py34,py35,py36}-pymemcache{130,140}' --result-json /tmp/pymemcache.results
+      - run: tox -e 'pymemcache_contrib{,_autopatch}-{py27,py34,py35,py36,py37}-pymemcache{130,140}' --result-json /tmp/pymemcache.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -556,7 +556,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'mongoengine_contrib-{py27,py34,py35,py36}-mongoengine{015}' --result-json /tmp/mongoengine.results
+      - run: tox -e 'mongoengine_contrib-{py27,py34,py35,py36,py37}-mongoengine{015}' --result-json /tmp/mongoengine.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -571,7 +571,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'pymongo_contrib-{py27,py34,py35,py36}-pymongo{30,31,32,33,34,36}-mongoengine{015}' --result-json /tmp/pymongo.results
+      - run: tox -e 'pymongo_contrib-{py27,py34,py35,py36,py37}-pymongo{30,31,32,33,34,36}-mongoengine{015}' --result-json /tmp/pymongo.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -585,7 +585,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'pyramid_contrib{,_autopatch}-{py27,py34,py35,py36}-pyramid{17,18,19}-webtest' --result-json /tmp/pyramid.results
+      - run: tox -e 'pyramid_contrib{,_autopatch}-{py27,py34,py35,py36,py37}-pyramid{17,18,19}-webtest' --result-json /tmp/pyramid.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -600,7 +600,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'requests_contrib{,_autopatch}-{py27,py34,py35,py36}-requests{208,209,210,211,212,213,219}' --result-json /tmp/requests.results
+      - run: tox -e 'requests_contrib{,_autopatch}-{py27,py34,py35,py36,py37}-requests{208,209,210,211,212,213,219}' --result-json /tmp/requests.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -615,7 +615,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'requests_gevent_contrib-{py36}-requests{208,209,210,211,212,213,219}-gevent{12,13}' --result-json /tmp/requestsgevent.results
+      - run: tox -e 'requests_gevent_contrib-{py36,py37}-requests{208,209,210,211,212,213,219}-gevent{12,13}' --result-json /tmp/requestsgevent.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -641,7 +641,7 @@ jobs:
       - checkout
       - *restore_cache_step
       - run: tox -e 'wait' postgres mysql
-      - run: tox -e 'sqlalchemy_contrib-{py27,py34,py35,py36}-sqlalchemy{10,11,12}-psycopg2{27}-mysqlconnector{21}' --result-json /tmp/sqlalchemy.results
+      - run: tox -e 'sqlalchemy_contrib-{py27,py34,py35,py36,py37}-sqlalchemy{10,11,12}-psycopg2{27}-mysqlconnector{21}' --result-json /tmp/sqlalchemy.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -655,7 +655,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'dbapi_contrib-{py27,py34,py35,py36}' --result-json /tmp/dbapi.results
+      - run: tox -e 'dbapi_contrib-{py27,py34,py35,py36,py37}' --result-json /tmp/dbapi.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -675,7 +675,7 @@ jobs:
       - checkout
       - *restore_cache_step
       - run: tox -e 'wait' postgres
-      - run: tox -e 'psycopg_contrib-{py27,py34,py35,py36}-psycopg2{24,25,26,27}' --result-json /tmp/psycopg.results
+      - run: tox -e 'psycopg_contrib-{py27,py34,py35,py36,py37}-psycopg2{24,25,26,27}' --result-json /tmp/psycopg.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -690,7 +690,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'aiobotocore_contrib-{py34,py35,py36}-aiobotocore{02,03,04}' --result-json /tmp/aiobotocore.results
+      - run: tox -e 'aiobotocore_contrib-{py34,py35,py36,py37}-aiobotocore{02,03,04}' --result-json /tmp/aiobotocore.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -710,7 +710,7 @@ jobs:
       - checkout
       - *restore_cache_step
       - run: tox -e 'wait' postgres
-      - run: tox -e 'aiopg_contrib-{py34,py35,py36}-aiopg{012,015}' --result-json /tmp/aiopg.results
+      - run: tox -e 'aiopg_contrib-{py34,py35,py36,py37}-aiopg{012,015}' --result-json /tmp/aiopg.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -725,7 +725,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'redis_contrib-{py27,py34,py35,py36}-redis{26,27,28,29,210,300}' --result-json /tmp/redis.results
+      - run: tox -e 'redis_contrib-{py27,py34,py35,py36,py37}-redis{26,27,28,29,210,300}' --result-json /tmp/redis.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -743,7 +743,7 @@ jobs:
       - checkout
       - *restore_cache_step
       - run: tox -e wait rediscluster
-      - run: tox -e 'rediscluster_contrib-{py27,py34,py35,py36}-rediscluster{135,136}-redis210' --result-json /tmp/rediscluster.results
+      - run: tox -e 'rediscluster_contrib-{py27,py34,py35,py36,py37}-rediscluster{135,136}-redis210' --result-json /tmp/rediscluster.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -763,7 +763,7 @@ jobs:
       - checkout
       - *restore_cache_step
       - run: tox -e wait vertica
-      - run: tox -e 'vertica_contrib-{py27,py34,py35,py36}-vertica{060,070}' --result-json /tmp/vertica.results
+      - run: tox -e 'vertica_contrib-{py27,py34,py35,py36,py37}-vertica{060,070}' --result-json /tmp/vertica.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -779,7 +779,7 @@ jobs:
     - checkout
     - *restore_cache_step
     - run: tox -e wait rabbitmq
-    - run: tox -e 'kombu_contrib-{py27,py34,py35,py36}-kombu{40,41,42}' --result-json /tmp/kombu.results
+    - run: tox -e 'kombu_contrib-{py27,py34,py35,py36,py37}-kombu{40,41,42}' --result-json /tmp/kombu.results
     - persist_to_workspace:
         root: /tmp
         paths:
@@ -793,7 +793,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'sqlite3_contrib-{py27,py34,py35,py36}-sqlite3' --result-json /tmp/sqlite3.results
+      - run: tox -e 'sqlite3_contrib-{py27,py34,py35,py36,py37}-sqlite3' --result-json /tmp/sqlite3.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -821,7 +821,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'unit_tests-{py27,py34,py35,py36}' --result-json /tmp/unit_tests.results
+      - run: tox -e 'unit_tests-{py27,py34,py35,py36,py37}' --result-json /tmp/unit_tests.results
       - persist_to_workspace:
           root: /tmp
           paths:
@@ -858,7 +858,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'jinja2_contrib-{py27,py34,py35,py36}-jinja{27,28,29,210}' --result-json /tmp/jinja2.results
+      - run: tox -e 'jinja2_contrib-{py27,py34,py35,py36,py37}-jinja{27,28,29,210}' --result-json /tmp/jinja2.results
       - persist_to_workspace:
           root: /tmp
           paths:
