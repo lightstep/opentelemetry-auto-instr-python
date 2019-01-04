@@ -11,6 +11,7 @@ from .span import Span
 from .constants import FILTERS_KEY, SAMPLE_RATE_METRIC_KEY
 from . import compat
 from .ext.priority import AUTO_REJECT, AUTO_KEEP
+from .utils.log import format_log_message
 
 
 log = logging.getLogger(__name__)
@@ -237,6 +238,13 @@ class Tracer(object):
         # add it to the current context
         context.add_span(span)
 
+        log.debug(format_log_message(
+            "tracer started span (name:%s) (resource:%s) (service:%s) (sampled:%s)",
+            span.name,
+            span.resource,
+            span.service,
+            span.sampled,
+        ))
         return span
 
     def trace(self, name, service=None, resource=None, span_type=None):
@@ -314,6 +322,7 @@ class Tracer(object):
         # extract and enqueue the trace if it's sampled
         trace, sampled = context.get()
         if trace and sampled:
+            log.debug(format_log_message("tracer recording trace with %s spans (sampled:%s)", len(trace) if trace else trace, sampled))
             self.write(trace)
 
     def write(self, spans):
@@ -324,14 +333,22 @@ class Tracer(object):
         if not spans:
             return  # nothing to do
 
-        if self.debug_logging:
-            log.debug("writing %s spans (enabled:%s)", len(spans), self.enabled)
-            for span in spans:
-                log.debug("\n%s", span.pprint())
+        log.debug(format_log_message("tracer writing %s spans (enabled:%s)", len(spans), self.enabled))
+
+        # if self.debug_logging:
+        #     for span in spans:
+        #         log.debug("\n%s", span.pprint())
 
         if self.enabled and self.writer:
+            log.debug(format_log_message("tracer sending %s spans to the writer", len(spans)))
             # only submit the spans if we're actually enabled (and don't crash :)
             self.writer.write(spans=spans)
+        else:
+            log.debug(format_log_message(
+                "tracing not sending spans to the writer (enabled:%s) (writer:%r)",
+                self.enabled,
+                self.writer,
+            ))
 
     def set_service_info(self, service, app, app_type):
         """Set the information about the given service.

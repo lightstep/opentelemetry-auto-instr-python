@@ -9,6 +9,7 @@ import time
 from ddtrace import api
 
 from .api import _parse_response_json
+from .utils.log import format_log_message
 
 log = logging.getLogger(__name__)
 
@@ -36,6 +37,7 @@ class AgentWriter(object):
         # if the worker needs to be reset, do it.
         self._reset_worker()
 
+        log.debug(format_log_message("writer received %s spans", len(spans) if spans else spans))
         if spans:
             self._traces.add(spans)
 
@@ -44,7 +46,7 @@ class AgentWriter(object):
         # forked) reset everything so that we can safely work from it.
         pid = os.getpid()
         if self._pid != pid:
-            log.debug("resetting queues. pids(old:%s new:%s)", self._pid, pid)
+            log.debug(format_log_message("resetting queues. pids(old:%s new:%s)", self._pid, pid))
             self._traces = Q(max_size=MAX_TRACES)
             self._services = Q(max_size=MAX_SERVICES)
             self._worker = None
@@ -52,6 +54,10 @@ class AgentWriter(object):
 
         # ensure we have an active thread working on this queue
         if not self._worker or not self._worker.is_alive():
+            alive = None
+            if self._worker:
+                alive = self._worker.is_alive()
+            log.debug(format_log_message("writer creating new worker pid(%s) (alive:%s)", self._pid, alive))
             self._worker = AsyncWorker(
                 self.api,
                 self._traces,
@@ -80,18 +86,20 @@ class AsyncWorker(object):
         return self._thread.is_alive()
 
     def start(self):
+        log.debug(format_log_message("starting async worker"))
         with self._lock:
             if not self._thread:
-                log.debug("starting flush thread")
                 self._thread = threading.Thread(target=self._target)
                 self._thread.setDaemon(True)
                 self._thread.start()
+                log.debug(format_log_message("starting flush thread"))
                 atexit.register(self._on_shutdown)
 
     def stop(self):
         """
         Close the trace queue so that the worker will stop the execution
         """
+        log.debug(format_log_message("stopping async worker "))
         with self._lock:
             if self._thread and self.is_alive():
                 self._trace_queue.close()
@@ -101,9 +109,11 @@ class AsyncWorker(object):
         Wait for the AsyncWorker execution. This call doesn't block the execution
         and it has a 2 seconds of timeout by default.
         """
+        log.debug(format_log_message("joining async worker "))
         self._thread.join(timeout)
 
     def _on_shutdown(self):
+        log.debug(format_log_message("async worker on shutdown "))
         with self._lock:
             if not self._thread:
                 return
@@ -115,11 +125,11 @@ class AsyncWorker(object):
             size = self._trace_queue.size()
             if size:
                 key = "ctrl-break" if os.name == 'nt' else 'ctrl-c'
-                log.debug(
+                log.debug(format_log_message(
                     "Waiting %ss for traces to be sent. Hit %s to quit.",
                     self._shutdown_timeout,
                     key,
-                )
+                ))
                 timeout = time.time() + self._shutdown_timeout
                 while time.time() < timeout and self._trace_queue.size():
                     # FIXME[matt] replace with a queue join
@@ -129,9 +139,13 @@ class AsyncWorker(object):
         result_traces = None
         result_services = None
 
+        log.debug(format_log_message("worker listening for traces "))
         while True:
             traces = self._trace_queue.pop()
+            log.debug(format_log_message("worker popped %s traces ", len(traces) if traces else 0))
+
             if traces:
+                log.debug(format_log_message("worker filtering %s traces ", len(traces)))
                 # Before sending the traces, make them go through the
                 # filters
                 try:
@@ -139,6 +153,7 @@ class AsyncWorker(object):
                 except Exception as err:
                     log.error("error while filtering traces:{0}".format(err))
             if traces:
+                log.debug(format_log_message("worker flushing %s traces ", len(traces)))
                 # If we have data, let's try to send it.
                 try:
                     result_traces = self.api.send_traces(traces)
@@ -153,6 +168,7 @@ class AsyncWorker(object):
                     log.error("cannot send services to {1}:{2}: {0}".format(err, self.api.hostname, self.api.port))
 
             if self._trace_queue.closed() and self._trace_queue.size() == 0:
+                log.debug(format_log_message("worker stopping due to closed trace queue (thread id: %s)"))
                 # no traces and the queue is closed. our work is done
                 return
 
@@ -222,21 +238,28 @@ class Q(object):
             return self._closed
 
     def add(self, thing):
+        log.debug(format_log_message("adding to the queue"))
         with self._lock:
             if self._closed:
                 return False
 
             if len(self._things) < self._max_size or self._max_size <= 0:
+                log.debug(format_log_message("appending to the end of the queue"))
                 self._things.append(thing)
+                log.debug(format_log_message("new queue size %s", len(self._things)))
                 return True
             else:
+                log.debug(format_log_message("randomly overwriting into queue"))
                 idx = random.randrange(0, len(self._things))
                 self._things[idx] = thing
+                log.debug(format_log_message("new queue size %s", len(self._things)))
 
     def pop(self):
+        log.debug(format_log_message("popping from the queue"))
         with self._lock:
             if not self._things:
                 return None
             things = self._things
             self._things = []
+            log.debug(format_log_message("popping %s traces from the queue", len(things)))
             return things

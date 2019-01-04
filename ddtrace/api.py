@@ -7,6 +7,7 @@ from json import loads
 # project
 from .encoding import get_encoder, JSONEncoder
 from .compat import httplib, PYTHON_VERSION, PYTHON_INTERPRETER, get_connection_response
+from .utils.log import format_log_message
 
 
 log = logging.getLogger(__name__)
@@ -100,6 +101,7 @@ class API(object):
         self._set_version(self._fallback)
 
     def send_traces(self, traces):
+        log.debug(format_log_message("api sending %s traces", len(traces)))
         if not traces:
             return
         start = time.time()
@@ -108,11 +110,11 @@ class API(object):
 
         # the API endpoint is not available so we should downgrade the connection and re-try the call
         if response.status in [404, 415] and self._fallback:
-            log.debug('calling endpoint "%s" but received %s; downgrading API', self._traces, response.status)
+            log.debug(format_log_message('calling endpoint "%s" but received %s; downgrading API', self._traces, response.status))
             self._downgrade()
             return self.send_traces(traces)
 
-        log.debug("reported %d traces in %.5fs", len(traces), time.time() - start)
+        log.debug(format_log_message("reported %d traces in %.5fs (status:%s)", len(traces), time.time() - start, response.status))
         return response
 
     def send_services(self, services):
@@ -126,14 +128,15 @@ class API(object):
 
         # the API endpoint is not available so we should downgrade the connection and re-try the call
         if response.status in [404, 415] and self._fallback:
-            log.debug('calling endpoint "%s" but received %s; downgrading API', self._services, response.status)
+            log.debug(format_log_message('calling endpoint "%s" but received %s; downgrading API', self._services, response.status))
             self._downgrade()
             return self.send_services(services)
 
-        log.debug("reported %d services", len(services))
+        log.debug(format_log_message("reported %d services", len(services)))
         return response
 
     def _put(self, endpoint, data, count=0):
+        log.debug(format_log_message("api making put request (endpoint:%s) (headers:%s) (count:%s)", endpoint, self._headers, count))
         conn = httplib.HTTPConnection(self.hostname, self.port)
         try:
             headers = self._headers

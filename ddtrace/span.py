@@ -7,6 +7,7 @@ import traceback
 
 from .compat import StringIO, stringify, iteritems, numeric_types
 from .ext import errors
+from .utils.log import format_log_message
 
 
 log = logging.getLogger(__name__)
@@ -116,6 +117,13 @@ class Span(object):
             # be defensive so we don't die if start isn't set
             self.duration = ft - (self.start or ft)
 
+        log.debug(format_log_message(
+            "span finishing (name:%s) (resource:%s) (service:%s) (sampled:%s)",
+            self.name,
+            self.resource,
+            self.service,
+            self.sampled,
+        ))
         # if a tracer is available to process the current context
         if self._tracer and self._context:
             try:
@@ -123,6 +131,8 @@ class Span(object):
                 self._tracer.record(self._context)
             except Exception:
                 log.exception("error recording finished trace")
+        else:
+            log.debug(format_log_message('span no tracer or context to write to (tracer:%r) (context:%r)', self._tracer, self._context))
 
     def set_tag(self, key, value):
         """ Set the given key / value tag pair on the span. Keys and values

@@ -3,6 +3,7 @@ import threading
 
 from .constants import SAMPLING_PRIORITY_KEY
 from .utils.formats import asbool, get_env
+from .utils.log import format_log_message
 
 log = logging.getLogger(__name__)
 
@@ -175,6 +176,7 @@ class Context(object):
 
         This operation is thread-safe.
         """
+        log.debug(format_log_message('context has %s spans (fiinshed:%s)', len(self._trace), self._is_finished()))
         with self._lock:
             if self._is_finished():
                 # get the trace
