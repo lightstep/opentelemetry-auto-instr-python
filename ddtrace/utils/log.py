@@ -2,6 +2,8 @@ import multiprocessing
 import os
 import threading
 
+from ..compat import to_unicode
+
 
 def format_log_message(msg, *args, **kwargs):
     if args:
@@ -14,11 +16,11 @@ def format_log_message(msg, *args, **kwargs):
     try:
         pid = os.getpid()
         thread = threading.current_thread()
-        tname = thread.name
+        tname = to_unicode(thread.name)
         tid = threading.get_ident()
         process = multiprocessing.current_process()
-        pname = process.name
+        pname = to_unicode(process.name)
     except Exception:
         pass
 
-    return '({}:{}) ({}:{}) {}'.format(pname, pid, tname, tid, msg)
+    return to_unicode('({}:{}) ({}:{}) {}').format(pname, pid, tname, tid, msg)
