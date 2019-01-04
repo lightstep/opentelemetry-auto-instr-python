@@ -132,7 +132,9 @@ class Span(object):
             except Exception:
                 log.exception("error recording finished trace")
         else:
-            log.debug(format_log_message('span no tracer or context to write to (tracer:%r) (context:%r)', self._tracer, self._context))
+            log.debug(format_log_message(
+                'span no tracer or context to write to (tracer:%r) (context:%r)', self._tracer, self._context,
+            ))
 
     def set_tag(self, key, value):
         """ Set the given key / value tag pair on the span. Keys and values

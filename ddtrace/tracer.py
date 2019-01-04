@@ -322,7 +322,9 @@ class Tracer(object):
         # extract and enqueue the trace if it's sampled
         trace, sampled = context.get()
         if trace and sampled:
-            log.debug(format_log_message("tracer recording trace with %s spans (sampled:%s)", len(trace) if trace else trace, sampled))
+            log.debug(format_log_message(
+                "tracer recording trace with %s spans (sampled:%s)", len(trace) if trace else trace, sampled,
+            ))
             self.write(trace)
 
     def write(self, spans):
