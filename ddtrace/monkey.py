@@ -49,6 +49,7 @@ PATCH_MODULES = {
     'mako': True,
     'flask': True,
     'kombu': False,
+    'gunicorn': True,
 
     # Ignore some web framework integrations that might be configured explicitly in code
     "django": False,
@@ -72,6 +73,7 @@ _PATCH_ON_IMPORT = {
     'celery': ('celery', ),
     'flask': ('flask, '),
     'gevent': ('gevent', ),
+    'gunicorn': ('gunicorn', ),
     'requests': ('requests', ),
 }
 
