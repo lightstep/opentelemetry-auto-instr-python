@@ -174,7 +174,7 @@ class AsyncWorker(object):
             # If the payload is large enough or enough time has passed, then flush
             if payload.full or now >= next_flush:
                 if not payload.empty:
-                    log.debug('Attempting to flush %r', payload)
+                    print('Attempting to flush ', repr(payload))
                     self._flush(payload)
 
                     # Get a fresh payload
