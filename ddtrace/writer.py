@@ -148,7 +148,7 @@ class AsyncWorker(object):
         return trace
 
     def _target(self):
-        next_flush = time.time() + 1
+        next_flush = time.time() + 1.0
         payload = self.api.new_payload()
 
         while True:
@@ -170,9 +170,8 @@ class AsyncWorker(object):
                 log.debug('Popped %s', _get_trace_info(trace))
                 payload.add_trace(trace)
 
-            now = time.time()
             # If the payload is large enough or enough time has passed, then flush
-            if payload.full or now >= next_flush:
+            if payload.full or time.time() >= next_flush:
                 if not payload.empty:
                     print('Attempting to flush ', repr(payload))
                     self._flush(payload)
@@ -180,7 +179,10 @@ class AsyncWorker(object):
                     # Get a fresh payload
                     # DEV: Payloads are not reusable
                     payload = self.api.new_payload()
-                next_flush = now + 1
+
+                # Defer setting `next_flush` until after we flushed the payload
+                now = time.time()
+                next_flush = now + 1.0
 
             # Wait up until the next flush for another trace to be added
             self._trace_queue.wait(max(0, next_flush - now))
