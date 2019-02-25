@@ -19,7 +19,8 @@ class Payload:
 
     # Default max payload size of 5mb
     # DEV: Trace agent limit is 10mb, cutoff at 5mb to ensure we don't hit 10mb
-    DEFAULT_MAX_PAYLOAD_SIZE = 5 * 1000000
+    # DEFAULT_MAX_PAYLOAD_SIZE = 5 * 1000000
+    DEFAULT_MAX_PAYLOAD_SIZE = 4000
 
     def __init__(self, encoder=None, max_payload_size=DEFAULT_MAX_PAYLOAD_SIZE):
         """
