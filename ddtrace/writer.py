@@ -181,11 +181,10 @@ class AsyncWorker(object):
                     payload = self.api.new_payload()
 
                 # Defer setting `next_flush` until after we flushed the payload
-                now = time.time()
-                next_flush = now + 1.0
+                next_flush = time.time() + 1.0
 
             # Wait up until the next flush for another trace to be added
-            self._trace_queue.wait(max(0, next_flush - now))
+            self._trace_queue.wait(max(0, next_flush - time.time()))
 
             # no traces and the queue is closed. our work is done
             if self._trace_queue.closed() and self._trace_queue.qsize() == 0:
