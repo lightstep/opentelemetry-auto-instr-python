@@ -7,9 +7,9 @@ import asyncio
 # 3p
 import aiopg
 from psycopg2 import extras
-from nose.tools import eq_
 
 # project
+from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
 from ddtrace.contrib.aiopg.patch import patch, unpatch
 from ddtrace import Pin
 
@@ -23,7 +23,7 @@ from tests.contrib.asyncio.utils import AsyncioTestCase, mark_asyncio
 TEST_PORT = str(POSTGRES_CONFIG['port'])
 
 
-class TestPsycopgPatch(AsyncioTestCase):
+class AiopgTestCase(AsyncioTestCase):
     # default service
     TEST_SERVICE = 'postgres'
 
@@ -64,18 +64,18 @@ class TestPsycopgPatch(AsyncioTestCase):
         yield from cursor.execute(q)
         rows = yield from cursor.fetchall()
         end = time.time()
-        eq_(rows, [('foobarblah',)])
+        assert rows == [('foobarblah',)]
         assert rows
         spans = writer.pop()
         assert spans
-        eq_(len(spans), 1)
+        assert len(spans) == 1
         span = spans[0]
-        eq_(span.name, 'postgres.query')
-        eq_(span.resource, q)
-        eq_(span.service, service)
-        eq_(span.meta['sql.query'], q)
-        eq_(span.error, 0)
-        eq_(span.span_type, 'sql')
+        assert span.name == 'postgres.query'
+        assert span.resource == q
+        assert span.service == service
+        assert span.meta['sql.query'] == q
+        assert span.error == 0
+        assert span.span_type == 'sql'
         assert start <= span.start <= end
         assert span.duration <= end - start
 
@@ -85,21 +85,21 @@ class TestPsycopgPatch(AsyncioTestCase):
             cursor = yield from db.cursor()
             yield from cursor.execute(q)
             rows = yield from cursor.fetchall()
-            eq_(rows, [('foobarblah',)])
+            assert rows == [('foobarblah',)]
         spans = writer.pop()
-        eq_(len(spans), 2)
+        assert len(spans) == 2
         ot_span, dd_span = spans
         # confirm the parenting
-        eq_(ot_span.parent_id, None)
-        eq_(dd_span.parent_id, ot_span.span_id)
-        eq_(ot_span.name, 'aiopg_op')
-        eq_(ot_span.service, 'aiopg_svc')
-        eq_(dd_span.name, 'postgres.query')
-        eq_(dd_span.resource, q)
-        eq_(dd_span.service, service)
-        eq_(dd_span.meta['sql.query'], q)
-        eq_(dd_span.error, 0)
-        eq_(dd_span.span_type, 'sql')
+        assert ot_span.parent_id == None
+        assert dd_span.parent_id == ot_span.span_id
+        assert ot_span.name == 'aiopg_op'
+        assert ot_span.service == 'aiopg_svc'
+        assert dd_span.name == 'postgres.query'
+        assert dd_span.resource == q
+        assert dd_span.service == service
+        assert dd_span.meta['sql.query'] == q
+        assert dd_span.error == 0
+        assert dd_span.span_type == 'sql'
 
         # run a query with an error and ensure all is well
         q = 'select * from some_non_existant_table'
@@ -112,16 +112,16 @@ class TestPsycopgPatch(AsyncioTestCase):
             assert 0, 'should have an error'
         spans = writer.pop()
         assert spans, spans
-        eq_(len(spans), 1)
+        assert len(spans) == 1
         span = spans[0]
-        eq_(span.name, 'postgres.query')
-        eq_(span.resource, q)
-        eq_(span.service, service)
-        eq_(span.meta['sql.query'], q)
-        eq_(span.error, 1)
-        eq_(span.meta['out.host'], 'localhost')
-        eq_(span.meta['out.port'], TEST_PORT)
-        eq_(span.span_type, 'sql')
+        assert span.name == 'postgres.query'
+        assert span.resource == q
+        assert span.service == service
+        assert span.meta['sql.query'] == q
+        assert span.error == 1
+        # assert span.meta['out.host'] == 'localhost'
+        assert span.meta['out.port'] == TEST_PORT
+        assert span.span_type == 'sql'
 
     @mark_asyncio
     def test_disabled_execute(self):
@@ -153,11 +153,8 @@ class TestPsycopgPatch(AsyncioTestCase):
 
         # ensure we have the service types
         service_meta = tracer.writer.pop_services()
-        expected = {
-            'db': {'app': 'postgres', 'app_type': 'db'},
-            'another': {'app': 'postgres', 'app_type': 'db'},
-        }
-        eq_(service_meta, expected)
+        expected = {}
+        assert service_meta == expected
 
     @mark_asyncio
     def test_patch_unpatch(self):
@@ -177,7 +174,7 @@ class TestPsycopgPatch(AsyncioTestCase):
 
         spans = writer.pop()
         assert spans, spans
-        eq_(len(spans), 1)
+        assert len(spans) == 1
 
         # Test unpatch
         unpatch()
@@ -199,4 +196,46 @@ class TestPsycopgPatch(AsyncioTestCase):
 
         spans = writer.pop()
         assert spans, spans
-        eq_(len(spans), 1)
+        assert len(spans) == 1
+
+
+class AiopgAnalyticsTestCase(AiopgTestCase):
+    @asyncio.coroutine
+    def trace_spans(self):
+        service = 'db'
+        conn, _ = yield from self._get_conn_and_tracer()
+
+        Pin.get_from(conn).clone(service='db', tracer=self.tracer).onto(conn)
+
+        cursor = yield from conn.cursor()
+        yield from cursor.execute('select \'foobar\'')
+        rows = yield from cursor.fetchall()
+        assert rows
+
+        return self.get_spans()
+
+    @mark_asyncio
+    def test_analytics_default(self):
+        spans = yield from self.trace_spans()
+        self.assertEqual(len(spans), 1)
+        self.assertIsNone(spans[0].get_metric(ANALYTICS_SAMPLE_RATE_KEY))
+
+    @mark_asyncio
+    def test_analytics_with_rate(self):
+        with self.override_config(
+            'aiopg',
+            dict(analytics_enabled=True, analytics_sample_rate=0.5)
+        ):
+            spans = yield from self.trace_spans()
+            self.assertEqual(len(spans), 1)
+            self.assertEqual(spans[0].get_metric(ANALYTICS_SAMPLE_RATE_KEY), 0.5)
+
+    @mark_asyncio
+    def test_analytics_without_rate(self):
+        with self.override_config(
+            'aiopg',
+            dict(analytics_enabled=True)
+        ):
+            spans = yield from self.trace_spans()
+            self.assertEqual(len(spans), 1)
+            self.assertEqual(spans[0].get_metric(ANALYTICS_SAMPLE_RATE_KEY), 1.0)

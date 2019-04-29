@@ -2,13 +2,12 @@
 
 Any `sampled = False` trace won't be written, and can be ignored by the instrumentation.
 """
-import logging
-
 from threading import Lock
 
 from .compat import iteritems
+from .internal.logger import get_logger
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 MAX_TRACE_ID = 2 ** 64
 
@@ -39,7 +38,7 @@ class RateSampler(object):
 
         self.set_sample_rate(sample_rate)
 
-        log.info("initialized RateSampler, sample %s%% of traces", 100 * sample_rate)
+        log.debug("initialized RateSampler, sample %s%% of traces", 100 * sample_rate)
 
     def set_sample_rate(self, sample_rate):
         self.sample_rate = sample_rate

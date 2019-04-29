@@ -1,10 +1,10 @@
-import logging
-
-import wrapt
 import ddtrace
 
+from .internal.logger import get_logger
+from .vendor import wrapt
 
-log = logging.getLogger(__name__)
+
+log = get_logger(__name__)
 
 
 # To set attributes on wrapt proxy objects use this prefix:
@@ -48,7 +48,7 @@ class Pin(object):
         return self._config['service_name']
 
     def __setattr__(self, name, value):
-        if getattr(self, '_initialized', False) and name is not '_target':
+        if getattr(self, '_initialized', False) and name != '_target':
             raise AttributeError("can't mutate a pin, use override() or clone() instead")
         super(Pin, self).__setattr__(name, value)
 
@@ -134,15 +134,6 @@ class Pin(object):
         """Patch this pin onto the given object. If send is true, it will also
         queue the metadata to be sent to the server.
         """
-        # pinning will also queue the metadata for service submission. this
-        # feels a bit side-effecty, but bc it's async and pretty clearly
-        # communicates what we want, i think it makes sense.
-        if send:
-            try:
-                self._send()
-            except Exception:
-                log.debug("can't send pin info", exc_info=True)
-
         # Actually patch it on the object.
         try:
             if hasattr(obj, '__setddpin__'):
@@ -188,11 +179,4 @@ class Pin(object):
             tags=tags,
             tracer=tracer or self.tracer,  # do not clone the Tracer
             _config=config,
-        )
-
-    def _send(self):
-        self.tracer.set_service_info(
-            service=self.service,
-            app=self.app,
-            app_type=self.app_type,
         )

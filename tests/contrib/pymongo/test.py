@@ -1,12 +1,13 @@
 # stdlib
 import time
+import unittest
 
 # 3p
-from nose.tools import eq_
 import pymongo
 
 # project
 from ddtrace import Pin
+from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
 from ddtrace.ext import mongo as mongox
 from ddtrace.contrib.pymongo.client import trace_mongo_client, normalize_filter
 from ddtrace.contrib.pymongo.patch import patch, unpatch
@@ -14,6 +15,7 @@ from ddtrace.contrib.pymongo.patch import patch, unpatch
 # testing
 from tests.opentracer.utils import init_tracer
 from ..config import MONGO_CONFIG
+from ...base import override_config
 from ...test_tracer import get_dummy_tracer
 
 
@@ -59,7 +61,7 @@ def test_normalize_filter():
     ]
     for i, expected in cases:
         out = normalize_filter(i)
-        eq_(expected, out)
+        assert expected == out
 
 
 class PymongoCore(object):
@@ -94,18 +96,18 @@ class PymongoCore(object):
             {'$set': {'artist': 'Shakey'}},
         )
 
-        eq_(result.matched_count, 2)
-        eq_(result.modified_count, 2)
+        assert result.matched_count == 2
+        assert result.modified_count == 2
 
         # ensure all is traced.
         spans = writer.pop()
         assert spans, spans
         for span in spans:
             # ensure all the of the common metadata is set
-            eq_(span.service, self.TEST_SERVICE)
-            eq_(span.span_type, 'mongodb')
-            eq_(span.meta.get('mongodb.collection'), 'songs')
-            eq_(span.meta.get('mongodb.db'), 'testdb')
+            assert span.service == self.TEST_SERVICE
+            assert span.span_type == 'mongodb'
+            assert span.meta.get('mongodb.collection') == 'songs'
+            assert span.meta.get('mongodb.db') == 'testdb'
             assert span.meta.get('out.host')
             assert span.meta.get('out.port')
 
@@ -115,7 +117,7 @@ class PymongoCore(object):
             'insert songs',
         ])
 
-        eq_(expected_resources, {s.resource for s in spans})
+        assert expected_resources == {s.resource for s in spans}
 
     def test_delete(self):
         # ensure we trace deletes
@@ -136,25 +138,25 @@ class PymongoCore(object):
 
         # test delete one
         af = {'artist': 'Neil'}
-        eq_(songs.count(af), 2)
+        assert songs.count(af) == 2
         songs.delete_one(af)
-        eq_(songs.count(af), 1)
+        assert songs.count(af) == 1
 
         # test delete many
         af = {'artist': 'Leonard'}
-        eq_(songs.count(af), 2)
+        assert songs.count(af) == 2
         songs.delete_many(af)
-        eq_(songs.count(af), 0)
+        assert songs.count(af) == 0
 
         # ensure all is traced.
         spans = writer.pop()
         assert spans, spans
         for span in spans:
             # ensure all the of the common metadata is set
-            eq_(span.service, self.TEST_SERVICE)
-            eq_(span.span_type, 'mongodb')
-            eq_(span.meta.get('mongodb.collection'), collection_name)
-            eq_(span.meta.get('mongodb.db'), 'testdb')
+            assert span.service == self.TEST_SERVICE
+            assert span.span_type == 'mongodb'
+            assert span.meta.get('mongodb.collection') == collection_name
+            assert span.meta.get('mongodb.db') == 'testdb'
             assert span.meta.get('out.host')
             assert span.meta.get('out.port')
 
@@ -169,7 +171,7 @@ class PymongoCore(object):
             'insert here.are.songs',
         ]
 
-        eq_(sorted(expected_resources), sorted(s.resource for s in spans))
+        assert sorted(expected_resources) == sorted(s.resource for s in spans)
 
     def test_insert_find(self):
         tracer, client = self.get_tracer_and_client()
@@ -203,23 +205,23 @@ class PymongoCore(object):
         count = 0
         for row in cursor:
             count += 1
-        eq_(count, len(teams))
+        assert count == len(teams)
 
         # scoped query (using the getattr syntax)
         q = {'name': 'Toronto Maple Leafs'}
         queried = list(db.teams.find(q))
         end = time.time()
-        eq_(len(queried), 1)
-        eq_(queried[0]['name'], 'Toronto Maple Leafs')
-        eq_(queried[0]['established'], 1917)
+        assert len(queried) == 1
+        assert queried[0]['name'] == 'Toronto Maple Leafs'
+        assert queried[0]['established'] == 1917
 
         spans = writer.pop()
         for span in spans:
             # ensure all the of the common metadata is set
-            eq_(span.service, self.TEST_SERVICE)
-            eq_(span.span_type, 'mongodb')
-            eq_(span.meta.get('mongodb.collection'), 'teams')
-            eq_(span.meta.get('mongodb.db'), 'testdb')
+            assert span.service == self.TEST_SERVICE
+            assert span.span_type == 'mongodb'
+            assert span.meta.get('mongodb.collection') == 'teams'
+            assert span.meta.get('mongodb.db') == 'testdb'
             assert span.meta.get('out.host'), span.pprint()
             assert span.meta.get('out.port'), span.pprint()
             assert span.start > start
@@ -239,13 +241,13 @@ class PymongoCore(object):
             '{} teams {{"name": "?"}}'.format(name),
         ])
 
-        eq_(expected_resources, list(s.resource for s in spans))
+        assert expected_resources == list(s.resource for s in spans)
 
         # confirm query tag for find all
-        eq_(spans[-2].get_tag('mongodb.query'), None)
+        assert spans[-2].get_tag('mongodb.query') is None
 
         # confirm query tag find with query criteria on name
-        eq_(spans[-1].get_tag('mongodb.query'), '{\'name\': \'?\'}')
+        assert spans[-1].get_tag('mongodb.query') == '{\'name\': \'?\'}'
 
     def test_update_ot(self):
         """OpenTracing version of test_update."""
@@ -268,27 +270,27 @@ class PymongoCore(object):
                 {'$set': {'artist': 'Shakey'}},
             )
 
-            eq_(result.matched_count, 2)
-            eq_(result.modified_count, 2)
+            assert result.matched_count == 2
+            assert result.modified_count == 2
 
         # ensure all is traced.
         spans = writer.pop()
         assert spans, spans
-        eq_(len(spans), 4)
+        assert len(spans) == 4
 
         ot_span = spans[0]
-        eq_(ot_span.parent_id, None)
-        eq_(ot_span.name, 'mongo_op')
-        eq_(ot_span.service, 'mongo_svc')
+        assert ot_span.parent_id is None
+        assert ot_span.name == 'mongo_op'
+        assert ot_span.service == 'mongo_svc'
 
         for span in spans[1:]:
             # ensure the parenting
-            eq_(span.parent_id, ot_span.span_id)
+            assert span.parent_id == ot_span.span_id
             # ensure all the of the common metadata is set
-            eq_(span.service, self.TEST_SERVICE)
-            eq_(span.span_type, 'mongodb')
-            eq_(span.meta.get('mongodb.collection'), 'songs')
-            eq_(span.meta.get('mongodb.db'), 'testdb')
+            assert span.service == self.TEST_SERVICE
+            assert span.span_type == 'mongodb'
+            assert span.meta.get('mongodb.collection') == 'songs'
+            assert span.meta.get('mongodb.db') == 'testdb'
             assert span.meta.get('out.host')
             assert span.meta.get('out.port')
 
@@ -298,10 +300,45 @@ class PymongoCore(object):
             'insert songs',
         ])
 
-        eq_(expected_resources, {s.resource for s in spans[1:]})
+        assert expected_resources == {s.resource for s in spans[1:]}
+
+    def test_analytics_default(self):
+        tracer, client = self.get_tracer_and_client()
+        db = client['testdb']
+        db.drop_collection('songs')
+
+        spans = tracer.writer.pop()
+        assert len(spans) == 1
+        assert spans[0].get_metric(ANALYTICS_SAMPLE_RATE_KEY) is None
+
+    def test_analytics_with_rate(self):
+        with override_config(
+            'pymongo',
+            dict(analytics_enabled=True, analytics_sample_rate=0.5)
+        ):
+            tracer, client = self.get_tracer_and_client()
+            db = client['testdb']
+            db.drop_collection('songs')
+
+            spans = tracer.writer.pop()
+            assert len(spans) == 1
+            assert spans[0].get_metric(ANALYTICS_SAMPLE_RATE_KEY) == 0.5
+
+    def test_analytics_without_rate(self):
+        with override_config(
+            'pymongo',
+            dict(analytics_enabled=True)
+        ):
+            tracer, client = self.get_tracer_and_client()
+            db = client['testdb']
+            db.drop_collection('songs')
+
+            spans = tracer.writer.pop()
+            assert len(spans) == 1
+            assert spans[0].get_metric(ANALYTICS_SAMPLE_RATE_KEY) == 1.0
 
 
-class TestPymongoTraceClient(PymongoCore):
+class TestPymongoTraceClient(unittest.TestCase, PymongoCore):
     """Test suite for pymongo with the legacy trace interface"""
 
     TEST_SERVICE = 'test-mongo-trace-client'
@@ -313,7 +350,7 @@ class TestPymongoTraceClient(PymongoCore):
         return tracer, client
 
 
-class TestPymongoPatchDefault(PymongoCore):
+class TestPymongoPatchDefault(unittest.TestCase, PymongoCore):
     """Test suite for pymongo with the default patched library"""
 
     TEST_SERVICE = mongox.TYPE
@@ -337,11 +374,7 @@ class TestPymongoPatchDefault(PymongoCore):
         db.drop_collection('songs')
 
         services = writer.pop_services()
-        eq_(len(services), 1)
-        assert self.TEST_SERVICE in services
-        s = services[self.TEST_SERVICE]
-        assert s['app_type'] == 'db'
-        assert s['app'] == 'mongodb'
+        assert services == {}
 
     def test_host_kwarg(self):
         # simulate what celery and django do when instantiating a new client
@@ -358,7 +391,7 @@ class TestPymongoPatchDefault(PymongoCore):
         assert client
 
 
-class TestPymongoPatchConfigured(PymongoCore):
+class TestPymongoPatchConfigured(unittest.TestCase, PymongoCore):
     """Test suite for pymongo with a configured patched library"""
 
     TEST_SERVICE = 'test-mongo-trace-client'
@@ -389,7 +422,7 @@ class TestPymongoPatchConfigured(PymongoCore):
 
         spans = writer.pop()
         assert spans, spans
-        eq_(len(spans), 1)
+        assert len(spans) == 1
 
         # Test unpatch
         unpatch()
@@ -409,4 +442,4 @@ class TestPymongoPatchConfigured(PymongoCore):
 
         spans = writer.pop()
         assert spans, spans
-        eq_(len(spans), 1)
+        assert len(spans) == 1

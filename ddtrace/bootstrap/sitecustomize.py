@@ -9,11 +9,16 @@ import sys
 import logging
 
 from ddtrace.utils.formats import asbool, get_env
+from ddtrace.internal.logger import get_logger
 
 logs_injection = asbool(get_env('logs', 'injection'))
 DD_LOG_FORMAT = '%(asctime)s %(levelname)s [%(name)s] [%(filename)s:%(lineno)d] {}- %(message)s'.format(
     '[dd.trace_id=%(dd.trace_id)s dd.span_id=%(dd.span_id)s] ' if logs_injection else ''
 )
+
+if logs_injection:
+    # immediately patch logging if trace id injected
+    from ddtrace import patch; patch(logging=True)  # noqa
 
 debug = os.environ.get("DATADOG_TRACE_DEBUG")
 
@@ -28,7 +33,7 @@ if debug and debug.lower() == "true":
 else:
     logging.basicConfig(format=DD_LOG_FORMAT)
 
-log = logging.getLogger(__name__)
+log = get_logger(__name__)
 
 EXTRA_PATCHED_MODULES = {
     "bottle": True,
@@ -41,7 +46,10 @@ EXTRA_PATCHED_MODULES = {
 
 
 def update_patched_modules():
-    for patch in os.environ.get("DATADOG_PATCH_MODULES", '').split(','):
+    modules_to_patch = os.environ.get("DATADOG_PATCH_MODULES")
+    if not modules_to_patch:
+        return
+    for patch in modules_to_patch.split(','):
         if len(patch.split(':')) != 2:
             log.debug("skipping malformed patch instruction")
             continue
@@ -89,6 +97,8 @@ try:
         opts["port"] = int(port)
     if priority_sampling:
         opts["priority_sampling"] = asbool(priority_sampling)
+
+    opts['collect_metrics'] = asbool(get_env('runtime_metrics', 'enabled'))
 
     if opts:
         tracer.configure(**opts)

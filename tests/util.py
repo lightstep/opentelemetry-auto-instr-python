@@ -1,11 +1,9 @@
 import os
 import sys
 import mock
-import ddtrace
 
+import ddtrace
 from ddtrace import __file__ as root_file
-from ddtrace import config
-from nose.tools import ok_
 from contextlib import contextmanager
 
 
@@ -41,17 +39,13 @@ def patch_time():
 
 
 def assert_dict_issuperset(a, b):
-    ok_(
-        set(a.items()).issuperset(set(b.items())),
-        msg="{a} is not a superset of {b}".format(a=a, b=b),
-    )
+    assert set(a.items()).issuperset(set(b.items())), \
+        "{a} is not a superset of {b}".format(a=a, b=b)
 
 
 def assert_list_issuperset(a, b):
-    ok_(
-        set(a).issuperset(set(b)),
-        msg="{a} is not a superset of {b}".format(a=a, b=b),
-    )
+    assert set(a).issuperset(set(b)), \
+        "{a} is not a superset of {b}".format(a=a, b=b)
 
 
 @contextmanager
@@ -65,44 +59,6 @@ def override_global_tracer(tracer):
     ddtrace.tracer = tracer
     yield
     ddtrace.tracer = original_tracer
-
-
-@contextmanager
-def override_config(integration, values):
-    """
-    Temporarily override an integration configuration value
-    >>> with override_config('flask', dict(service_name='test-service')):
-        # Your test
-    """
-    options = getattr(config, integration)
-
-    original = dict(
-        (key, options.get(key))
-        for key in values.keys()
-    )
-
-    options.update(values)
-    try:
-        yield
-    finally:
-        options.update(original)
-
-
-@contextmanager
-def set_env(**environ):
-    """
-    Temporarily set the process environment variables.
-
-    >>> with set_env(DEFAULT_SERVICE='my-webapp'):
-            # your test
-    """
-    old_environ = dict(os.environ)
-    os.environ.update(environ)
-    try:
-        yield
-    finally:
-        os.environ.clear()
-        os.environ.update(old_environ)
 
 
 def inject_sitecustomize(path):
