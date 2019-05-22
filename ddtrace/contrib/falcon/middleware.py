@@ -1,11 +1,10 @@
 import sys
 
-from ddtrace.ext import http as httpx
-from ddtrace.http import store_request_headers, store_response_headers
-from ddtrace.propagation.http import HTTPPropagator
-
 from ...compat import iteritems
 from ...constants import ANALYTICS_SAMPLE_RATE_KEY
+from ...ext import http as httpx
+from ...http import store_request_headers, store_response_headers
+from ...propagation.http import HTTPPropagator
 from ...settings import config
 
 

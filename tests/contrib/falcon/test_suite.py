@@ -232,7 +232,18 @@ class FalconTestCase(object):
 
         assert span.get_tag('my.custom') == 'tag'
 
-    def test_http_header_tracing(self):
+    def test_http_header_tracing_disabled(self):
+        with self.override_config('falcon', {}):
+            self.simulate_get('/200', headers={'my-header': 'my_value'})
+            traces = self.tracer.writer.pop_traces()
+
+        assert len(traces) == 1
+        assert len(traces[0]) == 1
+        span = traces[0][0]
+        assert span.get_tag('http.request.headers.my-header') is None
+        assert span.get_tag('http.response.headers.my-response-header') is None
+
+    def test_http_header_tracing_enabled(self):
         with self.override_config('falcon', {}):
             config.falcon.http.trace_headers(['my-header', 'my-response-header'])
             self.simulate_get('/200', headers={'my-header': 'my_value'})

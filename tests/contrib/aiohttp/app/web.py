@@ -14,7 +14,8 @@ TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 
 @asyncio.coroutine
 def home(request):
-    return web.Response(text="What's tracing?")
+    return web.Response(text="What's tracing?",
+                        headers={'my-response-header': 'my_response_value'})
 
 
 @asyncio.coroutine

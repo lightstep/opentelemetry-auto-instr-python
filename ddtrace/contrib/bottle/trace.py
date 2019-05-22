@@ -7,6 +7,7 @@ import ddtrace
 # project
 from ...constants import ANALYTICS_SAMPLE_RATE_KEY
 from ...ext import http
+from ...http import store_request_headers, store_response_headers
 from ...propagation.http import HTTPPropagator
 from ...settings import config
 
@@ -61,5 +62,7 @@ class TracePlugin(object):
                     s.set_tag(http.STATUS_CODE, code or response.status_code)
                     s.set_tag(http.URL, request.urlparts._replace(query='').geturl())
                     s.set_tag(http.METHOD, request.method)
+                    store_request_headers(request.headers, s, config.bottle)
+                    store_response_headers(response.headers, s, config.bottle)
 
         return wrapped

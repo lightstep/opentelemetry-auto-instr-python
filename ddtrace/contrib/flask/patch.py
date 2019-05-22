@@ -5,6 +5,7 @@ import werkzeug
 from ddtrace.vendor.wrapt import wrap_function_wrapper as _w
 
 from ddtrace import config, Pin
+from ddtrace.http import store_request_headers, store_response_headers
 
 from ...constants import ANALYTICS_SAMPLE_RATE_KEY
 from ...ext import AppTypes
@@ -320,6 +321,9 @@ def traced_wsgi_app(pin, wrapped, instance, args, kwargs):
                     s.error = 1
                 elif code in config.flask.get('extra_error_codes', set()):
                     s.error = 1
+
+                store_response_headers(headers, s, config.flask)
+
                 return func(status_code, headers)
             return traced_start_response
         start_response = _wrap_start_response(start_response)
@@ -328,6 +332,8 @@ def traced_wsgi_app(pin, wrapped, instance, args, kwargs):
         # DEV: Use `request.base_url` and not `request.url` to keep from leaking any query string parameters
         s.set_tag(http.URL, request.base_url)
         s.set_tag(http.METHOD, request.method)
+
+        store_request_headers(request.headers, s, config.flask)
 
         return wrapped(environ, start_response)
 

@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
+from ddtrace import config
 from ddtrace.compat import PY2
 from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
 from ddtrace.contrib.flask.patch import flask_version
 from ddtrace.ext import http
 from ddtrace.propagation.http import HTTP_HEADER_TRACE_ID, HTTP_HEADER_PARENT_ID
-from flask import abort
+from flask import abort, Response
 
 from . import BaseFlaskTestCase
 
@@ -793,3 +794,44 @@ class FlaskRequestTestCase(BaseFlaskTestCase):
         self.assertTrue(user_ex_span.get_tag('error.msg').startswith('500 error'))
         self.assertTrue(user_ex_span.get_tag('error.stack').startswith('Traceback'))
         self.assertEqual(user_ex_span.get_tag('error.type'), base_exception_name)
+
+    def test_http_header_tracing_disabled(self):
+        @self.app.route('/')
+        def index():
+            return 'Hello Flask', 200
+
+        @self.app.after_request
+        def add_response_header(response):
+            response.headers.set('my-response-header', 'my_response_value')
+            return response
+
+        with self.override_config('flask', {}):
+            res = self.client.get('/', headers={'my-header': 'my_value'})
+            spans = self.get_spans()
+            self.assertEqual(len(spans), 9)
+            req_span = spans[0]
+            assert req_span.service == 'flask'
+            assert req_span.name == 'flask.request'
+            assert req_span.get_tag('http.request.headers.my-header') is None
+            assert req_span.get_tag('http.response.headers.my-response-header') is None
+
+    def test_http_header_tracing_enabled(self):
+        @self.app.route('/')
+        def index():
+            return 'Hello Flask', 200
+
+        @self.app.after_request
+        def add_response_header(response):
+            response.headers.set('my-response-header', 'my_response_value')
+            return response
+
+        with self.override_config('flask', {}):
+            config.flask.http.trace_headers(['my-header', 'my-response-header'])
+            res = self.client.get('/', headers={'my-header': 'my_value'})
+            spans = self.get_spans()
+            self.assertEqual(len(spans), 9)
+            req_span = spans[0]
+            assert req_span.service == 'flask'
+            assert req_span.name == 'flask.request'
+            assert req_span.get_tag('http.request.headers.my-header') == 'my_value'
+            assert req_span.get_tag('http.response.headers.my-response-header') == 'my_response_value'

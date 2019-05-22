@@ -3,6 +3,7 @@ import asyncio
 
 from aiohttp.test_utils import unittest_run_loop
 
+from ddtrace import config
 from ddtrace.contrib.aiohttp.middlewares import trace_app, trace_middleware
 from ddtrace.ext import http
 from ddtrace.sampler import RateSampler
@@ -435,3 +436,26 @@ class TestTraceMiddleware(TraceTestCase):
         # Assert root span does not have the appropriate metric
         root = self.get_root_span()
         self.assertIsNone(root.get_metric(ANALYTICS_SAMPLE_RATE_KEY))
+
+    @unittest_run_loop
+    @asyncio.coroutine
+    def test_http_header_tracing_disabled(self):
+        with self.override_config('aiohttp', {}):
+            request = yield from self.client.request('GET', '/',
+                                                     headers={'my-header': 'my_value'})
+            spans = self.get_spans()
+            span = spans[0]
+            assert span.get_tag('http.request.headers.my-header') is None
+            assert span.get_tag('http.response.headers.my-response-header') is None
+
+    @unittest_run_loop
+    @asyncio.coroutine
+    def test_http_header_tracing_enabled(self):
+        with self.override_config('aiohttp', {}):
+            config.aiohttp.http.trace_headers(['my-header', 'my-response-header'])
+            request = yield from self.client.request('GET', '/',
+                                                     headers={'my-header': 'my_value'})
+            spans = self.get_spans()
+            span = spans[0]
+            assert span.get_tag('http.request.headers.my-header') == 'my_value'
+            assert span.get_tag('http.response.headers.my-response-header') == 'my_response_value'

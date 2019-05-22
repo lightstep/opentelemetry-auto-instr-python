@@ -5,7 +5,7 @@ import webtest
 from tests.opentracer.utils import init_tracer
 from ...base import BaseTracerTestCase
 
-from ddtrace import compat
+from ddtrace import compat, config
 from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
 from ddtrace.contrib.bottle import TracePlugin
 from ddtrace.ext import http
@@ -290,3 +290,36 @@ class TraceBottleTest(BaseTracerTestCase):
 
         services = self.tracer.writer.pop_services()
         assert services == {}
+
+    def test_http_header_tracing_disabled(self):
+        @self.app.route('/hello')
+        def hello():
+            bottle.response.set_header('my-response-header', 'my_response_value')
+            return 'Hello'
+
+        self._trace_app(self.tracer)
+
+        with self.override_config('bottle', {}):
+            self.app.get('/hello', headers={'my-header': 'my_value'})
+            spans = self.tracer.writer.pop()
+            assert len(spans) == 1
+            s = spans[0]
+            assert s.get_tag('http.request.headers.my-header') is None
+            assert s.get_tag('http.response.headers.my-response-header') is None
+
+    def test_http_header_tracing_enabled(self):
+        @self.app.route('/hello')
+        def hello():
+            bottle.response.set_header('my-response-header', 'my_response_value')
+            return 'Hello'
+
+        self._trace_app(self.tracer)
+
+        with self.override_config('bottle', {}):
+            config.bottle.http.trace_headers(['my-header', 'my-response-header'])
+            self.app.get('/hello', headers={'my-header': 'my_value'})
+            spans = self.tracer.writer.pop()
+            assert len(spans) == 1
+            s = spans[0]
+            assert s.get_tag('http.request.headers.my-header') == 'my_value'
+            assert s.get_tag('http.response.headers.my-response-header') == 'my_response_value'
