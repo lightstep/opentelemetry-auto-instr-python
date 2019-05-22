@@ -39,6 +39,7 @@ DEFAULTS = {
     'ANALYTICS_SAMPLE_RATE': True,
     'TAGS': {},
     'TRACER': 'ddtrace.tracer',
+    'HTTP_TRACE_HEADERS': None,
 }
 
 # List of settings that may be in string import notation.

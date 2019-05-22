@@ -416,3 +416,24 @@ class DjangoMiddlewareTest(DjangoTraceTestCase):
         assert sp_request.get_tag('http.method') == 'GET'
         assert sp_request.span_type == 'http'
         assert sp_request.resource == 'django.views.defaults.page_not_found'
+
+    def test_http_header_tracing_disabled(self):
+        self.client.get('/response-headers', **{'my-header': 'my_value'})
+        traces = self.tracer.writer.pop_traces()
+
+        assert len(traces) == 1
+        assert len(traces[0]) == 1
+        span = traces[0][0]
+        assert span.get_tag('http.request.headers.my-header') is None
+        assert span.get_tag('http.response.headers.my-response-header') is None
+
+    @override_ddtrace_settings(HTTP_TRACE_HEADERS=['my-header', 'my-response-header'])
+    def test_http_header_tracing_enabled(self):
+        self.client.get('/response-headers', **{'my-header': 'my_value'})
+        traces = self.tracer.writer.pop_traces()
+
+        assert len(traces) == 1
+        assert len(traces[0]) == 1
+        span = traces[0][0]
+        assert span.get_tag('http.request.headers.my-header') == 'my_value'
+        assert span.get_tag('http.response.headers.my-response-header') == 'my_response_value', span.meta

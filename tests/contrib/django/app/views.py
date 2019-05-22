@@ -55,6 +55,12 @@ class FeedView(Feed):
         return 'empty'
 
 
+def response_headers(request):
+    response = HttpResponse(status=200)
+    response['my-response-header'] = 'my_response_value'
+    return response
+
+
 partial_view = partial(function_view)
 
 # disabling flake8 test below, yes, declaring a func like this is bad, we know
@@ -71,4 +77,6 @@ urlpatterns = [
     url(r'^partial-view/$', partial_view, name='partial-view'),
     url(r'^lambda-view/$', lambda_view, name='lambda-view'),
     url(r'^error-500/$', error_500, name='error-500'),
+    url(r'^error-500/$', error_500, name='error-500'),
+    url(r'^response-headers/$', response_headers, name='response-headers'),
 ]

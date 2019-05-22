@@ -9,6 +9,7 @@ from .templates import patch_template
 from .middleware import insert_exception_middleware, insert_trace_middleware
 
 from ...internal.logger import get_logger
+from ...settings import config
 
 log = get_logger(__name__)
 
@@ -66,3 +67,6 @@ class TracerConfig(AppConfig):
                     patch_restframework(tracer)
                 except Exception:
                     log.exception('error patching rest_framework app')
+
+            if settings.HTTP_TRACE_HEADERS:
+                config.django.http.trace_headers(settings.HTTP_TRACE_HEADERS)

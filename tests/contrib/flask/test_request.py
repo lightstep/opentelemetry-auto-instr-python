@@ -5,7 +5,7 @@ from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
 from ddtrace.contrib.flask.patch import flask_version
 from ddtrace.ext import http
 from ddtrace.propagation.http import HTTP_HEADER_TRACE_ID, HTTP_HEADER_PARENT_ID
-from flask import abort, Response
+from flask import abort
 
 from . import BaseFlaskTestCase
 
@@ -806,7 +806,7 @@ class FlaskRequestTestCase(BaseFlaskTestCase):
             return response
 
         with self.override_config('flask', {}):
-            res = self.client.get('/', headers={'my-header': 'my_value'})
+            self.client.get('/', headers={'my-header': 'my_value'})
             spans = self.get_spans()
             self.assertEqual(len(spans), 9)
             req_span = spans[0]
@@ -827,7 +827,7 @@ class FlaskRequestTestCase(BaseFlaskTestCase):
 
         with self.override_config('flask', {}):
             config.flask.http.trace_headers(['my-header', 'my-response-header'])
-            res = self.client.get('/', headers={'my-header': 'my_value'})
+            self.client.get('/', headers={'my-header': 'my_value'})
             spans = self.get_spans()
             self.assertEqual(len(spans), 9)
             req_span = spans[0]

@@ -5,6 +5,7 @@ from .compat import user_is_authenticated, get_resolver
 from ...constants import ANALYTICS_SAMPLE_RATE_KEY
 from ...contrib import func_name
 from ...ext import http
+from ...http import store_request_headers, store_response_headers
 from ...internal.logger import get_logger
 from ...propagation.http import HTTPPropagator
 from ...settings import config
@@ -131,6 +132,7 @@ class TraceMiddleware(InstrumentationMixin):
 
             span.set_tag(http.METHOD, request.method)
             span.set_tag(http.URL, request.build_absolute_uri(request.path))
+            store_request_headers(request.META, span, config.django)
             _set_req_span(request, span)
         except Exception:
             log.debug('error tracing request', exc_info=True)
@@ -176,6 +178,7 @@ class TraceMiddleware(InstrumentationMixin):
                         span.resource = _django_default_views.get(response.status_code, 'unknown')
 
                 span.set_tag(http.STATUS_CODE, response.status_code)
+                store_response_headers(response, span, config.django)
                 span = _set_auth_tags(span, request)
                 span.finish()
         except Exception:
