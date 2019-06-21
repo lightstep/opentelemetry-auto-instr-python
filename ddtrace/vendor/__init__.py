@@ -8,6 +8,17 @@ whenever a dependency is imported. Doing this allows us to have a little more co
 Dependencies
 ============
 
+appdirs
+-------
+
+Website: https://github.com/ActiveState/appdirs
+Source: https://github.com/ActiveState/appdirs
+Version: 1.4.3
+License: MIT
+
+Notes:
+  Imported `appdirs.py` as `appdirs/__init__.py`
+
 msgpack
 -------
 
@@ -21,6 +32,44 @@ Notes:
 
   `_packer.pyx` and `_unpacker.pyx` were updated to import from `ddtrace.vendor.msgpack`
 
+packaging
+---------
+
+Website: https://github.com/pypa/packaging
+Source: https://github.com/pypa/packaging
+Version: 19.0
+License: Apache License, Version 2.0  or BSD License
+
+Notes:
+  Updated references to `pyparsing` to `..pyparsing`
+  Updated references to `six` to `..six`
+
+pkg_resources
+-------------
+
+Website: https://github.com/pypa/setuptools
+Source: https://github.com/pypa/setuptools
+Version: 41.0.1
+License: MIT
+
+Notes:
+  Pulled just `pkg_resources` package from `setuptools`
+
+  Removed unnecessary files, like `_vendor`, `extern`, `tests`, and `api_tests.txt`
+
+  Updated references to vendored packages to point to `ddtrace.vendor` packages
+
+pyparsing
+---------
+
+Website: https://github.com/pyparsing/pyparsing/
+Source: https://github.com/pyparsing/pyparsing/
+Version: 2.4.0
+License: MIT
+
+Notes:
+  Imported `pyparsing.py` as `pyparsing/__init__.py`
+
 six
 ---
 
@@ -32,7 +81,6 @@ License: MIT
 Notes:
   `six/__init__.py` is just the source code's `six.py`
   `curl https://raw.githubusercontent.com/benjaminp/six/1.11.0/six.py > ddtrace/vendor/six/__init__.py`
-
 
 wrapt
 -----
