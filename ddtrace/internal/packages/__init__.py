@@ -3,7 +3,7 @@ from ...vendor.packaging import markers, requirements, version
 # Try to import `importlib.metadata` first, because everything is better than `pkg_resources`
 # DEV: `importlib.metadata` is Python >= 3.8 only
 try:
-    from importlib.metadata import distribution, distributions
+    from importlib.metadata import distributions
 
     def _get_all_packages():
         return dict(
@@ -11,16 +11,6 @@ try:
             for d in distributions()
             if 'name' in d.metadata
         )
-
-    def _get_package_version(name):
-        try:
-            dist = distribution(name)
-            if dist:
-                return dist.version
-        except Exception:
-            pass
-
-        return None
 
 except ImportError:
     # TODO: Should we just try to backport `importlib.metadata`?
@@ -32,46 +22,25 @@ except ImportError:
             for d in pkg_resources.working_set
         )
 
-    def _get_package_version(name):
-        try:
-            dist = pkg_resources.get_distribution(name)
-            if dist:
-                return dist.version
-        except Exception:
-            pass
 
-        return None
+_package_cache = _get_all_packages()
 
 
-_package_cache = None
-
-
-def list_all_packages():
+def get_package_list():
     global _package_cache
-    if not _package_cache:
-        _package_cache = _get_all_packages()
-
     return _package_cache
 
 
 def get_package_version(name):
     global _package_cache
-    if name in _package_cache:
-        return _package_cache[name]
-
-    v = _get_package_version(name)
-    if v:
-        v = version.parse(v)
-
-    # Always cache, even if it was not found so we don't lookup again
-    _package_cache[name] = v
-    return v
+    return _package_cache.get(name)
 
 
 def parse_requirement(req):
     if not isinstance(req, requirements.Requirement):
         req = requirements.Requirement(str(req))
     return req
+
 
 def requirement_passes(req):
     req = parse_requirement(req)

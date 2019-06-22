@@ -1,15 +1,6 @@
 from __future__ import absolute_import
 
-import functools
 from importlib import import_module
-
-from ..internal.packages import (
-    marker_passes,
-    parse_marker,
-
-    requirement_passes,
-    parse_requirement,
-)
 
 
 class require_modules(object):
@@ -27,48 +18,6 @@ class require_modules(object):
 
     def __exit__(self, exc_type, exc_value, traceback):
         return False
-
-
-class require_package:
-    __slots__ = ('req', )
-
-    def __init__(self, req):
-        self.req = parse_requirement(req)
-
-    def __call__(self, func):
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            if requirement_passes(self.req):
-                return func(*args, **kwargs)
-        return wrapper
-
-    def __enter__(self):
-        if requirement_passes(self.req):
-            yield
-
-    def __exit__(self, *args, **kwargs):
-        pass
-
-
-class require_marker:
-    __slots__ = ('m', )
-
-    def __init__(self, m):
-        self.m = parse_marker(m)
-
-    def __call__(self, func):
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            if marker_passes(self.m):
-                return func(*args, **kwargs)
-        return wrapper
-
-    def __enter__(self):
-        if marker_passes(self.m):
-            yield
-
-    def __exit__(self, *args, **kwargs):
-        pass
 
 
 def func_name(f):
