@@ -1,57 +1,35 @@
-# 3p
-import redis
-from ddtrace.vendor import wrapt
-
-# project
-from ddtrace import config
 from ...constants import ANALYTICS_SAMPLE_RATE_KEY
-from ...pin import Pin
 from ...ext import AppTypes, redis as redisx
-from ...utils.wrappers import unwrap
+from ...internal.import_hooks import hooks, register_module_hook
+from ...pin import Pin
+from ...settings import config
+from ...vendor.wrapt import wrap_function_wrapper as _w
 from .util import format_command_args, _extract_conn_tags
 
 
-def patch():
-    """Patch the instrumented methods
-
-    This duplicated doesn't look nice. The nicer alternative is to use an ObjectProxy on top
-    of Redis and StrictRedis. However, it means that any "import redis.Redis" won't be instrumented.
-    """
-    if getattr(redis, '_datadog_patch', False):
-        return
-    setattr(redis, '_datadog_patch', True)
-
-    _w = wrapt.wrap_function_wrapper
-
+@register_module_hook('redis')
+def patch_redis(redis):
     if redis.VERSION < (3, 0, 0):
-        _w('redis', 'StrictRedis.execute_command', traced_execute_command)
-        _w('redis', 'StrictRedis.pipeline', traced_pipeline)
-        _w('redis', 'Redis.pipeline', traced_pipeline)
-        _w('redis.client', 'BasePipeline.execute', traced_execute_pipeline)
-        _w('redis.client', 'BasePipeline.immediate_execute_command', traced_execute_command)
+        _w(redis, 'StrictRedis.execute_command', traced_execute_command)
+        _w(redis, 'StrictRedis.pipeline', traced_pipeline)
+        _w(redis, 'Redis.pipeline', traced_pipeline)
     else:
-        _w('redis', 'Redis.execute_command', traced_execute_command)
-        _w('redis', 'Redis.pipeline', traced_pipeline)
-        _w('redis.client', 'Pipeline.execute', traced_execute_pipeline)
-        _w('redis.client', 'Pipeline.immediate_execute_command', traced_execute_command)
+        _w(redis, 'Redis.execute_command', traced_execute_command)
+        _w(redis, 'Redis.pipeline', traced_pipeline)
+
     Pin(service=redisx.DEFAULT_SERVICE, app=redisx.APP, app_type=AppTypes.db).onto(redis.StrictRedis)
 
 
-def unpatch():
-    if getattr(redis, '_datadog_patch', False):
-        setattr(redis, '_datadog_patch', False)
+@register_module_hook('redis.client')
+def patch_redis_client(redis_client):
+    pipeline = 'BasePipeline' if hasattr(redis_client, 'BasePipeline') else 'Pipeline'
+    _w(redis_client, '{}.execute'.format(pipeline), traced_execute_pipeline)
+    _w(redis_client, '{}.immediate_execute_command'.format(pipeline), traced_execute_command)
 
-        if redis.VERSION < (3, 0, 0):
-            unwrap(redis.StrictRedis, 'execute_command')
-            unwrap(redis.StrictRedis, 'pipeline')
-            unwrap(redis.Redis, 'pipeline')
-            unwrap(redis.client.BasePipeline, 'execute')
-            unwrap(redis.client.BasePipeline, 'immediate_execute_command')
-        else:
-            unwrap(redis.Redis, 'execute_command')
-            unwrap(redis.Redis, 'pipeline')
-            unwrap(redis.client.Pipeline, 'execute')
-            unwrap(redis.client.Pipeline, 'immediate_execute_command')
+
+def unpatch():
+    hooks.deregister('redis', patch_redis)
+    hooks.deregister('redis.client', patch_redis_client)
 
 
 #
@@ -113,3 +91,4 @@ def traced_execute_pipeline(func, instance, args, kwargs):
 
 def _get_tags(conn):
     return _extract_conn_tags(conn.connection_pool.connection_kwargs)
+

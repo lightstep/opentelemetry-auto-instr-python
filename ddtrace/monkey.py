@@ -12,6 +12,7 @@ import threading
 
 from ddtrace.vendor.wrapt.importer import when_imported
 
+from .contrib import redis  # noqa: F401
 from .internal.logger import get_logger
 
 
@@ -37,7 +38,6 @@ PATCH_MODULES = {
     'pylibmc': True,
     'pymemcache': True,
     'pymongo': True,
-    'redis': True,
     'requests': True,
     'sqlalchemy': False,  # Prefer DB client instrumentation
     'sqlite3': True,
