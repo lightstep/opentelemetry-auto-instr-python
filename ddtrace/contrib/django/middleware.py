@@ -130,7 +130,14 @@ class TraceMiddleware(InstrumentationMixin):
                 )
 
             span.set_tag(http.METHOD, request.method)
-            span.set_tag(http.URL, request.build_absolute_uri(request.path))
+
+            full_path = request.get_full_path()
+            try:
+                span.set_tag(http.URL, request.build_absolute_uri(full_path))
+            except Exception:
+                log.debug('failed to build absolute uri from %s', full_path, exc_info=True)
+                span.set_tag(http.URL, full_path)
+
             _set_req_span(request, span)
         except Exception:
             log.debug('error tracing request', exc_info=True)
