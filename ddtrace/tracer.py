@@ -95,7 +95,7 @@ class Tracer(object):
 
     def configure(self, enabled=None, hostname=None, port=None, uds_path=None, dogstatsd_host=None,
                   dogstatsd_port=None, sampler=None, context_provider=None, wrap_executor=None,
-                  priority_sampling=None, settings=None, collect_metrics=None):
+                  priority_sampling=None, settings=None, collect_metrics=None, external_tracer=None):
         """
         Configure an existing Tracer the easy way.
         Allow to configure or reconfigure a Tracer instance.
@@ -115,6 +115,7 @@ class Tracer(object):
             from the default value
         :param priority_sampling: enable priority sampling, this is required for
             complete distributed tracing support. Enabled by default.
+        :param external_tracer: use a non-Datadog tracer for export.
         """
         if enabled is not None:
             self.enabled = enabled
@@ -163,6 +164,9 @@ class Tracer(object):
                 self._start_dogstatsd_client()
 
             self._start_runtime_worker()
+
+        if external_tracer is not None:
+            self._external_tracer = external_tracer
 
     def start_span(self, name, child_of=None, service=None, resource=None, span_type=None):
         """
@@ -282,6 +286,19 @@ class Tracer(object):
             # The constant tags for the dogstatsd client needs to updated with any new
             # service(s) that may have been added.
             self._update_dogstatsd_constant_tags()
+
+        # let the external tracer create a copy of the span for export
+        if self._external_tracer is not None:
+            print("creating external span for " + str(service) + " - " + str(name) + " - current_span=" + str(child_of.get_current_span().to_dict()))
+            print("  typeof parent: " + str(type(parent)))
+            ot_child_span = None
+            if parent is not None and hasattr(parent, '_external_span') and parent._external_span is not None:
+                ot_child_span = parent._external_span
+                print("  found ot_child_span = " + str(ot_child_span.operation_name))
+            span._external_span = self._external_tracer.start_span(
+                    operation_name=name, child_of=ot_child_span,
+                    references=None, tags=None, start_time=None,
+                    ignore_active_span=False)
 
         return span
 

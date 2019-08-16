@@ -115,6 +115,7 @@ class Span(OpenTracingSpan):
 
         This sets the tag on the underlying datadog span.
         """
+        print("opentracer/span.py set_tag("+key+", "+value+")")
         if key == Tags.SPAN_TYPE:
             self._dd_span.span_type = value
         elif key == Tags.SERVICE_NAME:

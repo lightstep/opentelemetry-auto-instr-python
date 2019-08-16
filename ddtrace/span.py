@@ -34,6 +34,7 @@ class Span(object):
         # Internal attributes
         '_tracer',
         '_context',
+        '_external_span',
         '_finished',
         '_parent',
         '__weakref__',
@@ -112,6 +113,13 @@ class Span(object):
             return
         self._finished = True
 
+        print("ddspan finish on " + str(self.name))
+        # finish external span
+        if hasattr(self, "_external_span") and self._external_span is not None:
+            print("  calling finish on external span")
+            self._external_span.finish(finish_time=finish_time)
+
+
         if self.duration is None:
             ft = finish_time or time.time()
             # be defensive so we don't die if start isn't set
@@ -136,6 +144,7 @@ class Span(object):
             be ignored.
         """
 
+        print("dd/span.py set_tag("+str(key)+", "+str(value)+")")
         if key in NUMERIC_TAGS:
             try:
                 self.set_metric(key, float(value))
