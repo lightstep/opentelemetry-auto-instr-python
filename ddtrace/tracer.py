@@ -209,6 +209,7 @@ class Tracer(object):
         else:
             trace_id = context.trace_id
             parent_span_id = context.span_id
+            print("parent_span_id extracted from context: " + str(parent_span_id))
 
         if trace_id:
             # child_of a non-empty context, so either a local child span or from a remote context
@@ -299,6 +300,19 @@ class Tracer(object):
                     operation_name=name, child_of=ot_child_span,
                     references=None, tags=None, start_time=None,
                     ignore_active_span=False)
+            #print("LS span id was: " + str(span._external_span.context.span_id))
+            # Force OpenTracing to use the same ids used by ddtracer
+            # If the same IDs are used by both spans then the propagation
+            # mechanishm already implemented by ddtracer will carry the span ID
+            # and it won't be necessary to inject opentracing ids manually
+            span._external_span.context.span_id = span.span_id
+            span._external_span.context.trace_id = span.trace_id
+            #print("trace id is ", trace_id)
+            # if child_of is not passed then the logic above tries to get
+            # parent_span_id from the context propagated from another process.
+            span._external_span.parent_id = parent_span_id
+            #print("LS span id is: " + str(span._external_span.context.span_id))
+            print("\n")
 
         return span
 
