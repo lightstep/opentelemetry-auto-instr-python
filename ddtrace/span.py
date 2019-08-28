@@ -34,6 +34,7 @@ class Span(object):
         # Internal attributes
         '_tracer',
         '_context',
+        '_otel_span',
         '_finished',
         '_parent',
         '__weakref__',
@@ -111,6 +112,11 @@ class Span(object):
         if self._finished:
             return
         self._finished = True
+
+        # finish otel span
+        if hasattr(self, "_otel_span") and self._otel_span is not None:
+            self._otel_span.end()
+
 
         if self.duration is None:
             ft = finish_time or time.time()

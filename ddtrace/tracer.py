@@ -16,6 +16,8 @@ from .utils.deprecation import deprecated
 from .vendor.dogstatsd import DogStatsd
 from .writer import AgentWriter
 from . import compat
+from opentelemetry.sdk.trace import Span as OTelSDKSpan
+from opentelemetry.trace import SpanContext as OTelSpanContext
 
 
 log = get_logger(__name__)
@@ -95,7 +97,7 @@ class Tracer(object):
 
     def configure(self, enabled=None, hostname=None, port=None, uds_path=None, dogstatsd_host=None,
                   dogstatsd_port=None, sampler=None, context_provider=None, wrap_executor=None,
-                  priority_sampling=None, settings=None, collect_metrics=None):
+                  priority_sampling=None, settings=None, collect_metrics=None, otel_tracer=None):
         """
         Configure an existing Tracer the easy way.
         Allow to configure or reconfigure a Tracer instance.
@@ -115,6 +117,7 @@ class Tracer(object):
             from the default value
         :param priority_sampling: enable priority sampling, this is required for
             complete distributed tracing support. Enabled by default.
+        :param otel_tracer: OpenTelemetry tracer
         """
         if enabled is not None:
             self.enabled = enabled
@@ -163,6 +166,9 @@ class Tracer(object):
                 self._start_dogstatsd_client()
 
             self._start_runtime_worker()
+
+        if otel_tracer is not None:
+            self._otel_tracer = otel_tracer
 
     def start_span(self, name, child_of=None, service=None, resource=None, span_type=None):
         """
@@ -282,6 +288,26 @@ class Tracer(object):
             # The constant tags for the dogstatsd client needs to updated with any new
             # service(s) that may have been added.
             self._update_dogstatsd_constant_tags()
+
+        # let the OpenTelemetry tracer create a copy of the span for export
+        if self._otel_tracer is not None:
+            otel_parent_span = None
+            if parent is not None and hasattr(parent, '_otel_span') and parent._otel_span is not None:
+                otel_parent_span = parent._otel_span
+                otel_context = OTelSpanContext(
+                    span.trace_id,
+                    span.span_id,
+                    otel_parent_span.context.trace_options,
+                    otel_parent_span.context.trace_state)
+            else:
+                otel_context = OTelSpanContext(span.trace_id, span.span_id)
+
+            # Once SpanProcessor exists, we will use it in:
+            #     OTelSDKSpan(..., span_processor=...)
+            # Pending on https://github.com/open-telemetry/opentelemetry-python/pull/115
+
+            span._otel_span = OTelSDKSpan(name=name, context=otel_context, parent=otel_parent_span)
+            span._otel_span.start()
 
         return span
 
