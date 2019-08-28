@@ -95,7 +95,7 @@ class Tracer(object):
 
     def configure(self, enabled=None, hostname=None, port=None, uds_path=None, dogstatsd_host=None,
                   dogstatsd_port=None, sampler=None, context_provider=None, wrap_executor=None,
-                  priority_sampling=None, settings=None, collect_metrics=None):
+                  priority_sampling=None, settings=None, collect_metrics=None, otel_tracer=None):
         """
         Configure an existing Tracer the easy way.
         Allow to configure or reconfigure a Tracer instance.
@@ -115,6 +115,7 @@ class Tracer(object):
             from the default value
         :param priority_sampling: enable priority sampling, this is required for
             complete distributed tracing support. Enabled by default.
+        :param otel_tracer: OpenTelemetry tracer
         """
         if enabled is not None:
             self.enabled = enabled
@@ -163,6 +164,9 @@ class Tracer(object):
                 self._start_dogstatsd_client()
 
             self._start_runtime_worker()
+
+        if otel_tracer is not None:
+            self._otel_tracer = otel_tracer
 
     def start_span(self, name, child_of=None, service=None, resource=None, span_type=None):
         """
@@ -282,6 +286,19 @@ class Tracer(object):
             # The constant tags for the dogstatsd client needs to updated with any new
             # service(s) that may have been added.
             self._update_dogstatsd_constant_tags()
+
+        # let the OpenTelemetry tracer create a copy of the span for export
+        if self._otel_tracer is not None:
+            print("creating OpenTelemetry span for " + str(service) + " - " + str(name) + " - current_span=" + str(child_of.get_current_span().to_dict()))
+            otel_parent_span = None
+            if parent is not None and hasattr(parent, '_otel_span') and parent._otel_span is not None:
+                otel_parent_span = parent._otel_span
+            span._otel_span = self._otel_tracer.create_span(
+                    name=name, parent=otel_parent_span, span_id=span.span_id,
+                    )
+            span._otel_span.start()
+            print("comparing span_id: dd=" + str(span.span_id))
+            print("comparing span_id: otel=" + str(span._otel_span.get_context().span_id))
 
         return span
 
