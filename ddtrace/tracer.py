@@ -294,11 +294,12 @@ class Tracer(object):
             if parent is not None and hasattr(parent, '_otel_span') and parent._otel_span is not None:
                 otel_parent_span = parent._otel_span
             span._otel_span = self._otel_tracer.create_span(
-                    name=name, parent=otel_parent_span, span_id=span.span_id,
+                    name=name, parent=otel_parent_span,
+                    trace_id=span.trace_id, span_id=span.span_id,
                     )
             span._otel_span.start()
-            print("comparing span_id: dd=" + str(span.span_id))
-            print("comparing span_id: otel=" + str(span._otel_span.get_context().span_id))
+            print("comparing trace_id: dd: " + str(span.trace_id) + " otel: "+ str(span._otel_span.get_context().trace_id))
+            print("comparing span_id: dd: " + str(span.span_id) + " otel: "+ str(span._otel_span.get_context().span_id))
 
         return span
 
