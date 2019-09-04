@@ -115,6 +115,21 @@ class Span(object):
 
         # finish otel span
         if hasattr(self, "_otel_span") and self._otel_span is not None:
+            # convert from ddog members to opentelemetry attributes.
+            # https://github.com/DataDog/dd-trace-py/blob/1f04d0fcfb3974611967004a22882b55db77433e/ddtrace/opentracer/span.py#L113
+            # TODO: use constans defined in opentracer/tags.py
+            if self.span_type is not None:
+                self._otel_span.set_attribute("span.type", self.span_type)
+
+            if self.service is not None:
+                self._otel_span.set_attribute("service.name", self.service)
+
+            if self.resource is not None:
+                self._otel_span.set_attribute("resource.name", self.resource)
+
+            if self.context.sampling_priority is not None:
+                self._otel_span.set_attribute("sampling.priority", self.context.sampling_priority)
+
             self._otel_span.end()
 
 
@@ -122,6 +137,8 @@ class Span(object):
             ft = finish_time or time.time()
             # be defensive so we don't die if start isn't set
             self.duration = ft - (self.start or ft)
+
+        #print("ddog: {0}".format(self.pprint()))
 
         if self._context:
             try:
@@ -158,6 +175,20 @@ class Span(object):
 
         try:
             self.meta[key] = stringify(value)
+
+            # if there is an otel span configured, set the attribute there
+            if hasattr(self, "_otel_span") and self._otel_span is not None:
+                # convert ddog names to otel names basically
+                # https://github.com/DataDog/dd-trace-py/blob/1f04d0fcfb3974611967004a22882b55db77433e/ddtrace/opentracer/span.py#L113
+                # they other way
+                # Attributes that are members in the ddog span are processed in the finish() method
+                if key == Tags.TARGET_HOST:
+                    key = "peer.hostname"
+                elif key == Tags.TARGET_PORT:
+                    key = "peer.port"
+
+                self._otel_span.set_attribute(key, stringify(value))
+
         except Exception:
             log.debug('error setting tag %s, ignoring it', key, exc_info=True)
 
