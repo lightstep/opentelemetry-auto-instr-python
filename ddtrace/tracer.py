@@ -16,9 +16,12 @@ from .utils.deprecation import deprecated
 from .vendor.dogstatsd import DogStatsd
 from .writer import AgentWriter
 from . import compat
-from opentelemetry.sdk.trace import Span as OTelSDKSpan
-from opentelemetry.trace import SpanContext as OTelSpanContext
 
+from opentelemetry.sdk.trace import Span as OTelSDKSpan
+from opentelemetry.sdk.trace import SpanProcessor as OtelSpanProcessor
+from opentelemetry.sdk.trace import export
+from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter as OtelInMemorySpanExporter
+from opentelemetry.trace import SpanContext as OTelSpanContext
 
 log = get_logger(__name__)
 
@@ -97,7 +100,8 @@ class Tracer(object):
 
     def configure(self, enabled=None, hostname=None, port=None, uds_path=None, dogstatsd_host=None,
                   dogstatsd_port=None, sampler=None, context_provider=None, wrap_executor=None,
-                  priority_sampling=None, settings=None, collect_metrics=None, otel_tracer=None):
+                  priority_sampling=None, settings=None, collect_metrics=None, otel_tracer=None,
+                  span_processor=None):
         """
         Configure an existing Tracer the easy way.
         Allow to configure or reconfigure a Tracer instance.
@@ -169,6 +173,9 @@ class Tracer(object):
 
         if otel_tracer is not None:
             self._otel_tracer = otel_tracer
+
+        if span_processor is not None:
+            self._span_processor = span_processor
 
     def start_span(self, name, child_of=None, service=None, resource=None, span_type=None):
         """
@@ -306,7 +313,8 @@ class Tracer(object):
             #     OTelSDKSpan(..., span_processor=...)
             # Pending on https://github.com/open-telemetry/opentelemetry-python/pull/115
 
-            span._otel_span = OTelSDKSpan(name=name, context=otel_context, parent=otel_parent_span)
+            span._otel_span = OTelSDKSpan(name=name, context=otel_context,
+                                          parent=otel_parent_span, span_processor=self._span_processor)
             span._otel_span.start()
 
         return span

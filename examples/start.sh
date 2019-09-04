@@ -7,7 +7,7 @@ virtualenv venv
 source venv/bin/activate
 
 # Install OTel-Python
-pushd /home/alban/go/src/github.com/open-telemetry/opentelemetry-python
+pushd /home/mvb/kinvolk/opentelemetry/opentelemetry-python/
     # Install API
     pushd opentelemetry-api
         python setup.py install

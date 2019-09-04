@@ -12,11 +12,21 @@ from opentelemetry import trace
 from opentelemetry.context import Context
 from opentelemetry.sdk.trace import Tracer
 
+from opentelemetry.sdk.trace import export
+from opentelemetry.sdk.trace.export.in_memory_span_exporter import (
+    InMemorySpanExporter,
+)
+
 trace.set_preferred_tracer_implementation(lambda T: Tracer())
 tracer = trace.tracer()
 
-ddtrace.tracer.configure(otel_tracer=tracer)
+# setup in memory span exporter
+memory_exporter = InMemorySpanExporter()
+span_processor = export.SimpleExportSpanProcessor(memory_exporter)
+tracer.add_span_processor(span_processor)
 
+
+ddtrace.tracer.configure(otel_tracer=tracer, span_processor=span_processor)
 
 app = Flask(__name__)
 
@@ -41,3 +51,10 @@ def hello_word2():
 
 app.run(host='127.0.0.1', port=8055)
 
+
+# print captured traces to the console
+print("captured traces: ")
+memory_exporter.shutdown()
+finished_spans = memory_exporter.get_finished_spans()
+for span in finished_spans:
+    print(span.pprint())
