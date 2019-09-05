@@ -52,6 +52,7 @@ class Tracer(object):
         # Apply the default configuration
         self.configure(
             enabled=True,
+            enable_report=True,
             hostname=self.DEFAULT_HOSTNAME,
             port=self.DEFAULT_PORT,
             sampler=AllSampler(),
@@ -101,7 +102,7 @@ class Tracer(object):
     def configure(self, enabled=None, hostname=None, port=None, uds_path=None, dogstatsd_host=None,
                   dogstatsd_port=None, sampler=None, context_provider=None, wrap_executor=None,
                   priority_sampling=None, settings=None, collect_metrics=None, otel_tracer=None,
-                  span_processor=None):
+                  span_processor=None, enable_report=None):
         """
         Configure an existing Tracer the easy way.
         Allow to configure or reconfigure a Tracer instance.
@@ -125,6 +126,9 @@ class Tracer(object):
         """
         if enabled is not None:
             self.enabled = enabled
+
+        if enable_report is not None:
+            self.enable_report = enable_report
 
         filters = None
         if settings is not None:
@@ -465,7 +469,7 @@ class Tracer(object):
             for span in spans:
                 log.debug('\n%s', span.pprint())
 
-        if self.enabled and self.writer:
+        if self.enable_report and self.writer:
             # only submit the spans if we're actually enabled (and don't crash :)
             self.writer.write(spans=spans)
 

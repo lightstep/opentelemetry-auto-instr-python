@@ -11,6 +11,16 @@ import logging
 from ddtrace.utils.formats import asbool, get_env
 from ddtrace.internal.logger import get_logger
 
+# TODO: add error handling in case these modules are not available
+from opentelemetry import trace as OtelTrace
+from opentelemetry.context import Context
+from opentelemetry.sdk.trace import Tracer
+
+from opentelemetry.sdk.trace import export
+from opentelemetry.sdk.trace.export.in_memory_span_exporter import (
+    InMemorySpanExporter,
+)
+
 logs_injection = asbool(get_env('logs', 'injection'))
 DD_LOG_FORMAT = '%(asctime)s %(levelname)s [%(name)s] [%(filename)s:%(lineno)d] {}- %(message)s'.format(
     '[dd.trace_id=%(dd.trace_id)s dd.span_id=%(dd.span_id)s] ' if logs_injection else ''
@@ -78,26 +88,35 @@ def add_global_tags(tracer):
 try:
     from ddtrace import tracer
     patch = True
+    otel_comp_enabled = False
 
     # Respect DATADOG_* environment variables in global tracer configuration
     # TODO: these variables are deprecated; use utils method and update our documentation
     # correct prefix should be DD_*
     enabled = os.environ.get('DATADOG_TRACE_ENABLED')
+    enable_report = os.environ.get('DATADOG_TRACE_ENABLE_REPORT')
     hostname = os.environ.get('DD_AGENT_HOST', os.environ.get('DATADOG_TRACE_AGENT_HOSTNAME'))
     port = os.environ.get('DATADOG_TRACE_AGENT_PORT')
     priority_sampling = os.environ.get('DATADOG_PRIORITY_SAMPLING')
+
+    otel_comp = os.environ.get('ENABLE_OTEL_COMPATIBILITY')
 
     opts = {}
 
     if enabled and enabled.lower() == 'false':
         opts['enabled'] = False
         patch = False
+    if enable_report and enable_report.lower() == 'false':
+        opts['enable_report'] = False
     if hostname:
         opts['hostname'] = hostname
     if port:
         opts['port'] = int(port)
     if priority_sampling:
         opts['priority_sampling'] = asbool(priority_sampling)
+
+    if otel_comp and otel_comp.lower() == 'true':
+        otel_comp_enabled = True
 
     opts['collect_metrics'] = asbool(get_env('runtime_metrics', 'enabled'))
 
@@ -121,6 +140,19 @@ try:
 
     if 'DD_TRACE_GLOBAL_TAGS' in os.environ:
         add_global_tags(tracer)
+
+    # TODO: check if modules are actually available
+    if otel_comp_enabled:
+        print("you request otel_comp")
+        OtelTrace.set_preferred_tracer_implementation(lambda T: Tracer())
+        otel_tracer = OtelTrace.tracer()
+
+        # setup in memory span exporter
+        memory_exporter = InMemorySpanExporter()
+        span_processor = export.SimpleExportSpanProcessor(memory_exporter)
+        otel_tracer.add_span_processor(span_processor)
+
+        tracer.configure(otel_tracer=otel_tracer, span_processor=span_processor)
 
     # Ensure sitecustomize.py is properly called if available in application directories:
     # * exclude `bootstrap_dir` from the search
