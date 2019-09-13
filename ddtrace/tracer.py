@@ -95,7 +95,7 @@ class Tracer(object):
 
     def configure(self, enabled=None, hostname=None, port=None, uds_path=None, dogstatsd_host=None,
                   dogstatsd_port=None, sampler=None, context_provider=None, wrap_executor=None,
-                  priority_sampling=None, settings=None, collect_metrics=None):
+                  priority_sampling=None, settings=None, collect_metrics=None, exporter_type="DATADOG"):
         """
         Configure an existing Tracer the easy way.
         Allow to configure or reconfigure a Tracer instance.
@@ -134,7 +134,7 @@ class Tracer(object):
             self.priority_sampler = None
 
         if hostname is not None or port is not None or uds_path is not None or filters is not None or \
-                priority_sampling is not None:
+                priority_sampling is not None or exporter_type is not None:
             # Preserve hostname and port when overriding filters or priority sampling
             default_hostname = self.DEFAULT_HOSTNAME
             default_port = self.DEFAULT_PORT
@@ -147,6 +147,7 @@ class Tracer(object):
                 uds_path=uds_path,
                 filters=filters,
                 priority_sampler=self.priority_sampler,
+                exporter_type=exporter_type
             )
 
         if context_provider is not None:

@@ -86,7 +86,8 @@ try:
     hostname = os.environ.get('DD_AGENT_HOST', os.environ.get('DATADOG_TRACE_AGENT_HOSTNAME'))
     port = os.environ.get('DATADOG_TRACE_AGENT_PORT')
     priority_sampling = os.environ.get('DATADOG_PRIORITY_SAMPLING')
-
+    # datadog (default) or opentelemetry.
+    exporter_type = os.environ.get('EXPORTER_TYPE')
     opts = {}
 
     if enabled and enabled.lower() == 'false':
@@ -100,6 +101,8 @@ try:
         opts['priority_sampling'] = asbool(priority_sampling)
 
     opts['collect_metrics'] = asbool(get_env('runtime_metrics', 'enabled'))
+
+    opts["exporter_type"] = "DATADOG" if exporter_type is None else exporter_type
 
     if opts:
         tracer.configure(**opts)
