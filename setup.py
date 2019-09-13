@@ -68,6 +68,8 @@ setup_kwargs = dict(
     packages=find_packages(exclude=['tests*']),
     install_requires=[
         'psutil>=5.0.0',
+        'opentelemetry-api',
+        'opentelemetry-sdk',
     ],
     # plugin tox
     tests_require=['tox', 'flake8'],
@@ -86,7 +88,7 @@ setup_kwargs = dict(
         'Programming Language :: Python :: 3.7',
     ],
     use_scm_version=True,
-    setup_requires=['setuptools_scm'],
+    setup_requires=['setuptools_scm', 'opentelemetry-api', 'opentelemetry-sdk'],
 )
 
 

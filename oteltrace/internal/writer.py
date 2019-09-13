@@ -26,7 +26,7 @@ class AgentWriter(_worker.PeriodicWorkerThread):
     _STATS_EVERY_INTERVAL = 10
 
     def __init__(self, shutdown_timeout=DEFAULT_TIMEOUT, filters=None,
-                 priority_sampler=None, metrics_client=None):
+                 priority_sampler=None, metrics_client=None, api=None):
         super(AgentWriter, self).__init__(interval=self.QUEUE_PROCESSING_INTERVAL,
                                           exit_timeout=shutdown_timeout,
                                           name=self.__class__.__name__)
@@ -35,7 +35,7 @@ class AgentWriter(_worker.PeriodicWorkerThread):
         self._priority_sampler = priority_sampler
         self._last_error_ts = 0
         self.metrics_client = metrics_client
-        self.api = None  # TODO: will be added in next commits
+        self.api = api
         self._stats_rate_counter = 0
         self.start()
 

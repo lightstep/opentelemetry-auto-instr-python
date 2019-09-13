@@ -9,6 +9,14 @@ can be controlled by passing an `api` object to :func:`oteltrace.Tracer.configur
 
 The :class:`oteltrace.api_otel_exporter.APIOtel` class uses an OpenTelemetry exporters as backend.
 
+Sending traces to different backends
+------------------------------------
+
+`oteltrace` can export traces to different backends by using different api implementations, it
+can be controlled by passing an `api` object to :func:`oteltrace.Tracer.configure`.
+
+The :class:`oteltrace.api_otel_exporter.APIOtel` class uses an OpenTelemetry exporters as backend.
+
 
 Distributed Tracing
 -------------------
@@ -454,6 +462,21 @@ The available environment variables for ``oteltrace-run`` are:
   Sampling`
 * ``OTEL_LOGS_INJECTION`` (default: false): enables :ref:`Logs Injection`
 
+Exporter Configuration
+^^^^^^^^^^^^^^^^^^^^^^
+
+``oteltrace-run`` uses OpenTelemetry SDK exporters to send the traces to
+different backends.
+The exporter to be used is configured using the following env variables:
+
+* ``OTEL_EXPORTER_MODULE`` specifies the python module where the exporter is implemented.
+* ``OTEL_EXPORTER_FACTORY`` defines a function to be called to get an instance of the exporter.
+
+The specific configuration for each type of exporter is defined by using the
+``OTEL_EXPORTER_OPTIONS_*`` env variables.
+The text after ``OTEL_EXPORTER_OPTIONS_`` will be passed to
+``OTEL_EXPORTER_FACTORY`` as kwargs.
+
 ``oteltrace-run`` respects a variety of common entrypoints for web applications:
 
 - ``oteltrace-run python my_app.py``
@@ -497,6 +520,12 @@ API
 ``Pin``
 ^^^^^^^
 .. autoclass:: oteltrace.Pin
+    :members:
+    :special-members: __init__
+
+``APIOtel``
+^^^^^^^^^^^
+.. autoclass:: oteltrace.api_otel_exporter.APIOtel
     :members:
     :special-members: __init__
 

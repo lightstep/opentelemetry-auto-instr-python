@@ -25,7 +25,7 @@ then to auto-instrument using OpenTelemetry, the corresponding command is::
 
 $ oteltrace-run python app.py
 
-For more advanced usage of ``oteltrace-run`` refer to the documentation :ref:`here<oteltracerun>`.
+For more advanced usage of ``oteltrace-run``, like using an OpenTelemetry exporter, refer to the documentation :ref:`here<oteltracerun>`.
 
 ``patch_all``
 ^^^^^^^^^^^^^

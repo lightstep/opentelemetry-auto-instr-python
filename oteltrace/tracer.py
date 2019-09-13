@@ -100,7 +100,8 @@ class Tracer(object):
         return self._context_provider
 
     def configure(self, enabled=None, sampler=None, context_provider=None,
-                  wrap_executor=None, priority_sampling=None, settings=None, collect_metrics=None):
+                  wrap_executor=None, priority_sampling=None, settings=None, collect_metrics=None,
+                  api=None):
         """
         Configure an existing Tracer the easy way.
         Allow to configure or reconfigure a Tracer instance.
@@ -117,6 +118,8 @@ class Tracer(object):
         :param priority_sampling: enable priority sampling, this is required for
             complete distributed tracing support. Enabled by default.
         :param collect_metrics: Whether to enable runtime metrics collection.
+        :param object api: object to export the traces to a backend.
+        :param class http_propagator: type of propagator to be used to distribute the tracing context.
         """
         if enabled is not None:
             self.enabled = enabled
@@ -139,10 +142,11 @@ class Tracer(object):
         if isinstance(self.sampler, OpenTelemetrySampler):
             self.sampler._priority_sampler = self.priority_sampler
 
-        if filters is not None or priority_sampling is not None:
+        if filters is not None or priority_sampling is not None or api is not None:
             self.writer = AgentWriter(
                 filters=filters,
                 priority_sampler=self.priority_sampler,
+                api=api,
             )
 
         if context_provider is not None:

@@ -207,3 +207,18 @@ class OteltraceRunTest(BaseTestCase):
                 ['oteltrace-run', 'python', 'tests/commands/oteltrace_run_logs_injection.py']
             )
             assert out.startswith(b'Test success')
+
+    def test_otel_exporter(self):
+        """ Ensure exporter is properly loaded
+        """
+        oteltrace_run_conf = {
+            'OTEL_EXPORTER_MODULE': 'tests.commands.module_mock',
+            'OTEL_EXPORTER_FACTORY': 'build_exporter',
+            'OTEL_EXPORTER_OPTIONS_key': '0x9812892467541',
+            'OTEL_EXPORTER_OPTIONS_url': 'opentelemetry.io',
+        }
+        with self.override_env(oteltrace_run_conf):
+            out = subprocess.check_output(
+                ['oteltrace-run', 'python', 'tests/commands/oteltrace_run_otelexporter.py']
+            )
+            assert out.startswith(b'Test success')
