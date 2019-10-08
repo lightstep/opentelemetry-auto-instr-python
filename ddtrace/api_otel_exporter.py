@@ -74,13 +74,6 @@ class APIOtel(object):
         if self._exporter is None:
             raise ValueError("Exporter is None")
 
-        # fake hostname and port to avoid crash
-        self.hostname = ''
-        self.port = 0
-
-    def __str__(self):
-        pass
-
     def send_traces(self, traces):
         """Send traces to the API.
 

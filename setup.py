@@ -142,13 +142,6 @@ try:
             'ddtrace.vendor.wrapt._wrappers',
             sources=['ddtrace/vendor/wrapt/_wrappers.c'],
         ),
-        Extension(
-            'ddtrace.vendor.msgpack._cmsgpack',
-            sources=['ddtrace/vendor/msgpack/_cmsgpack.cpp'],
-            libraries=libraries,
-            include_dirs=['ddtrace/vendor/'],
-            define_macros=macros,
-        ),
     ]
     # DEV: Make sure `cmdclass` exists
     kwargs.setdefault('cmdclass', dict())

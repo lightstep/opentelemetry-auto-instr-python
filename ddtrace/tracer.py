@@ -13,7 +13,7 @@ from .sampler import AllSampler, RateSampler, RateByServiceSampler
 from .span import Span
 from .utils.formats import get_env
 from .utils.deprecation import deprecated
-from .vendor.dogstatsd import DogStatsd
+#from .vendor.dogstatsd import DogStatsd
 from .writer import AgentWriter
 from . import compat
 
@@ -32,9 +32,6 @@ class Tracer(object):
         from ddtrace import tracer
         trace = tracer.trace('app.request', 'web-server').finish()
     """
-    DEFAULT_HOSTNAME = environ.get('DD_AGENT_HOST', environ.get('DATADOG_TRACE_AGENT_HOSTNAME', 'localhost'))
-    DEFAULT_PORT = int(environ.get('DD_TRACE_AGENT_PORT', 8126))
-    DEFAULT_DOGSTATSD_PORT = int(get_env('dogstatsd', 'port', 8125))
 
     def __init__(self):
         """
@@ -47,8 +44,6 @@ class Tracer(object):
         # Apply the default configuration
         self.configure(
             enabled=True,
-            hostname=self.DEFAULT_HOSTNAME,
-            port=self.DEFAULT_PORT,
             sampler=AllSampler(),
             context_provider=DefaultContextProvider(),
         )
@@ -67,8 +62,8 @@ class Tracer(object):
         self._pid = getpid()
         self._runtime_worker = None
         self._dogstatsd_client = None
-        self._dogstatsd_host = self.DEFAULT_HOSTNAME
-        self._dogstatsd_port = self.DEFAULT_DOGSTATSD_PORT
+        #self._dogstatsd_host = self.DEFAULT_HOSTNAME
+        #self._dogstatsd_port = self.DEFAULT_DOGSTATSD_PORT
 
     def get_call_context(self, *args, **kwargs):
         """
@@ -93,18 +88,15 @@ class Tracer(object):
         """Returns the current Tracer Context Provider"""
         return self._context_provider
 
-    def configure(self, enabled=None, hostname=None, port=None, uds_path=None, dogstatsd_host=None,
+    def configure(self, enabled=None, dogstatsd_host=None,
                   dogstatsd_port=None, sampler=None, context_provider=None, wrap_executor=None,
-                  priority_sampling=None, settings=None, collect_metrics=None, exporter_type="DATADOG"):
+                  priority_sampling=None, settings=None, collect_metrics=None):
         """
         Configure an existing Tracer the easy way.
         Allow to configure or reconfigure a Tracer instance.
 
         :param bool enabled: If True, finished traces will be submitted to the API.
             Otherwise they'll be dropped.
-        :param str hostname: Hostname running the Trace Agent
-        :param int port: Port of the Trace Agent
-        :param str uds_path: The Unix Domain Socket path of the agent.
         :param int metric_port: Port of DogStatsd
         :param object sampler: A custom Sampler instance, locally deciding to totally drop the trace or not.
         :param object context_provider: The ``ContextProvider`` that will be used to retrieve
@@ -133,22 +125,11 @@ class Tracer(object):
         elif priority_sampling is False:
             self.priority_sampler = None
 
-        if hostname is not None or port is not None or uds_path is not None or filters is not None or \
-                priority_sampling is not None or exporter_type is not None:
-            # Preserve hostname and port when overriding filters or priority sampling
-            default_hostname = self.DEFAULT_HOSTNAME
-            default_port = self.DEFAULT_PORT
-            if hasattr(self, 'writer') and hasattr(self.writer, 'api'):
-                default_hostname = self.writer.api.hostname
-                default_port = self.writer.api.port
-            self.writer = AgentWriter(
-                hostname or default_hostname,
-                port or default_port,
-                uds_path=uds_path,
-                filters=filters,
-                priority_sampler=self.priority_sampler,
-                exporter_type=exporter_type
-            )
+        #if filters is not None or priority_sampling is not None:
+        self.writer = AgentWriter(
+            filters=filters,
+            priority_sampler=self.priority_sampler,
+        )
 
         if context_provider is not None:
             self._context_provider = context_provider
@@ -156,14 +137,14 @@ class Tracer(object):
         if wrap_executor is not None:
             self._wrap_executor = wrap_executor
 
-        if collect_metrics and self._runtime_worker is None:
-            self._dogstatsd_host = dogstatsd_host or self._dogstatsd_host
-            self._dogstatsd_port = dogstatsd_port or self._dogstatsd_port
-            # start dogstatsd client if not already running
-            if not self._dogstatsd_client:
-                self._start_dogstatsd_client()
-
-            self._start_runtime_worker()
+        #if collect_metrics and self._runtime_worker is None:
+        #    self._dogstatsd_host = dogstatsd_host or self._dogstatsd_host
+        #    self._dogstatsd_port = dogstatsd_port or self._dogstatsd_port
+        #    # start dogstatsd client if not already running
+        #    if not self._dogstatsd_client:
+        #        self._start_dogstatsd_client()
+        #
+        #    self._start_runtime_worker()
 
     def start_span(self, name, child_of=None, service=None, resource=None, span_type=None):
         """
