@@ -97,36 +97,6 @@ class DdtraceRunTest(BaseTestCase):
             )
             assert out.startswith(b'Test success')
 
-    def test_host_port_from_env(self):
-        """
-        DATADOG_TRACE_AGENT_HOSTNAME|PORT point to the tracer
-        to the correct host/port for submission
-        """
-        with self.override_env(dict(DATADOG_TRACE_AGENT_HOSTNAME='172.10.0.1',
-                                    DATADOG_TRACE_AGENT_PORT='8120')):
-            out = subprocess.check_output(
-                ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_hostname.py']
-            )
-            assert out.startswith(b'Test success')
-
-    def test_host_port_from_env_dd(self):
-        """
-        DD_AGENT_HOST|DD_TRACE_AGENT_PORT point to the tracer
-        to the correct host/port for submission
-        """
-        with self.override_env(dict(DD_AGENT_HOST='172.10.0.1',
-                                    DD_TRACE_AGENT_PORT='8120')):
-            out = subprocess.check_output(
-                ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_hostname.py']
-            )
-            assert out.startswith(b'Test success')
-
-            # Do we get the same results without `ddtrace-run`?
-            out = subprocess.check_output(
-                ['python', 'tests/commands/ddtrace_run_hostname.py']
-            )
-            assert out.startswith(b'Test success')
-
     def test_priority_sampling_from_env(self):
         """
         DATADOG_PRIORITY_SAMPLING enables Distributed Sampling

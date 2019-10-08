@@ -4,7 +4,6 @@ import random
 import os
 import time
 
-from .. import api
 from .. import _worker
 from ..utils import sizeof
 from ..internal.logger import get_logger
@@ -26,10 +25,8 @@ class AgentWriter(_worker.PeriodicWorkerThread):
     _ENABLE_STATS = False
     _STATS_EVERY_INTERVAL = 10
 
-    def __init__(self, hostname='localhost', port=8126, uds_path=None, https=False,
-                 shutdown_timeout=DEFAULT_TIMEOUT,
-                 filters=None, priority_sampler=None,
-                 metrics_client=None):
+    def __init__(self, shutdown_timeout=DEFAULT_TIMEOUT, filters=None,
+                 priority_sampler=None, metrics_client=None):
         super(AgentWriter, self).__init__(interval=self.QUEUE_PROCESSING_INTERVAL,
                                           exit_timeout=shutdown_timeout,
                                           name=self.__class__.__name__)
@@ -38,8 +35,7 @@ class AgentWriter(_worker.PeriodicWorkerThread):
         self._priority_sampler = priority_sampler
         self._last_error_ts = 0
         self.metrics_client = metrics_client
-        self.api = api.API(hostname, port, uds_path=uds_path, https=https,
-                           priority_sampling=priority_sampler is not None)
+        self.api = None  # TODO: will be added in next commits
         self._stats_rate_counter = 0
         self.start()
 
@@ -158,20 +154,11 @@ class AgentWriter(_worker.PeriodicWorkerThread):
             log_level = log.error
             self._last_error_ts = now
         prefix = 'Failed to send traces to Datadog Agent at %s: '
-        if isinstance(response, api.Response):
-            log_level(
-                prefix + 'HTTP error status %s, reason %s, message %s',
-                self.api,
-                response.status,
-                response.reason,
-                response.msg,
-            )
-        else:
-            log_level(
-                prefix + '%s',
-                self.api,
-                response,
-            )
+        log_level(
+            prefix + '%s',
+            self.api,
+            response,
+        )
 
     def _apply_filters(self, traces):
         """

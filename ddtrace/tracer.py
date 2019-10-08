@@ -1,6 +1,6 @@
 import functools
 import logging
-from os import environ, getpid
+from os import getpid
 
 from .constants import FILTERS_KEY, SAMPLE_RATE_METRIC_KEY
 from .ext import system
@@ -31,9 +31,6 @@ class Tracer(object):
     """
     _RUNTIME_METRICS_INTERVAL = 10
 
-    DEFAULT_HOSTNAME = environ.get('DD_AGENT_HOST', environ.get('DATADOG_TRACE_AGENT_HOSTNAME', 'localhost'))
-    DEFAULT_PORT = int(environ.get('DD_TRACE_AGENT_PORT', 8126))
-
     def __init__(self):
         """
         Create a new ``Tracer`` instance. A global tracer is already initialized
@@ -48,8 +45,6 @@ class Tracer(object):
         # Apply the default configuration
         self.configure(
             enabled=True,
-            hostname=self.DEFAULT_HOSTNAME,
-            port=self.DEFAULT_PORT,
             sampler=AllSampler(),
             context_provider=DefaultContextProvider(),
         )
@@ -104,19 +99,14 @@ class Tracer(object):
         """Returns the current Tracer Context Provider"""
         return self._context_provider
 
-    def configure(self, enabled=None, hostname=None, port=None, uds_path=None, https=None,
-                  sampler=None, context_provider=None, wrap_executor=None, priority_sampling=None,
-                  settings=None, collect_metrics=None):
+    def configure(self, enabled=None, sampler=None, context_provider=None,
+                  wrap_executor=None, priority_sampling=None, settings=None, collect_metrics=None):
         """
         Configure an existing Tracer the easy way.
         Allow to configure or reconfigure a Tracer instance.
 
         :param bool enabled: If True, finished traces will be submitted to the API.
             Otherwise they'll be dropped.
-        :param str hostname: Hostname running the Trace Agent
-        :param int port: Port of the Trace Agent
-        :param str uds_path: The Unix Domain Socket path of the agent.
-        :param bool https: Whether to use HTTPS or HTTP.
         :param object sampler: A custom Sampler instance, locally deciding to totally drop the trace or not.
         :param object context_provider: The ``ContextProvider`` that will be used to retrieve
             automatically the current call context. This is an advanced option that usually
@@ -149,21 +139,8 @@ class Tracer(object):
         if isinstance(self.sampler, DatadogSampler):
             self.sampler._priority_sampler = self.priority_sampler
 
-        if hostname is not None or port is not None or uds_path is not None or https is not None or \
-                filters is not None or priority_sampling is not None:
-            # Preserve hostname and port when overriding filters or priority sampling
-            default_hostname = self.DEFAULT_HOSTNAME
-            default_port = self.DEFAULT_PORT
-            if hasattr(self, 'writer') and hasattr(self.writer, 'api'):
-                default_hostname = self.writer.api.hostname
-                default_port = self.writer.api.port
-                if https is None:
-                    https = self.writer.api.https
+        if filters is not None or priority_sampling is not None:
             self.writer = AgentWriter(
-                hostname or default_hostname,
-                port or default_port,
-                uds_path=uds_path,
-                https=https,
                 filters=filters,
                 priority_sampler=self.priority_sampler,
             )

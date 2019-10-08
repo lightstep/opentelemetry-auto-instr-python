@@ -12,8 +12,6 @@ class DjangoInstrumentationTest(DjangoTraceTestCase):
     """
     def test_tracer_flags(self):
         assert self.tracer.enabled
-        assert self.tracer.writer.api.hostname == 'localhost'
-        assert self.tracer.writer.api.port == 8126
         assert self.tracer.tags == {'env': 'test'}
 
     def test_environment_vars(self):

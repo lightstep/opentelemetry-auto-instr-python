@@ -105,8 +105,8 @@ def should_skip_request(pin, request):
     if not pin or not pin.enabled():
         return True
 
-    api = pin.tracer.writer.api
-    return request.host == api.hostname and request.port == api.port
+    # TODO(Mauricio): what logic should be used here?
+    return False
 
 
 def patch():

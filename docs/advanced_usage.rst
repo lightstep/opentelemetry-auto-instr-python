@@ -1,24 +1,13 @@
 Advanced Usage
 ==============
 
-Agent Configuration
--------------------
+Sending traces to different backends
+------------------------------------
 
-If the Datadog Agent is on a separate host from your application, you can modify
-the default ``ddtrace.tracer`` object to utilize another hostname and port. Here
-is a small example showcasing this::
+`oteltrace` can export traces to different backends by using different api implementations, it
+can be controlled by passing an `api` object to :func:`oteltrace.Tracer.configure`.
 
-    from ddtrace import tracer
-
-    tracer.configure(hostname=<YOUR_HOST>, port=<YOUR_PORT>, https=<True/False>)
-
-By default, these will be set to ``localhost``, ``8126``, and ``False`` respectively.
-
-You can also use a Unix Domain Socket to connect to the agent::
-
-    from ddtrace import tracer
-
-    tracer.configure(uds_path="/path/to/socket")
+The :class:`oteltrace.api_otel_exporter.APIOtel` class uses an OpenTelemetry exporters as backend.
 
 
 Distributed Tracing

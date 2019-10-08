@@ -42,8 +42,6 @@ def tracer_config(__init__, app, args, kwargs):
         context_provider=context_provider,
         wrap_executor=decorators.wrap_executor,
         enabled=settings.get('enabled', None),
-        hostname=settings.get('agent_hostname', None),
-        port=settings.get('agent_port', None),
         settings=extra_settings,
     )
 

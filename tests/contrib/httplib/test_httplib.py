@@ -116,18 +116,6 @@ class HTTPLibTestCase(HTTPLibBaseMixin, BaseTracerTestCase):
         pin = Pin.get_from(request)
         self.assertTrue(should_skip_request(pin, request))
 
-        # Enabled Pin and internal request
-        self.tracer.enabled = True
-        request = self.get_http_connection(self.tracer.writer.api.hostname, self.tracer.writer.api.port)
-        pin = Pin.get_from(request)
-        self.assertTrue(should_skip_request(pin, request))
-
-        # Disabled Pin and internal request
-        self.tracer.enabled = False
-        request = self.get_http_connection(self.tracer.writer.api.hostname, self.tracer.writer.api.port)
-        pin = Pin.get_from(request)
-        self.assertTrue(should_skip_request(pin, request))
-
     def test_httplib_request_get_request(self, query_string=''):
         """
         When making a GET request via httplib.HTTPConnection.request
