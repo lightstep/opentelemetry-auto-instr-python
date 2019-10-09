@@ -34,8 +34,8 @@ class TestRequestsDistributed(BaseRequestTestCase, BaseTracerTestCase):
         with self.tracer.trace('root') as root:
             def matcher(request):
                 return self.headers_here(self.tracer, request, root)
-            adapter.register_uri('GET', 'mock://datadog/foo', additional_matcher=matcher, text='bar')
-            resp = self.session.get('mock://datadog/foo')
+            adapter.register_uri('GET', 'mock://opentelemetry/foo', additional_matcher=matcher, text='bar')
+            resp = self.session.get('mock://opentelemetry/foo')
             assert 200 == resp.status_code
             assert 'bar' == resp.text
 
@@ -48,8 +48,8 @@ class TestRequestsDistributed(BaseRequestTestCase, BaseTracerTestCase):
             with self.tracer.trace('root') as root:
                 def matcher(request):
                     return self.headers_here(self.tracer, request, root)
-                adapter.register_uri('GET', 'mock://datadog/foo', additional_matcher=matcher, text='bar')
-                resp = self.session.get('mock://datadog/foo')
+                adapter.register_uri('GET', 'mock://opentelemetry/foo', additional_matcher=matcher, text='bar')
+                resp = self.session.get('mock://opentelemetry/foo')
                 assert 200 == resp.status_code
                 assert 'bar' == resp.text
 
@@ -62,8 +62,8 @@ class TestRequestsDistributed(BaseRequestTestCase, BaseTracerTestCase):
             with self.tracer.trace('root'):
                 def matcher(request):
                     return self.headers_not_here(self.tracer, request)
-                adapter.register_uri('GET', 'mock://datadog/foo', additional_matcher=matcher, text='bar')
-                resp = self.session.get('mock://datadog/foo')
+                adapter.register_uri('GET', 'mock://opentelemetry/foo', additional_matcher=matcher, text='bar')
+                resp = self.session.get('mock://opentelemetry/foo')
                 assert 200 == resp.status_code
                 assert 'bar' == resp.text
 
@@ -77,8 +77,8 @@ class TestRequestsDistributed(BaseRequestTestCase, BaseTracerTestCase):
         with self.tracer.trace('root') as root:
             def matcher(request):
                 return self.headers_here(self.tracer, request, root)
-            adapter.register_uri('GET', 'mock://datadog/foo', additional_matcher=matcher, text='bar')
-            resp = self.session.get('mock://datadog/foo')
+            adapter.register_uri('GET', 'mock://opentelemetry/foo', additional_matcher=matcher, text='bar')
+            resp = self.session.get('mock://opentelemetry/foo')
             assert 200 == resp.status_code
             assert 'bar' == resp.text
 
@@ -99,8 +99,8 @@ class TestRequestsDistributed(BaseRequestTestCase, BaseTracerTestCase):
         with self.tracer.trace('root'):
             def matcher(request):
                 return self.headers_not_here(self.tracer, request)
-            adapter.register_uri('GET', 'mock://datadog/foo', additional_matcher=matcher, text='bar')
-            resp = self.session.get('mock://datadog/foo')
+            adapter.register_uri('GET', 'mock://opentelemetry/foo', additional_matcher=matcher, text='bar')
+            resp = self.session.get('mock://opentelemetry/foo')
             assert 200 == resp.status_code
             assert 'bar' == resp.text
 
@@ -113,8 +113,8 @@ class TestRequestsDistributed(BaseRequestTestCase, BaseTracerTestCase):
         with self.tracer.trace('root') as root:
             def matcher(request):
                 return self.headers_here(self.tracer, request, root)
-            adapter.register_uri('GET', 'mock://datadog/foo', additional_matcher=matcher, text='bar')
-            resp = self.session.get('mock://datadog/foo')
+            adapter.register_uri('GET', 'mock://opentelemetry/foo', additional_matcher=matcher, text='bar')
+            resp = self.session.get('mock://opentelemetry/foo')
             assert 200 == resp.status_code
             assert 'bar' == resp.text
 
@@ -135,8 +135,8 @@ class TestRequestsDistributed(BaseRequestTestCase, BaseTracerTestCase):
         with self.tracer.trace('root') as root:
             def matcher(request):
                 return self.headers_here(self.tracer, request, root)
-            adapter.register_uri('GET', 'mock://datadog/foo', additional_matcher=matcher, text='bar')
-            resp = self.session.get('mock://datadog/foo')
+            adapter.register_uri('GET', 'mock://opentelemetry/foo', additional_matcher=matcher, text='bar')
+            resp = self.session.get('mock://opentelemetry/foo')
             assert 200 == resp.status_code
             assert 'bar' == resp.text
 
@@ -157,7 +157,7 @@ class TestRequestsDistributed(BaseRequestTestCase, BaseTracerTestCase):
         with self.tracer.trace('root'):
             def matcher(request):
                 return self.headers_not_here(self.tracer, request)
-            adapter.register_uri('GET', 'mock://datadog/foo', additional_matcher=matcher, text='bar')
-            resp = self.session.get('mock://datadog/foo')
+            adapter.register_uri('GET', 'mock://opentelemetry/foo', additional_matcher=matcher, text='bar')
+            resp = self.session.get('mock://opentelemetry/foo')
             assert 200 == resp.status_code
             assert 'bar' == resp.text
