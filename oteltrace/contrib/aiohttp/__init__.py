@@ -17,11 +17,11 @@ Auto instrumentation is available using the ``trace_app`` function::
     trace_app(app, tracer, service='async-api')
     web.run_app(app, port=8000)
 
-Integration settings are attached to your application under the ``datadog_trace``
+Integration settings are attached to your application under the ``opentelemetry_trace``
 namespace. You can read or update them as follows::
 
     # disables distributed tracing for all received requests
-    app['datadog_trace']['distributed_tracing_enabled'] = False
+    app['opentelemetry_trace']['distributed_tracing_enabled'] = False
 
 Available settings are:
 
@@ -42,7 +42,7 @@ When a request span is created, a new ``Context`` for this logical execution is 
 to the ``request`` object, so that it can be used in the application code::
 
     async def home_handler(request):
-        ctx = request['datadog_context']
+        ctx = request['opentelemetry_context']
         # do something with the tracing Context
 """
 from ...utils.importlib import require_modules

@@ -26,7 +26,7 @@ class FlaskAutopatchTestCase(unittest.TestCase):
         #      we only need basic tests here to assert `oteltrace-run` patched thingsa
 
         # Assert module is marked as patched
-        self.assertTrue(flask._datadog_patch)
+        self.assertTrue(flask._opentelemetry_patch)
 
         # Assert our instance of flask.app.Flask is patched
         self.assertTrue(isinstance(self.app.add_url_rule, wrapt.ObjectProxy))

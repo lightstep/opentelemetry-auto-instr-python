@@ -51,7 +51,7 @@ the ``trace()`` method as usual::
 Tornado settings can be used to change some tracing configuration, like::
 
     settings = {
-        'datadog_trace': {
+        'opentelemetry_trace': {
             'default_service': 'my-tornado-app',
             'tags': {'env': 'production'},
             'distributed_tracing': False,

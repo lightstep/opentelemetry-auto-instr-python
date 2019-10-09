@@ -62,9 +62,9 @@ def patch():
     Patch `flask` module for tracing
     """
     # Check to see if we have patched Flask yet or not
-    if getattr(flask, '_datadog_patch', False):
+    if getattr(flask, '_opentelemetry_patch', False):
         return
-    setattr(flask, '_datadog_patch', True)
+    setattr(flask, '_opentelemetry_patch', True)
 
     # Attach service pin to `flask.app.Flask`
     Pin(
@@ -170,9 +170,9 @@ def patch():
 
 
 def unpatch():
-    if not getattr(flask, '_datadog_patch', False):
+    if not getattr(flask, '_opentelemetry_patch', False):
         return
-    setattr(flask, '_datadog_patch', False)
+    setattr(flask, '_opentelemetry_patch', False)
 
     props = [
         # Flask

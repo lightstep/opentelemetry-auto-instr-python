@@ -25,8 +25,8 @@ def connection_factory(tracer, service='postgres'):
 
     return functools.partial(
         TracedConnection,
-        datadog_tracer=tracer,
-        datadog_service=service,
+        opentelemetry_tracer=tracer,
+        opentelemetry_service=service,
     )
 
 
@@ -34,23 +34,23 @@ class TracedCursor(cursor):
     """Wrapper around cursor creating one span per query"""
 
     def __init__(self, *args, **kwargs):
-        self._datadog_tracer = kwargs.pop('datadog_tracer', None)
-        self._datadog_service = kwargs.pop('datadog_service', None)
-        self._datadog_tags = kwargs.pop('datadog_tags', None)
+        self._opentelemetry_tracer = kwargs.pop('opentelemetry_tracer', None)
+        self._opentelemetry_service = kwargs.pop('opentelemetry_service', None)
+        self._opentelemetry_tags = kwargs.pop('opentelemetry_tags', None)
         super(TracedCursor, self).__init__(*args, **kwargs)
 
     def execute(self, query, vars=None):
         """ just wrap the cursor execution in a span """
-        if not self._datadog_tracer:
+        if not self._opentelemetry_tracer:
             return cursor.execute(self, query, vars)
 
-        with self._datadog_tracer.trace('postgres.query', service=self._datadog_service) as s:
+        with self._opentelemetry_tracer.trace('postgres.query', service=self._opentelemetry_service) as s:
             if not s.sampled:
                 return super(TracedCursor, self).execute(query, vars)
 
             s.resource = query
             s.span_type = sql.TYPE
-            s.set_tags(self._datadog_tags)
+            s.set_tags(self._opentelemetry_tags)
             try:
                 return super(TracedCursor, self).execute(query, vars)
             finally:
@@ -66,14 +66,14 @@ class TracedConnection(connection):
 
     def __init__(self, *args, **kwargs):
 
-        self._datadog_tracer = kwargs.pop('datadog_tracer', None)
-        self._datadog_service = kwargs.pop('datadog_service', None)
+        self._opentelemetry_tracer = kwargs.pop('opentelemetry_tracer', None)
+        self._opentelemetry_service = kwargs.pop('opentelemetry_service', None)
 
         super(TracedConnection, self).__init__(*args, **kwargs)
 
         # add metadata (from the connection, string, etc)
         dsn = sql.parse_pg_dsn(self.dsn)
-        self._datadog_tags = {
+        self._opentelemetry_tags = {
             net.TARGET_HOST: dsn.get('host'),
             net.TARGET_PORT: dsn.get('port'),
             db.NAME: dsn.get('dbname'),
@@ -81,14 +81,14 @@ class TracedConnection(connection):
             'db.application': dsn.get('application_name'),
         }
 
-        self._datadog_cursor_class = functools.partial(
+        self._opentelemetry_cursor_class = functools.partial(
             TracedCursor,
-            datadog_tracer=self._datadog_tracer,
-            datadog_service=self._datadog_service,
-            datadog_tags=self._datadog_tags,
+            opentelemetry_tracer=self._opentelemetry_tracer,
+            opentelemetry_service=self._opentelemetry_service,
+            opentelemetry_tags=self._opentelemetry_tags,
         )
 
     def cursor(self, *args, **kwargs):
         """ register our custom cursor factory """
-        kwargs.setdefault('cursor_factory', self._datadog_cursor_class)
+        kwargs.setdefault('cursor_factory', self._opentelemetry_cursor_class)
         return super(TracedConnection, self).cursor(*args, **kwargs)

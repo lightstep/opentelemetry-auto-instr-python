@@ -1,1 +1,1 @@
-CONFIG_MIDDLEWARE = '__datadog_middleware'
+CONFIG_MIDDLEWARE = '__opentelemetry_middleware'

@@ -10,7 +10,7 @@ from django.template import Template
 
 log = get_logger(__name__)
 
-RENDER_ATTR = '_datadog_original_render'
+RENDER_ATTR = '_opentelemetry_original_render'
 
 
 def patch_template(tracer):
@@ -30,7 +30,7 @@ def patch_template(tracer):
     def traced_render(self, context):
         with tracer.trace('django.template', span_type=http.TEMPLATE) as span:
             try:
-                return Template._datadog_original_render(self, context)
+                return Template._opentelemetry_original_render(self, context)
             finally:
                 template_name = self.name or getattr(context, 'template_name', None) or 'unknown'
                 span.resource = template_name

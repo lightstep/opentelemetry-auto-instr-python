@@ -28,9 +28,9 @@ def patch():
 
 
 def _patch(elasticsearch):
-    if getattr(elasticsearch, '_datadog_patch', False):
+    if getattr(elasticsearch, '_opentelemetry_patch', False):
         return
-    setattr(elasticsearch, '_datadog_patch', True)
+    setattr(elasticsearch, '_opentelemetry_patch', True)
     _w(elasticsearch.transport, 'Transport.perform_request', _get_perform_request(elasticsearch))
     Pin(service=metadata.SERVICE, app=metadata.APP, app_type=AppTypes.db).onto(elasticsearch.transport.Transport)
 
@@ -41,8 +41,8 @@ def unpatch():
 
 
 def _unpatch(elasticsearch):
-    if getattr(elasticsearch, '_datadog_patch', False):
-        setattr(elasticsearch, '_datadog_patch', False)
+    if getattr(elasticsearch, '_opentelemetry_patch', False):
+        setattr(elasticsearch, '_opentelemetry_patch', False)
         _u(elasticsearch.transport.Transport, 'perform_request')
 
 

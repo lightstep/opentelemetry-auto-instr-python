@@ -27,17 +27,17 @@ def patch():
     """ Patch monkey patches psycopg's connection function
         so that the connection's functions are traced.
     """
-    if getattr(psycopg2, '_datadog_patch', False):
+    if getattr(psycopg2, '_opentelemetry_patch', False):
         return
-    setattr(psycopg2, '_datadog_patch', True)
+    setattr(psycopg2, '_opentelemetry_patch', True)
 
     wrapt.wrap_function_wrapper(psycopg2, 'connect', patched_connect)
     _patch_extensions(_psycopg2_extensions)  # do this early just in case
 
 
 def unpatch():
-    if getattr(psycopg2, '_datadog_patch', False):
-        setattr(psycopg2, '_datadog_patch', False)
+    if getattr(psycopg2, '_opentelemetry_patch', False):
+        setattr(psycopg2, '_opentelemetry_patch', False)
         psycopg2.connect = _connect
 
 

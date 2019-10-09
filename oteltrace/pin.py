@@ -9,7 +9,7 @@ log = get_logger(__name__)
 
 # To set attributes on wrapt proxy objects use this prefix:
 # http://wrapt.readthedocs.io/en/latest/wrappers.html
-_OTEL_PIN_NAME = '_datadog_pin'
+_OTEL_PIN_NAME = '_opentelemetry_pin'
 _OTEL_PIN_PROXY_NAME = '_self_' + _OTEL_PIN_NAME
 
 

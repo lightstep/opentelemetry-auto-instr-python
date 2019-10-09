@@ -45,8 +45,8 @@ class ElasticsearchTest(unittest.TestCase):
         tracer = get_dummy_tracer()
         writer = tracer.writer
         transport_class = get_traced_transport(
-                datadog_tracer=tracer,
-                datadog_service=self.TEST_SERVICE)
+                opentelemetry_tracer=tracer,
+                opentelemetry_service=self.TEST_SERVICE)
 
         es = elasticsearch.Elasticsearch(transport_class=transport_class, port=ELASTICSEARCH_CONFIG['port'])
 
@@ -153,8 +153,8 @@ class ElasticsearchTest(unittest.TestCase):
         ot_tracer = init_tracer('my_svc', tracer)
 
         transport_class = get_traced_transport(
-                datadog_tracer=tracer,
-                datadog_service=self.TEST_SERVICE)
+                opentelemetry_tracer=tracer,
+                opentelemetry_service=self.TEST_SERVICE)
 
         es = elasticsearch.Elasticsearch(transport_class=transport_class, port=ELASTICSEARCH_CONFIG['port'])
 

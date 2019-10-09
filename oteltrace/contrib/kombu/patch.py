@@ -35,9 +35,9 @@ def patch():
     This duplicated doesn't look nice. The nicer alternative is to use an ObjectProxy on top
     of Kombu. However, it means that any "import kombu.Connection" won't be instrumented.
     """
-    if getattr(kombu, '_datadog_patch', False):
+    if getattr(kombu, '_opentelemetry_patch', False):
         return
-    setattr(kombu, '_datadog_patch', True)
+    setattr(kombu, '_opentelemetry_patch', True)
 
     _w = wrapt.wrap_function_wrapper
     # We wrap the _publish method because the publish method:
@@ -60,8 +60,8 @@ def patch():
 
 
 def unpatch():
-    if getattr(kombu, '_datadog_patch', False):
-        setattr(kombu, '_datadog_patch', False)
+    if getattr(kombu, '_opentelemetry_patch', False):
+        setattr(kombu, '_opentelemetry_patch', False)
         unwrap(kombu.Producer, '_publish')
         unwrap(kombu.Consumer, 'receive')
 

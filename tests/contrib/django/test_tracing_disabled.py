@@ -23,7 +23,7 @@ class DjangoTracingDisabledTest(TestCase):
 
         # Restart app with tracing disabled
         settings.ENABLED = False
-        self.app = apps.get_app_config('datadog_django')
+        self.app = apps.get_app_config('opentelemetry_django')
         self.app.ready()
 
     def tearDown(self):

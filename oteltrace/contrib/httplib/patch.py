@@ -34,7 +34,7 @@ def _wrap_getresponse(func, instance, args, kwargs):
     finally:
         try:
             # Get the span attached to this instance, if available
-            span = getattr(instance, '_datadog_span', None)
+            span = getattr(instance, '_opentelemetry_span', None)
             if span:
                 if resp:
                     span.set_tag(ext_http.STATUS_CODE, resp.status)
@@ -42,7 +42,7 @@ def _wrap_getresponse(func, instance, args, kwargs):
                     store_response_headers(dict(resp.getheaders()), span, config.httplib)
 
                 span.finish()
-                delattr(instance, '_datadog_span')
+                delattr(instance, '_opentelemetry_span')
         except Exception:
             log.debug('error applying request tags', exc_info=True)
 
@@ -56,7 +56,7 @@ def _wrap_putrequest(func, instance, args, kwargs):
     try:
         # Create a new span and attach to this instance (so we can retrieve/update/close later on the response)
         span = pin.tracer.trace(span_name, span_type=ext_http.TYPE)
-        setattr(instance, '_datadog_span', span)
+        setattr(instance, '_opentelemetry_span', span)
 
         method, path = args[:2]
         scheme = 'https' if isinstance(instance, httplib.HTTPSConnection) else 'http'
@@ -91,7 +91,7 @@ def _wrap_putrequest(func, instance, args, kwargs):
 
 
 def _wrap_putheader(func, instance, args, kwargs):
-    span = getattr(instance, '_datadog_span', None)
+    span = getattr(instance, '_opentelemetry_span', None)
     if span:
         store_request_headers({args[0]: args[1]}, span, config.httplib)
 
@@ -109,9 +109,9 @@ def should_skip_request(pin, request):
 
 def patch():
     """ patch the built-in urllib/httplib/httplib.client methods for tracing"""
-    if getattr(httplib, '__datadog_patch', False):
+    if getattr(httplib, '__opentelemetry_patch', False):
         return
-    setattr(httplib, '__datadog_patch', True)
+    setattr(httplib, '__opentelemetry_patch', True)
 
     # Patch the desired methods
     setattr(httplib.HTTPConnection, '__init__',
@@ -126,9 +126,9 @@ def patch():
 
 def unpatch():
     """ unpatch any previously patched modules """
-    if not getattr(httplib, '__datadog_patch', False):
+    if not getattr(httplib, '__opentelemetry_patch', False):
         return
-    setattr(httplib, '__datadog_patch', False)
+    setattr(httplib, '__opentelemetry_patch', False)
 
     _u(httplib.HTTPConnection, '__init__')
     _u(httplib.HTTPConnection, 'getresponse')

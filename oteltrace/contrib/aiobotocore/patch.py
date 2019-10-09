@@ -18,17 +18,17 @@ TRACED_ARGS = ['params', 'path', 'verb']
 
 
 def patch():
-    if getattr(aiobotocore.client, '_datadog_patch', False):
+    if getattr(aiobotocore.client, '_opentelemetry_patch', False):
         return
-    setattr(aiobotocore.client, '_datadog_patch', True)
+    setattr(aiobotocore.client, '_opentelemetry_patch', True)
 
     wrapt.wrap_function_wrapper('aiobotocore.client', 'AioBaseClient._make_api_call', _wrapped_api_call)
     Pin(service='aws', app='aws', app_type='web').onto(aiobotocore.client.AioBaseClient)
 
 
 def unpatch():
-    if getattr(aiobotocore.client, '_datadog_patch', False):
-        setattr(aiobotocore.client, '_datadog_patch', False)
+    if getattr(aiobotocore.client, '_opentelemetry_patch', False):
+        setattr(aiobotocore.client, '_opentelemetry_patch', False)
         unwrap(aiobotocore.client.AioBaseClient, '_make_api_call')
 
 

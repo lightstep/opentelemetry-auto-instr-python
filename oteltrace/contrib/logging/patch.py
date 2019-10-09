@@ -35,15 +35,15 @@ def patch():
     Patch ``logging`` module in the Python Standard Library for injection of
     tracer information by wrapping the base factory method ``Logger.makeRecord``
     """
-    if getattr(logging, '_datadog_patch', False):
+    if getattr(logging, '_opentelemetry_patch', False):
         return
-    setattr(logging, '_datadog_patch', True)
+    setattr(logging, '_opentelemetry_patch', True)
 
     _w(logging.Logger, 'makeRecord', _w_makeRecord)
 
 
 def unpatch():
-    if getattr(logging, '_datadog_patch', False):
-        setattr(logging, '_datadog_patch', False)
+    if getattr(logging, '_opentelemetry_patch', False):
+        setattr(logging, '_opentelemetry_patch', False)
 
         _u(logging.Logger, 'makeRecord')

@@ -22,7 +22,7 @@ class TestAsyncioSafety(AsyncioTestCase):
         assert ctx is not None
         # test that it behaves the wrong way
         task = asyncio.Task.current_task()
-        task_ctx = getattr(task, '__datadog_context', None)
+        task_ctx = getattr(task, '__opentelemetry_context', None)
         assert task_ctx is None
 
     @mark_asyncio

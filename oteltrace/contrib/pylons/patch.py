@@ -11,18 +11,18 @@ from ...utils.wrappers import unwrap as _u
 
 def patch():
     """Instrument Pylons applications"""
-    if getattr(pylons.wsgiapp, '_datadog_patch', False):
+    if getattr(pylons.wsgiapp, '_opentelemetry_patch', False):
         return
 
-    setattr(pylons.wsgiapp, '_datadog_patch', True)
+    setattr(pylons.wsgiapp, '_opentelemetry_patch', True)
     wrapt.wrap_function_wrapper('pylons.wsgiapp', 'PylonsApp.__init__', traced_init)
 
 
 def unpatch():
     """Disable Pylons tracing"""
-    if not getattr(pylons.wsgiapp, '__datadog_patch', False):
+    if not getattr(pylons.wsgiapp, '__opentelemetry_patch', False):
         return
-    setattr(pylons.wsgiapp, '__datadog_patch', False)
+    setattr(pylons.wsgiapp, '__opentelemetry_patch', False)
 
     _u(pylons.wsgiapp.PylonsApp, '__init__')
 

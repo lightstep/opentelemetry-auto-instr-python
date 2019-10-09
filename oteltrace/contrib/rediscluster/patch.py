@@ -15,9 +15,9 @@ from ..redis.util import format_command_args
 def patch():
     """Patch the instrumented methods
     """
-    if getattr(rediscluster, '_datadog_patch', False):
+    if getattr(rediscluster, '_opentelemetry_patch', False):
         return
-    setattr(rediscluster, '_datadog_patch', True)
+    setattr(rediscluster, '_opentelemetry_patch', True)
 
     _w = wrapt.wrap_function_wrapper
     _w('rediscluster', 'StrictRedisCluster.execute_command', traced_execute_command)
@@ -27,8 +27,8 @@ def patch():
 
 
 def unpatch():
-    if getattr(rediscluster, '_datadog_patch', False):
-        setattr(rediscluster, '_datadog_patch', False)
+    if getattr(rediscluster, '_opentelemetry_patch', False):
+        setattr(rediscluster, '_opentelemetry_patch', False)
         unwrap(rediscluster.StrictRedisCluster, 'execute_command')
         unwrap(rediscluster.StrictRedisCluster, 'pipeline')
         unwrap(rediscluster.StrictClusterPipeline, 'execute')

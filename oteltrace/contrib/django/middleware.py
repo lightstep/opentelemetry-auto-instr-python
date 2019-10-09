@@ -193,12 +193,12 @@ class TraceMiddleware(InstrumentationMixin):
 
 def _get_req_span(request):
     """ Return the datadog span from the given request. """
-    return getattr(request, '_datadog_request_span', None)
+    return getattr(request, '_opentelemetry_request_span', None)
 
 
 def _set_req_span(request, span):
     """ Set the datadog span on the given request. """
-    return setattr(request, '_datadog_request_span', span)
+    return setattr(request, '_opentelemetry_request_span', span)
 
 
 def _set_auth_tags(span, request):

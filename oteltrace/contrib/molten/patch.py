@@ -26,9 +26,9 @@ config._add('molten', dict(
 def patch():
     """Patch the instrumented methods
     """
-    if getattr(molten, '_datadog_patch', False):
+    if getattr(molten, '_opentelemetry_patch', False):
         return
-    setattr(molten, '_datadog_patch', True)
+    setattr(molten, '_opentelemetry_patch', True)
 
     pin = Pin(
         service=config.molten['service_name'],
@@ -46,8 +46,8 @@ def patch():
 def unpatch():
     """Remove instrumentation
     """
-    if getattr(molten, '_datadog_patch', False):
-        setattr(molten, '_datadog_patch', False)
+    if getattr(molten, '_opentelemetry_patch', False):
+        setattr(molten, '_opentelemetry_patch', False)
 
         # remove pin
         pin = Pin.get_from(molten)

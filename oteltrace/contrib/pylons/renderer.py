@@ -13,9 +13,9 @@ def trace_rendering():
     of Pylons and multiple renderers.
     """
     # patch only once
-    if getattr(pylons.templating, '__datadog_patch', False):
+    if getattr(pylons.templating, '__opentelemetry_patch', False):
         return
-    setattr(pylons.templating, '__datadog_patch', True)
+    setattr(pylons.templating, '__opentelemetry_patch', True)
 
     if legacy_pylons:
         # Pylons <= 0.9.7

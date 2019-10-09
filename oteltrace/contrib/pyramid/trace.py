@@ -23,7 +23,7 @@ from .constants import (
 log = get_logger(__name__)
 
 OTEL_TWEEN_NAME = 'oteltrace.contrib.pyramid:trace_tween_factory'
-OTEL_SPAN = '_datadog_span'
+OTEL_SPAN = '_opentelemetry_span'
 
 
 def trace_pyramid(config):

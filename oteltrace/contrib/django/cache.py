@@ -10,7 +10,7 @@ from .utils import quantize_key_values, _resource_from_cache_prefix
 log = get_logger(__name__)
 
 # code instrumentation
-OPENTELEMETRY_NAMESPACE = '__datadog_original_{method}'
+OPENTELEMETRY_NAMESPACE = '__opentelemetry_original_{method}'
 TRACED_METHODS = [
     'get',
     'set',

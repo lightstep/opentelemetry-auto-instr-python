@@ -4,7 +4,7 @@ from oteltrace.settings import config
 from oteltrace.utils.wrappers import unwrap as _u
 from oteltrace.vendor.wrapt import wrap_function_wrapper as _w
 
-OTEL_PATCH_ATTR = '_datadog_patch'
+OTEL_PATCH_ATTR = '_opentelemetry_patch'
 
 SERVICE_NAME = 'algoliasearch'
 APP_NAME = 'algoliasearch'
@@ -31,7 +31,7 @@ def patch():
     if getattr(algoliasearch, OTEL_PATCH_ATTR, False):
         return
 
-    setattr(algoliasearch, '_datadog_patch', True)
+    setattr(algoliasearch, '_opentelemetry_patch', True)
 
     pin = Pin(
         service=config.algoliasearch.service_name, app=APP_NAME,

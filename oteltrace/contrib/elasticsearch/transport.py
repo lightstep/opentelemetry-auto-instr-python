@@ -13,24 +13,24 @@ SPAN_TYPE = 'elasticsearch'
 
 
 @deprecated(message='Use patching instead (see the docs).', version='1.0.0')
-def get_traced_transport(datadog_tracer, datadog_service=DEFAULT_SERVICE):
+def get_traced_transport(opentelemetry_tracer, opentelemetry_service=DEFAULT_SERVICE):
 
     class TracedTransport(elasticsearch.Transport):
         """ Extend elasticseach transport layer to allow Datadog
             tracer to catch any performed request.
         """
 
-        _datadog_tracer = datadog_tracer
-        _datadog_service = datadog_service
+        _opentelemetry_tracer = opentelemetry_tracer
+        _opentelemetry_service = opentelemetry_service
 
         def perform_request(self, method, url, params=None, body=None):
-            with self._datadog_tracer.trace('elasticsearch.query') as s:
+            with self._opentelemetry_tracer.trace('elasticsearch.query') as s:
                 # Don't instrument if the trace is not sampled
                 if not s.sampled:
                     return super(TracedTransport, self).perform_request(
                         method, url, params=params, body=body)
 
-                s.service = self._datadog_service
+                s.service = self._opentelemetry_service
                 s.span_type = SPAN_TYPE
                 s.set_tag(metadata.METHOD, method)
                 s.set_tag(metadata.URL, url)

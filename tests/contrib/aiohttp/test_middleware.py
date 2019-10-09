@@ -292,7 +292,7 @@ class TestTraceMiddleware(TraceTestCase):
     @asyncio.coroutine
     def test_distributed_tracing_disabled(self):
         # pass headers for distributed tracing
-        self.app['datadog_trace']['distributed_tracing_enabled'] = False
+        self.app['opentelemetry_trace']['distributed_tracing_enabled'] = False
         tracing_headers = {
             'x-datadog-trace-id': '100',
             'x-datadog-parent-id': '42',
@@ -402,8 +402,8 @@ class TestTraceMiddleware(TraceTestCase):
     @asyncio.coroutine
     def test_analytics_integration_enabled(self):
         """ Check trace has analytics sample rate set """
-        self.app['datadog_trace']['analytics_enabled'] = True
-        self.app['datadog_trace']['analytics_sample_rate'] = 0.5
+        self.app['opentelemetry_trace']['analytics_enabled'] = True
+        self.app['opentelemetry_trace']['analytics_sample_rate'] = 0.5
         request = yield from self.client.request('GET', '/template/')
         yield from request.text()
 
@@ -427,7 +427,7 @@ class TestTraceMiddleware(TraceTestCase):
     @asyncio.coroutine
     def test_analytics_integration_disabled(self):
         """ Check trace has analytics sample rate set """
-        self.app['datadog_trace']['analytics_enabled'] = False
+        self.app['opentelemetry_trace']['analytics_enabled'] = False
         request = yield from self.client.request('GET', '/template/')
         yield from request.text()
 

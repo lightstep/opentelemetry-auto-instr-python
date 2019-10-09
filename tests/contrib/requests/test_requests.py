@@ -29,7 +29,7 @@ class BaseRequestTestCase(object):
 
         patch()
         self.session = Session()
-        setattr(self.session, 'datadog_tracer', self.tracer)
+        setattr(self.session, 'opentelemetry_tracer', self.tracer)
 
     def tearDown(self):
         unpatch()
@@ -90,7 +90,7 @@ class TestRequests(BaseRequestTestCase, BaseTracerTestCase):
         # ensure that double patch doesn't duplicate instrumentation
         patch()
         session = Session()
-        setattr(session, 'datadog_tracer', self.tracer)
+        setattr(session, 'opentelemetry_tracer', self.tracer)
 
         out = session.get(URL_200)
         assert out.status_code == 200

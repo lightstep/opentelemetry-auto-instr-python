@@ -13,10 +13,10 @@ def patch():
     Patch falcon.API to include contrib.falcon.TraceMiddleware
     by default
     """
-    if getattr(falcon, '_datadog_patch', False):
+    if getattr(falcon, '_opentelemetry_patch', False):
         return
 
-    setattr(falcon, '_datadog_patch', True)
+    setattr(falcon, '_opentelemetry_patch', True)
     wrapt.wrap_function_wrapper('falcon', 'API.__init__', traced_init)
 
 

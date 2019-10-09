@@ -6,9 +6,9 @@ import django
 def patch():
     """Patch the instrumented methods
     """
-    if getattr(django, '_datadog_patch', False):
+    if getattr(django, '_opentelemetry_patch', False):
         return
-    setattr(django, '_datadog_patch', True)
+    setattr(django, '_opentelemetry_patch', True)
 
     _w = wrapt.wrap_function_wrapper
     _w('django', 'setup', traced_setup)

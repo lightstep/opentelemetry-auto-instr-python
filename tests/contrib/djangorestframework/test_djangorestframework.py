@@ -19,11 +19,11 @@ class RestFrameworkTest(DjangoTraceTestCase):
 
     def test_setup(self):
         assert apps.is_installed('rest_framework')
-        assert hasattr(self.APIView, '_datadog_patch')
+        assert hasattr(self.APIView, '_opentelemetry_patch')
 
     def test_unpatch(self):
         self.unpatch_restframework()
-        assert not getattr(self.APIView, '_datadog_patch')
+        assert not getattr(self.APIView, '_opentelemetry_patch')
 
         response = self.client.get('/users/')
 

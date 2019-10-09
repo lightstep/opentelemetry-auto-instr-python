@@ -8,9 +8,9 @@ from ...propagation.http import HTTPPropagator
 from ...settings import config
 
 
-CONFIG_KEY = 'datadog_trace'
-REQUEST_CONTEXT_KEY = 'datadog_context'
-REQUEST_SPAN_KEY = '__datadog_request_span'
+CONFIG_KEY = 'opentelemetry_trace'
+REQUEST_CONTEXT_KEY = 'opentelemetry_context'
+REQUEST_SPAN_KEY = '__opentelemetry_request_span'
 
 
 @asyncio.coroutine
@@ -114,9 +114,9 @@ def trace_app(app, tracer, service='aiohttp-web'):
     """
 
     # safe-guard: don't trace an application twice
-    if getattr(app, '__datadog_trace', False):
+    if getattr(app, '__opentelemetry_trace', False):
         return
-    setattr(app, '__datadog_trace', True)
+    setattr(app, '__opentelemetry_trace', True)
 
     # configure datadog settings
     app[CONFIG_KEY] = {

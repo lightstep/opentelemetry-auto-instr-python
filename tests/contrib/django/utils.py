@@ -68,7 +68,7 @@ class override_oteltrace_settings(object):
             self.backup[name] = getattr(settings, name)
             setattr(settings, name, value)
         self.unpatch_all()
-        app = apps.get_app_config('datadog_django')
+        app = apps.get_app_config('opentelemetry_django')
         app.ready()
 
     def disable(self):
@@ -76,7 +76,7 @@ class override_oteltrace_settings(object):
             setattr(settings, name, self.backup[name])
         self.unpatch_all()
         remove_exception_middleware()
-        app = apps.get_app_config('datadog_django')
+        app = apps.get_app_config('opentelemetry_django')
         app.ready()
 
     def __call__(self, func):

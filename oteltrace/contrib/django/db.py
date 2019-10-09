@@ -10,8 +10,8 @@ from ..dbapi import TracedCursor as DbApiTracedCursor
 
 log = get_logger(__name__)
 
-CURSOR_ATTR = '_datadog_original_cursor'
-ALL_CONNS_ATTR = '_datadog_original_connections_all'
+CURSOR_ATTR = '_opentelemetry_original_cursor'
+ALL_CONNS_ATTR = '_opentelemetry_original_connections_all'
 
 
 def patch_db(tracer):
@@ -62,7 +62,7 @@ def patch_conn(tracer, conn):
         }
 
         pin = Pin(service, tags=tags, tracer=tracer, app=prefix)
-        return DbApiTracedCursor(conn._datadog_original_cursor(), pin)
+        return DbApiTracedCursor(conn._opentelemetry_original_cursor(), pin)
 
     conn.cursor = cursor
 

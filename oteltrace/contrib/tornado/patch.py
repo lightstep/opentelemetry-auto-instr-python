@@ -13,9 +13,9 @@ def patch():
     traced using the given ``tracer``.
     """
     # patch only once
-    if getattr(tornado, '__datadog_patch', False):
+    if getattr(tornado, '__opentelemetry_patch', False):
         return
-    setattr(tornado, '__datadog_patch', True)
+    setattr(tornado, '__opentelemetry_patch', True)
 
     # patch Application to initialize properly our settings and tracer
     _w('tornado.web', 'Application.__init__', application.tracer_config)
@@ -42,9 +42,9 @@ def unpatch():
     """
     Remove all tracing functions in a Tornado web application.
     """
-    if not getattr(tornado, '__datadog_patch', False):
+    if not getattr(tornado, '__opentelemetry_patch', False):
         return
-    setattr(tornado, '__datadog_patch', False)
+    setattr(tornado, '__opentelemetry_patch', False)
 
     # unpatch Tornado
     _u(tornado.web.RequestHandler, '_execute')

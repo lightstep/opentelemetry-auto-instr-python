@@ -36,23 +36,23 @@ def get_traced_cache(oteltracer, service=DEFAULT_SERVICE, meta=None):
             * get, set, add, delete, clear
             * all many_ operations
         """
-        _datadog_tracer = oteltracer
-        _datadog_service = service
-        _datadog_meta = meta
+        _opentelemetry_tracer = oteltracer
+        _opentelemetry_service = service
+        _opentelemetry_meta = meta
 
         def __trace(self, cmd):
             """
             Start a tracing with default attributes and tags
             """
             # create a new span
-            s = self._datadog_tracer.trace(
+            s = self._opentelemetry_tracer.trace(
                 cmd,
                 span_type=TYPE,
-                service=self._datadog_service
+                service=self._opentelemetry_service
             )
             # set span tags
             s.set_tag(CACHE_BACKEND, self.config.get('CACHE_TYPE'))
-            s.set_tags(self._datadog_meta)
+            s.set_tags(self._opentelemetry_meta)
             # set analytics sample rate
             s.set_tag(
                 ANALYTICS_SAMPLE_RATE_KEY,

@@ -26,10 +26,10 @@ def patch_restframework(tracer):
         return wrapped(*args, **kwargs)
 
     # do not patch if already patched
-    if getattr(APIView, '_datadog_patch', False):
+    if getattr(APIView, '_opentelemetry_patch', False):
         return
     else:
-        setattr(APIView, '_datadog_patch', True)
+        setattr(APIView, '_opentelemetry_patch', True)
 
     # trace the handle_exception method
     wrap('rest_framework.views', 'APIView.handle_exception', _traced_handle_exception)
@@ -37,6 +37,6 @@ def patch_restframework(tracer):
 
 def unpatch_restframework():
     """ Unpatches rest_framework app."""
-    if getattr(APIView, '_datadog_patch', False):
-        setattr(APIView, '_datadog_patch', False)
+    if getattr(APIView, '_opentelemetry_patch', False):
+        setattr(APIView, '_opentelemetry_patch', False)
         unwrap(APIView, 'handle_exception')

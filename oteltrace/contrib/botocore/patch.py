@@ -23,17 +23,17 @@ TRACED_ARGS = ['params', 'path', 'verb']
 
 
 def patch():
-    if getattr(botocore.client, '_datadog_patch', False):
+    if getattr(botocore.client, '_opentelemetry_patch', False):
         return
-    setattr(botocore.client, '_datadog_patch', True)
+    setattr(botocore.client, '_opentelemetry_patch', True)
 
     wrapt.wrap_function_wrapper('botocore.client', 'BaseClient._make_api_call', patched_api_call)
     Pin(service='aws', app='aws', app_type='web').onto(botocore.client.BaseClient)
 
 
 def unpatch():
-    if getattr(botocore.client, '_datadog_patch', False):
-        setattr(botocore.client, '_datadog_patch', False)
+    if getattr(botocore.client, '_opentelemetry_patch', False):
+        setattr(botocore.client, '_opentelemetry_patch', False)
         unwrap(botocore.client.BaseClient, '_make_api_call')
 
 

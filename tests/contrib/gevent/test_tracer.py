@@ -39,14 +39,14 @@ class TestGeventTracer(TestCase):
     def test_main_greenlet(self):
         # the main greenlet must not be affected by the tracer
         main_greenlet = gevent.getcurrent()
-        ctx = getattr(main_greenlet, '__datadog_context', None)
+        ctx = getattr(main_greenlet, '__opentelemetry_context', None)
         assert ctx is None
 
     def test_main_greenlet_context(self):
         # the main greenlet must have a ``Context`` if called
         ctx_tracer = self.tracer.get_call_context()
         main_greenlet = gevent.getcurrent()
-        ctx_greenlet = getattr(main_greenlet, '__datadog_context', None)
+        ctx_greenlet = getattr(main_greenlet, '__opentelemetry_context', None)
         assert ctx_tracer is ctx_greenlet
         assert len(ctx_tracer._trace) == 0
 
@@ -58,7 +58,7 @@ class TestGeventTracer(TestCase):
         g = gevent.spawn(greenlet)
         g.join()
         ctx = g.value
-        stored_ctx = getattr(g, '__datadog_context', None)
+        stored_ctx = getattr(g, '__opentelemetry_context', None)
         assert stored_ctx is not None
         assert ctx == stored_ctx
 
@@ -79,7 +79,7 @@ class TestGeventTracer(TestCase):
 
         g = gevent.spawn(greenlet)
         g.join()
-        ctx = getattr(g, '__datadog_context', None)
+        ctx = getattr(g, '__opentelemetry_context', None)
         assert ctx is None
 
     def test_spawn_greenlet(self):
@@ -89,7 +89,7 @@ class TestGeventTracer(TestCase):
 
         g = gevent.spawn(greenlet)
         g.join()
-        ctx = getattr(g, '__datadog_context', None)
+        ctx = getattr(g, '__opentelemetry_context', None)
         assert ctx is not None
         assert 0 == len(ctx._trace)
 
@@ -101,7 +101,7 @@ class TestGeventTracer(TestCase):
 
         g = gevent.spawn_later(0.01, greenlet)
         g.join()
-        ctx = getattr(g, '__datadog_context', None)
+        ctx = getattr(g, '__opentelemetry_context', None)
         assert ctx is not None
         assert 0 == len(ctx._trace)
 

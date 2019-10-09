@@ -33,9 +33,9 @@ def patch():
     different services for connection. For exemple EC2 uses AWSQueryConnection and
     S3 uses AWSAuthConnection
     """
-    if getattr(boto.connection, '_datadog_patch', False):
+    if getattr(boto.connection, '_opentelemetry_patch', False):
         return
-    setattr(boto.connection, '_datadog_patch', True)
+    setattr(boto.connection, '_opentelemetry_patch', True)
 
     wrapt.wrap_function_wrapper(
         'boto.connection', 'AWSQueryConnection.make_request', patched_query_request
@@ -52,8 +52,8 @@ def patch():
 
 
 def unpatch():
-    if getattr(boto.connection, '_datadog_patch', False):
-        setattr(boto.connection, '_datadog_patch', False)
+    if getattr(boto.connection, '_opentelemetry_patch', False):
+        setattr(boto.connection, '_opentelemetry_patch', False)
         unwrap(boto.connection.AWSQueryConnection, 'make_request')
         unwrap(boto.connection.AWSAuthConnection, 'make_request')
 

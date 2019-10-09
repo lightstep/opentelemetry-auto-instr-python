@@ -10,10 +10,10 @@ from .constants import DEFAULT_TEMPLATE_NAME
 
 
 def patch():
-    if getattr(mako, '__datadog_patch', False):
+    if getattr(mako, '__opentelemetry_patch', False):
         # already patched
         return
-    setattr(mako, '__datadog_patch', True)
+    setattr(mako, '__opentelemetry_patch', True)
 
     Pin(service='mako', app='mako', app_type=http.TEMPLATE).onto(Template)
 
@@ -23,9 +23,9 @@ def patch():
 
 
 def unpatch():
-    if not getattr(mako, '__datadog_patch', False):
+    if not getattr(mako, '__opentelemetry_patch', False):
         return
-    setattr(mako, '__datadog_patch', False)
+    setattr(mako, '__opentelemetry_patch', False)
 
     _u(mako.template.Template, 'render')
     _u(mako.template.Template, 'render_unicode')

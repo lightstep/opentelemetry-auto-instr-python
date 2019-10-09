@@ -5,7 +5,7 @@ from ...provider import BaseContextProvider
 
 
 # Greenlet attribute used to set/get the Context instance
-CONTEXT_ATTR = '__datadog_context'
+CONTEXT_ATTR = '__opentelemetry_context'
 
 
 class GeventContextProvider(BaseContextProvider):

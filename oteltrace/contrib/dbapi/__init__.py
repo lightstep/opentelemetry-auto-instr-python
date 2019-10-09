@@ -25,7 +25,7 @@ class TracedCursor(wrapt.ObjectProxy):
         super(TracedCursor, self).__init__(cursor)
         pin.onto(self)
         name = pin.app or 'sql'
-        self._self_datadog_name = '{}.query'.format(name)
+        self._self_opentelemetry_name = '{}.query'.format(name)
         self._self_last_execute_operation = None
 
     def _trace_method(self, method, name, resource, extra_tags, *args, **kwargs):
@@ -78,7 +78,7 @@ class TracedCursor(wrapt.ObjectProxy):
         # FIXME[matt] properly handle kwargs here. arg names can be different
         # with different libs.
         return self._trace_method(
-            self.__wrapped__.executemany, self._self_datadog_name, query, {'sql.executemany': 'true'},
+            self.__wrapped__.executemany, self._self_opentelemetry_name, query, {'sql.executemany': 'true'},
             query, *args, **kwargs)
 
     def execute(self, query, *args, **kwargs):
@@ -88,12 +88,12 @@ class TracedCursor(wrapt.ObjectProxy):
         # Always return the result as-is
         # DEV: Some libraries return `None`, others `int`, and others the cursor objects
         #      These differences should be overriden at the integration specific layer (e.g. in `sqlite3/patch.py`)
-        return self._trace_method(self.__wrapped__.execute, self._self_datadog_name, query, {}, query, *args, **kwargs)
+        return self._trace_method(self.__wrapped__.execute, self._self_opentelemetry_name, query, {}, query, *args, **kwargs)
 
     def callproc(self, proc, args):
         """ Wraps the cursor.callproc method"""
         self._self_last_execute_operation = proc
-        return self._trace_method(self.__wrapped__.callproc, self._self_datadog_name, proc, {}, proc, args)
+        return self._trace_method(self.__wrapped__.callproc, self._self_opentelemetry_name, proc, {}, proc, args)
 
     def __enter__(self):
         # previous versions of the dbapi didn't support context managers. let's
@@ -113,19 +113,19 @@ class FetchTracedCursor(TracedCursor):
     """
     def fetchone(self, *args, **kwargs):
         """ Wraps the cursor.fetchone method"""
-        span_name = '{}.{}'.format(self._self_datadog_name, 'fetchone')
+        span_name = '{}.{}'.format(self._self_opentelemetry_name, 'fetchone')
         return self._trace_method(self.__wrapped__.fetchone, span_name, self._self_last_execute_operation, {},
                                   *args, **kwargs)
 
     def fetchall(self, *args, **kwargs):
         """ Wraps the cursor.fetchall method"""
-        span_name = '{}.{}'.format(self._self_datadog_name, 'fetchall')
+        span_name = '{}.{}'.format(self._self_opentelemetry_name, 'fetchall')
         return self._trace_method(self.__wrapped__.fetchall, span_name, self._self_last_execute_operation, {},
                                   *args, **kwargs)
 
     def fetchmany(self, *args, **kwargs):
         """ Wraps the cursor.fetchmany method"""
-        span_name = '{}.{}'.format(self._self_datadog_name, 'fetchmany')
+        span_name = '{}.{}'.format(self._self_opentelemetry_name, 'fetchmany')
         # We want to trace the information about how many rows were requested. Note that this number may be larger
         # the number of rows actually returned if less then requested are available from the query.
         size_tag_key = 'db.fetch.size'
@@ -154,7 +154,7 @@ class TracedConnection(wrapt.ObjectProxy):
 
         super(TracedConnection, self).__init__(conn)
         name = _get_vendor(conn)
-        self._self_datadog_name = '{}.connection'.format(name)
+        self._self_opentelemetry_name = '{}.connection'.format(name)
         db_pin = pin or Pin(service=name, app=name, app_type=AppTypes.db)
         db_pin.onto(self)
         # wrapt requires prefix of `_self` for attributes that are only in the
@@ -181,11 +181,11 @@ class TracedConnection(wrapt.ObjectProxy):
         return self._self_cursor_cls(cursor, pin)
 
     def commit(self, *args, **kwargs):
-        span_name = '{}.{}'.format(self._self_datadog_name, 'commit')
+        span_name = '{}.{}'.format(self._self_opentelemetry_name, 'commit')
         return self._trace_method(self.__wrapped__.commit, span_name, {}, *args, **kwargs)
 
     def rollback(self, *args, **kwargs):
-        span_name = '{}.{}'.format(self._self_datadog_name, 'rollback')
+        span_name = '{}.{}'.format(self._self_opentelemetry_name, 'rollback')
         return self._trace_method(self.__wrapped__.rollback, span_name, {}, *args, **kwargs)
 
 

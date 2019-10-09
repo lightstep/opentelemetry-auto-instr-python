@@ -25,7 +25,7 @@ class PyramidBase(BaseTracerTestCase):
         # get default settings or use what is provided
         settings = settings or self.get_settings()
         # always set the dummy tracer as a default tracer
-        settings.update({'datadog_tracer': self.tracer})
+        settings.update({'opentelemetry_tracer': self.tracer})
 
         app, renderer = create_app(settings, self.instrument)
         self.app = webtest.TestApp(app)
@@ -44,7 +44,7 @@ class PyramidTestCase(PyramidBase):
 
     def get_settings(self):
         return {
-            'datadog_trace_service': 'foobar',
+            'opentelemetry_trace_service': 'foobar',
         }
 
     def test_200(self):
@@ -90,7 +90,7 @@ class PyramidTestCase(PyramidBase):
                 We expect the root span to have the appropriate tag
         """
         with self.override_global_config(dict(analytics_enabled=True)):
-            self.override_settings(dict(datadog_analytics_enabled=True, datadog_analytics_sample_rate=0.5))
+            self.override_settings(dict(opentelemetry_analytics_enabled=True, opentelemetry_analytics_sample_rate=0.5))
             res = self.app.get('/', status=200)
             assert b'idx' in res.body
 
@@ -118,7 +118,7 @@ class PyramidTestCase(PyramidBase):
                 We expect the root span to have the appropriate tag
         """
         with self.override_global_config(dict(analytics_enabled=False)):
-            self.override_settings(dict(datadog_analytics_enabled=True, datadog_analytics_sample_rate=0.5))
+            self.override_settings(dict(opentelemetry_analytics_enabled=True, opentelemetry_analytics_sample_rate=0.5))
             res = self.app.get('/', status=200)
             assert b'idx' in res.body
 

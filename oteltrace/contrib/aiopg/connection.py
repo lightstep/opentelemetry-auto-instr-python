@@ -17,7 +17,7 @@ class AIOTracedCursor(wrapt.ObjectProxy):
         super(AIOTracedCursor, self).__init__(cursor)
         pin.onto(self)
         name = pin.app or 'sql'
-        self._datadog_name = '%s.query' % name
+        self._opentelemetry_name = '%s.query' % name
 
     @asyncio.coroutine
     def _trace_method(self, method, resource, extra_tags, *args, **kwargs):
@@ -27,7 +27,7 @@ class AIOTracedCursor(wrapt.ObjectProxy):
             return result
         service = pin.service
 
-        with pin.tracer.trace(self._datadog_name, service=service,
+        with pin.tracer.trace(self._opentelemetry_name, service=service,
                               resource=resource) as s:
             s.span_type = sql.TYPE
             s.set_tag(sql.QUERY, resource)

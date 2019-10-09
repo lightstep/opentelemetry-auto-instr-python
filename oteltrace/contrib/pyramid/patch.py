@@ -12,7 +12,7 @@ from pyramid.path import caller_package
 
 from oteltrace.vendor import wrapt
 
-OTEL_PATCH = '_datadog_patch'
+OTEL_PATCH = '_opentelemetry_patch'
 
 
 def patch():

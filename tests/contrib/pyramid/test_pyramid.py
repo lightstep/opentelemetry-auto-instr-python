@@ -51,7 +51,7 @@ class TestPyramidDistributedTracingDisabled(PyramidBase):
 
     def get_settings(self):
         return {
-            'datadog_distributed_tracing': False,
+            'opentelemetry_distributed_tracing': False,
         }
 
     def test_distributed_tracing_disabled(self):

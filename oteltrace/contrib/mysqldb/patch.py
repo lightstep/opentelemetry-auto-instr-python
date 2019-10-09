@@ -19,9 +19,9 @@ KWPOS_BY_TAG = {
 
 def patch():
     # patch only once
-    if getattr(MySQLdb, '__datadog_patch', False):
+    if getattr(MySQLdb, '__opentelemetry_patch', False):
         return
-    setattr(MySQLdb, '__datadog_patch', True)
+    setattr(MySQLdb, '__opentelemetry_patch', True)
 
     # `Connection` and `connect` are aliases for
     # `Connect`; patch them too
@@ -33,9 +33,9 @@ def patch():
 
 
 def unpatch():
-    if not getattr(MySQLdb, '__datadog_patch', False):
+    if not getattr(MySQLdb, '__opentelemetry_patch', False):
         return
-    setattr(MySQLdb, '__datadog_patch', False)
+    setattr(MySQLdb, '__opentelemetry_patch', False)
 
     # unpatch MySQLdb
     _u(MySQLdb, 'Connect')

@@ -44,7 +44,7 @@ def _wrap_send(func, instance, args, kwargs):
     # and is oteltrace.tracer; it's used only inside our tests and can
     # be easily changed by providing a TracingTestCase that sets common
     # tracing functionalities.
-    tracer = getattr(instance, 'datadog_tracer', oteltrace.tracer)
+    tracer = getattr(instance, 'opentelemetry_tracer', oteltrace.tracer)
 
     # skip if tracing is not enabled
     if not tracer.enabled:

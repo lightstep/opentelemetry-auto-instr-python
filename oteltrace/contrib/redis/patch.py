@@ -17,9 +17,9 @@ def patch():
     This duplicated doesn't look nice. The nicer alternative is to use an ObjectProxy on top
     of Redis and StrictRedis. However, it means that any "import redis.Redis" won't be instrumented.
     """
-    if getattr(redis, '_datadog_patch', False):
+    if getattr(redis, '_opentelemetry_patch', False):
         return
-    setattr(redis, '_datadog_patch', True)
+    setattr(redis, '_opentelemetry_patch', True)
 
     _w = wrapt.wrap_function_wrapper
 
@@ -38,8 +38,8 @@ def patch():
 
 
 def unpatch():
-    if getattr(redis, '_datadog_patch', False):
-        setattr(redis, '_datadog_patch', False)
+    if getattr(redis, '_opentelemetry_patch', False):
+        setattr(redis, '_opentelemetry_patch', False)
 
         if redis.VERSION < (3, 0, 0):
             unwrap(redis.StrictRedis, 'execute_command')

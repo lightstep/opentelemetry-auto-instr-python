@@ -91,8 +91,8 @@ class TraceMiddleware(object):
             will be passed in.
         """
         # when we teardown the span, ensure we have a clean slate.
-        span = getattr(g, 'flask_datadog_span', None)
-        setattr(g, 'flask_datadog_span', None)
+        span = getattr(g, 'flask_opentelemetry_span', None)
+        setattr(g, 'flask_opentelemetry_span', None)
         if not span:
             return
 
@@ -109,7 +109,7 @@ class TraceMiddleware(object):
             if context.trace_id:
                 self.app._tracer.context_provider.activate(context)
         try:
-            g.flask_datadog_span = self.app._tracer.trace(
+            g.flask_opentelemetry_span = self.app._tracer.trace(
                 SPAN_NAME,
                 service=self.app._service,
                 span_type=http.TYPE,
@@ -118,7 +118,7 @@ class TraceMiddleware(object):
             log.debug('flask: error tracing request', exc_info=True)
 
     def _process_response(self, response):
-        span = getattr(g, 'flask_datadog_span', None)
+        span = getattr(g, 'flask_opentelemetry_span', None)
         if not (span and span.sampled):
             return
 
@@ -127,7 +127,7 @@ class TraceMiddleware(object):
 
     def _request_exception(self, *args, **kwargs):
         exception = kwargs.get('exception', None)
-        span = getattr(g, 'flask_datadog_span', None)
+        span = getattr(g, 'flask_opentelemetry_span', None)
         if span and exception:
             _set_error_on_span(span, exception)
 

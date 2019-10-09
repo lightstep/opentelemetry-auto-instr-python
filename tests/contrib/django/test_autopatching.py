@@ -14,14 +14,14 @@ class DjangoAutopatchTest(DjangoTraceTestCase):
 
     @skipIf(django.VERSION >= (1, 10), 'skip if version above 1.10')
     def test_autopatching_middleware_classes(self):
-        assert django._datadog_patch
+        assert django._opentelemetry_patch
         assert 'oteltrace.contrib.django' in settings.INSTALLED_APPS
         assert settings.MIDDLEWARE_CLASSES[0] == 'oteltrace.contrib.django.TraceMiddleware'
         assert settings.MIDDLEWARE_CLASSES[-1] == 'oteltrace.contrib.django.TraceExceptionMiddleware'
 
     @skipIf(django.VERSION >= (1, 10), 'skip if version above 1.10')
     def test_autopatching_twice_middleware_classes(self):
-        assert django._datadog_patch
+        assert django._opentelemetry_patch
         # Call django.setup() twice and ensure we don't add a duplicate tracer
         django.setup()
 
@@ -38,7 +38,7 @@ class DjangoAutopatchTest(DjangoTraceTestCase):
 
     @skipIf(django.VERSION < (1, 10), 'skip if version is below 1.10')
     def test_autopatching_middleware(self):
-        assert django._datadog_patch
+        assert django._opentelemetry_patch
         assert 'oteltrace.contrib.django' in settings.INSTALLED_APPS
         assert settings.MIDDLEWARE[0] == 'oteltrace.contrib.django.TraceMiddleware'
         # MIDDLEWARE_CLASSES gets created internally in django 1.10 & 1.11 but doesn't
@@ -53,7 +53,7 @@ class DjangoAutopatchTest(DjangoTraceTestCase):
 
     @skipIf(django.VERSION < (1, 10), 'skip if version is below 1.10')
     def test_autopatching_twice_middleware(self):
-        assert django._datadog_patch
+        assert django._opentelemetry_patch
         # Call django.setup() twice and ensure we don't add a duplicate tracer
         django.setup()
 

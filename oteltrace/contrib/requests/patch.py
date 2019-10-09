@@ -22,9 +22,9 @@ config._add('requests', {
 
 def patch():
     """Activate http calls tracing"""
-    if getattr(requests, '__datadog_patch', False):
+    if getattr(requests, '__opentelemetry_patch', False):
         return
-    setattr(requests, '__datadog_patch', True)
+    setattr(requests, '__opentelemetry_patch', True)
 
     _w('requests', 'Session.send', _wrap_send)
     Pin(
@@ -44,8 +44,8 @@ def patch():
 
 def unpatch():
     """Disable traced sessions"""
-    if not getattr(requests, '__datadog_patch', False):
+    if not getattr(requests, '__opentelemetry_patch', False):
         return
-    setattr(requests, '__datadog_patch', False)
+    setattr(requests, '__opentelemetry_patch', False)
 
     _u(requests.Session, 'send')

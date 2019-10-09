@@ -15,7 +15,7 @@ log = get_logger(__name__)
 
 class TracerConfig(AppConfig):
     name = 'oteltrace.contrib.django'
-    label = 'datadog_django'
+    label = 'opentelemetry_django'
 
     def ready(self):
         """
