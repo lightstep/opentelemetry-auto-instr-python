@@ -1,5 +1,5 @@
 """
-Datadog trace code for flask_cache
+OpenTelemetry trace code for flask_cache
 """
 
 # stdlib

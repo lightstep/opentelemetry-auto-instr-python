@@ -41,7 +41,7 @@ def tags_from_context(context):
 
 def attach_span(task, task_id, span, is_publish=False):
     """Helper to propagate a `Span` for the given `Task` instance. This
-    function uses a `WeakValueDictionary` that stores a Datadog Span using
+    function uses a `WeakValueDictionary` that stores a OpenTelemetry Span using
     the `(task_id, is_publish)` as a key. This is useful when information must be
     propagated from one Celery signal to another.
 

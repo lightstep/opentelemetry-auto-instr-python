@@ -6,7 +6,7 @@ def get_correlation_ids(tracer=None):
     This helper method can be achieved manually and should be considered
     only a shortcut. The main reason is to abstract the current ``Tracer``
     implementation so that these identifiers can be extracted either the
-    tracer is an OpenTracing tracer or a Datadog tracer.
+    tracer is an OpenTracing tracer or a OpenTelemetry tracer.
 
     OpenTracing users can still extract these values using the ``ScopeManager``
     API, though this shortcut is a simple one-liner. The usage is:
@@ -21,7 +21,7 @@ def get_correlation_ids(tracer=None):
     # GlobalTracer. In the case of OpenTracing, ``opentracing.tracer`` is exposed
     # and we're doing the same here for ``oteltrace.tracer``. Because this helper
     # must work also with OpenTracing, we should take the right used ``Tracer``.
-    # At the time of writing, it's enough to support our Datadog Tracer.
+    # At the time of writing, it's enough to support our OpenTelemetry Tracer.
 
     # If no tracer passed in, use global tracer
     if not tracer:

@@ -344,7 +344,7 @@ class TestTraceMiddleware(TraceTestCase):
     def _assert_200_parenting(self, traces):
         """Helper to assert parenting when handling aiohttp requests.
 
-        This is used to ensure that parenting is consistent between Datadog
+        This is used to ensure that parenting is consistent between OpenTelemetry
         and OpenTracing implementations of tracing.
         """
         assert 2 == len(traces)

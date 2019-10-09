@@ -37,8 +37,8 @@ To find out how to trace your own code manually refer to the documentation :ref:
 OpenTracing
 -----------
 
-``oteltrace`` also provides an OpenTracing API to the Datadog tracer so
-that you can use the Datadog tracer in your OpenTracing-compatible
+``oteltrace`` also provides an OpenTracing API to the OpenTelemetry tracer so
+that you can use the OpenTelemetry tracer in your OpenTracing-compatible
 applications.
 
 Installation
@@ -68,7 +68,7 @@ Typically this method looks something like::
 
     def init_tracer(service_name):
         """
-        Initialize a new Datadog opentracer and set it as the
+        Initialize a new OpenTelemetry opentracer and set it as the
         global tracer.
 
         This overwrites the opentracing.tracer reference.

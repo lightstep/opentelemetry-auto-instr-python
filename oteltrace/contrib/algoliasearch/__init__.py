@@ -16,7 +16,7 @@ Configuration
 
 .. py:data:: oteltrace.config.algoliasearch['collect_query_text']
 
-   Whether to pass the text of your query onto Datadog. Since this may contain sensitive data it's off by default
+   Whether to pass the text of your query onto OpenTelemetry. Since this may contain sensitive data it's off by default
 
    Default: ``False``
 

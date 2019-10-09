@@ -35,7 +35,7 @@ class Tox(TestCommand):
 long_description = """
 # dd-trace-py
 
-`oteltrace` is Datadog's tracing library for Python.  It is used to trace requests
+`oteltrace` is OpenTelemetry's tracing library for Python.  It is used to trace requests
 as they flow across web servers, databases and microservices so that developers
 have great visiblity into bottlenecks and troublesome requests.
 
@@ -58,9 +58,9 @@ documentation][visualization docs].
 # Base `setup()` kwargs without any C-extension registering
 setup_kwargs = dict(
     name='oteltrace',
-    description='Datadog tracing code',
+    description='OpenTelemetry tracing code',
     url='https://github.com/DataDog/dd-trace-py',
-    author='Datadog, Inc.',
+    author='OpenTelemetry, Inc.',
     author_email='dev@datadoghq.com',
     long_description=long_description,
     long_description_content_type='text/markdown',

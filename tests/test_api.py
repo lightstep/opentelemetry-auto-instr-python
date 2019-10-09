@@ -140,19 +140,19 @@ class APITests(TestCase):
         test_cases = {
             'OK': dict(
                 js=None,
-                log='Cannot parse Datadog Agent response, please make sure your Datadog Agent is up to date',
+                log='Cannot parse OpenTelemetry Agent response, please make sure your OpenTelemetry Agent is up to date',
             ),
             'OK\n': dict(
                 js=None,
-                log='Cannot parse Datadog Agent response, please make sure your Datadog Agent is up to date',
+                log='Cannot parse OpenTelemetry Agent response, please make sure your OpenTelemetry Agent is up to date',
             ),
             'error:unsupported-endpoint': dict(
                 js=None,
-                log='Unable to parse Datadog Agent JSON response: .*? \'error:unsupported-endpoint\'',
+                log='Unable to parse OpenTelemetry Agent JSON response: .*? \'error:unsupported-endpoint\'',
             ),
             42: dict(  # int as key to trigger TypeError
                 js=None,
-                log='Unable to parse Datadog Agent JSON response: .*? 42',
+                log='Unable to parse OpenTelemetry Agent JSON response: .*? 42',
             ),
             '{}': dict(js={}),
             '[]': dict(js=[]),
@@ -270,11 +270,11 @@ def test_api_container_info(get_container_info):
 
     api = API(_HOST, 8126)
     assert api._container_info is info
-    assert api._headers['Datadog-Container-Id'] == 'test-container-id'
+    assert api._headers['OpenTelemetry-Container-Id'] == 'test-container-id'
 
     # When we do not have container information
     get_container_info.return_value = None
 
     api = API(_HOST, 8126)
     assert api._container_info is None
-    assert 'Datadog-Container-Id' not in api._headers
+    assert 'OpenTelemetry-Container-Id' not in api._headers

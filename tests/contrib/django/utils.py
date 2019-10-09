@@ -25,7 +25,7 @@ tracer.writer = DummyWriter()
 class DjangoTraceTestCase(BaseTestCase, TestCase):
     """
     Base class that provides an internal tracer according to given
-    Datadog settings. This class ensures that the tracer spans are
+    OpenTelemetry settings. This class ensures that the tracer spans are
     properly reset after each run. The tracer is available in
     the ``self.tracer`` attribute.
     """

@@ -199,7 +199,7 @@ class TestWorkers(TestCase):
 
         logged_errors = log_handler.messages['error']
         assert len(logged_errors) == 1
-        assert 'Failed to send traces to Datadog Agent at localhost:8126: ' \
+        assert 'Failed to send traces to OpenTelemetry Agent at localhost:8126: ' \
             'HTTP error status 400, reason Bad Request, message Content-Type:' \
             in logged_errors[0]
 
@@ -263,12 +263,12 @@ class TestAPITransport(TestCase):
 
         # retrieve the headers from the mocked request call
         expected_headers = {
-            'Datadog-Container-Id': 'test-container-id',  # mocked in setUp()
-            'Datadog-Meta-Lang': 'python',
-            'Datadog-Meta-Lang-Interpreter': PYTHON_INTERPRETER,
-            'Datadog-Meta-Lang-Version': PYTHON_VERSION,
-            'Datadog-Meta-Tracer-Version': oteltrace.__version__,
-            'X-Datadog-Trace-Count': '1',
+            'OpenTelemetry-Container-Id': 'test-container-id',  # mocked in setUp()
+            'OpenTelemetry-Meta-Lang': 'python',
+            'OpenTelemetry-Meta-Lang-Interpreter': PYTHON_INTERPRETER,
+            'OpenTelemetry-Meta-Lang-Version': PYTHON_VERSION,
+            'OpenTelemetry-Meta-Tracer-Version': oteltrace.__version__,
+            'X-OpenTelemetry-Trace-Count': '1',
             'Content-Type': 'application/msgpack',
         }
         params, _ = request_call.call_args_list[0]

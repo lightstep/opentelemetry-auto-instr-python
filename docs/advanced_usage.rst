@@ -4,7 +4,7 @@ Advanced Usage
 Agent Configuration
 -------------------
 
-If the Datadog Agent is on a separate host from your application, you can modify
+If the OpenTelemetry Agent is on a separate host from your application, you can modify
 the default ``oteltrace.tracer`` object to utilize another hostname and port. Here
 is a small example showcasing this::
 
@@ -410,7 +410,7 @@ OpenTracing
 -----------
 
 
-The Datadog opentracer can be configured via the ``config`` dictionary
+The OpenTelemetry opentracer can be configured via the ``config`` dictionary
 parameter to the tracer which accepts the following described fields. See below
 for usage.
 
@@ -421,9 +421,9 @@ for usage.
 +---------------------+----------------------------------------+---------------+
 | `debug`             | enable debug logging                   | `False`       |
 +---------------------+----------------------------------------+---------------+
-| `agent_hostname`    | hostname of the Datadog agent to use   | `localhost`   |
+| `agent_hostname`    | hostname of the OpenTelemetry agent to use   | `localhost`   |
 +---------------------+----------------------------------------+---------------+
-| `agent_port`        | port the Datadog agent is listening on | `8126`        |
+| `agent_port`        | port the OpenTelemetry agent is listening on | `8126`        |
 +---------------------+----------------------------------------+---------------+
 | `global_tags`       | tags that will be applied to each span | `{}`          |
 +---------------------+----------------------------------------+---------------+
@@ -490,7 +490,7 @@ To trace a function using the span context manager::
   my_operation()
 
 See our tracing trace-examples_ repository for concrete, runnable examples of
-the Datadog opentracer.
+the OpenTelemetry opentracer.
 
 .. _trace-examples: https://github.com/DataDog/trace-examples/tree/master/python
 
@@ -499,9 +499,9 @@ See also the `Python OpenTracing`_ repository for usage of the tracer.
 .. _Python OpenTracing: https://github.com/opentracing/opentracing-python
 
 
-**Alongside Datadog tracer**
+**Alongside OpenTelemetry tracer**
 
-The Datadog OpenTracing tracer can be used alongside the Datadog tracer. This
+The OpenTelemetry OpenTracing tracer can be used alongside the OpenTelemetry tracer. This
 provides the advantage of providing tracing information collected by
 ``oteltrace`` in addition to OpenTracing.  The simplest way to do this is to use
 the :ref:`oteltrace-run<oteltracerun>` command to invoke your OpenTraced
@@ -526,7 +526,7 @@ and database modules without the need for changing your code::
   $ oteltrace-run -h
 
   Execute the given Python program, after configuring it
-  to emit Datadog traces.
+  to emit OpenTelemetry traces.
 
   Append command line arguments to your program as usual.
 

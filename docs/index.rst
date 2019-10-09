@@ -1,9 +1,9 @@
 .. include:: ./shared.rst
 
-Datadog Python Trace Client
+OpenTelemetry Python Trace Client
 ===========================
 
-``oteltrace`` is Datadog's Python tracing client. It is used to trace requests as
+``oteltrace`` is OpenTelemetry's Python tracing client. It is used to trace requests as
 they flow across web servers, databases and microservices. This enables
 developers to have greater visibility into bottlenecks and troublesome requests
 in their application.
@@ -16,7 +16,7 @@ For a basic product overview: check out the `setup documentation`_.
 For details about developing and contributing: refer to the `development
 guide`_.
 
-For descriptions of the terminology of Datadog APM: take a look at the `official
+For descriptions of the terminology of OpenTelemetry APM: take a look at the `official
 documentation`_.
 
 

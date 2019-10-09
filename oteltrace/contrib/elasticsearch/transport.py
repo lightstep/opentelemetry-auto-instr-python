@@ -16,7 +16,7 @@ SPAN_TYPE = 'elasticsearch'
 def get_traced_transport(opentelemetry_tracer, opentelemetry_service=DEFAULT_SERVICE):
 
     class TracedTransport(elasticsearch.Transport):
-        """ Extend elasticseach transport layer to allow Datadog
+        """ Extend elasticseach transport layer to allow OpenTelemetry
             tracer to catch any performed request.
         """
 

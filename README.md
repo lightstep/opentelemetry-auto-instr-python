@@ -5,7 +5,7 @@
 [![PypiVersions](https://img.shields.io/pypi/v/oteltrace.svg)](https://pypi.org/project/oteltrace/)
 [![OpenTracing Badge](https://img.shields.io/badge/OpenTracing-enabled-blue.svg)](http://pypi.datadoghq.com/trace/docs/installation_quickstart.html#opentracing)
 
-`oteltrace` is Datadog's tracing library for Python.  It is used to trace requests
+`oteltrace` is OpenTelemetry's tracing library for Python.  It is used to trace requests
 as they flow across web servers, databases and microservices so that developers
 have great visiblity into bottlenecks and troublesome requests.
 

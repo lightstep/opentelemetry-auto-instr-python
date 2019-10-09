@@ -1,5 +1,5 @@
 # project
-from oteltrace.contrib.django.conf import DatadogSettings
+from oteltrace.contrib.django.conf import OpenTelemetrySettings
 
 # testing
 from .utils import DjangoTraceTestCase
@@ -23,7 +23,7 @@ class DjangoInstrumentationTest(DjangoTraceTestCase):
             OPENTELEMETRY_TRACE_AGENT_HOSTNAME='agent.consul.local',
             OPENTELEMETRY_TRACE_AGENT_PORT='58126'
         )):
-            settings = DatadogSettings()
+            settings = OpenTelemetrySettings()
             assert settings.AGENT_HOSTNAME == 'agent.consul.local'
             assert settings.AGENT_PORT == 58126
 
@@ -31,5 +31,5 @@ class DjangoInstrumentationTest(DjangoTraceTestCase):
         # ensures that a wrong Agent Port doesn't crash the system
         # and defaults to 8126
         with self.override_env(dict(OPENTELEMETRY_TRACE_AGENT_PORT='something')):
-            settings = DatadogSettings()
+            settings = OpenTelemetrySettings()
             assert settings.AGENT_PORT == 8126

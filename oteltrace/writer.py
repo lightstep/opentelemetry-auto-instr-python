@@ -107,7 +107,7 @@ class AsyncWorker(_worker.PeriodicWorkerThread):
         if now > self._last_error_ts + LOG_ERR_INTERVAL:
             log_level = log.error
             self._last_error_ts = now
-        prefix = 'Failed to send traces to Datadog Agent at %s: '
+        prefix = 'Failed to send traces to OpenTelemetry Agent at %s: '
         if isinstance(response, api.Response):
             log_level(
                 prefix + 'HTTP error status %s, reason %s, message %s',

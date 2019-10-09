@@ -1,5 +1,5 @@
 """
-Settings for Datadog tracer are all namespaced in the OPENTELEMETRY_TRACE setting.
+Settings for OpenTelemetry tracer are all namespaced in the OPENTELEMETRY_TRACE setting.
 For example your project's `settings.py` file might look like this:
 
 OPENTELEMETRY_TRACE = {
@@ -7,7 +7,7 @@ OPENTELEMETRY_TRACE = {
 }
 
 This module provides the `setting` object, that is used to access
-Datadog settings, checking for user settings first, then falling
+OpenTelemetry settings, checking for user settings first, then falling
 back to the defaults.
 """
 from __future__ import unicode_literals
@@ -71,9 +71,9 @@ def import_from_string(val, setting_name):
         raise ImportError(msg)
 
 
-class DatadogSettings(object):
+class OpenTelemetrySettings(object):
     """
-    A settings object, that allows Datadog settings to be accessed as properties.
+    A settings object, that allows OpenTelemetry settings to be accessed as properties.
     For example:
 
         from oteltrace.contrib.django.conf import settings
@@ -149,7 +149,7 @@ class DatadogSettings(object):
         return user_settings
 
 
-settings = DatadogSettings(None, DEFAULTS, IMPORT_STRINGS)
+settings = OpenTelemetrySettings(None, DEFAULTS, IMPORT_STRINGS)
 
 
 def reload_settings(*args, **kwargs):
@@ -159,4 +159,4 @@ def reload_settings(*args, **kwargs):
     global settings
     setting, value = kwargs['setting'], kwargs['value']
     if setting == 'OPENTELEMETRY_TRACE':
-        settings = DatadogSettings(value, DEFAULTS, IMPORT_STRINGS)
+        settings = OpenTelemetrySettings(value, DEFAULTS, IMPORT_STRINGS)

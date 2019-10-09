@@ -1,5 +1,5 @@
 """
-Datadog APM traces can be integrated with Logs by first having the tracing
+OpenTelemetry APM traces can be integrated with Logs by first having the tracing
 library patch the standard library ``logging`` module and updating the log
 formatter used by an application. This feature enables you to inject the current
 trace information into a log entry.

@@ -15,7 +15,7 @@ __IMapUnordered = gevent.pool.IMapUnordered
 def patch():
     """
     Patch the gevent module so that all references to the
-    internal ``Greenlet`` class points to the ``DatadogGreenlet``
+    internal ``Greenlet`` class points to the ``OpenTelemetryGreenlet``
     class.
 
     This action ensures that if a user extends the ``Greenlet``
@@ -28,7 +28,7 @@ def patch():
 def unpatch():
     """
     Restore the original ``Greenlet``. This function must be invoked
-    before executing application code, otherwise the ``DatadogGreenlet``
+    before executing application code, otherwise the ``OpenTelemetryGreenlet``
     class may be used during initialization.
     """
     _replace(__Greenlet, __IMap, __IMapUnordered)

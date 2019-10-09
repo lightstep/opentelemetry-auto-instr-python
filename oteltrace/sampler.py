@@ -57,7 +57,7 @@ class RateByServiceSampler(object):
 
     @staticmethod
     def _key(service=None, env=None):
-        """Compute a key with the same format used by the Datadog agent API."""
+        """Compute a key with the same format used by the OpenTelemetry agent API."""
         service = service or ''
         env = env or ''
         return 'service:' + service + ',env:' + env

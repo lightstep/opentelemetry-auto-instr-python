@@ -16,7 +16,7 @@ if debug and debug.lower() == 'true':
 log = logging.getLogger(__name__)
 
 USAGE = """
-Execute the given Python program after configuring it to emit Datadog traces.
+Execute the given Python program after configuring it to emit OpenTelemetry traces.
 Append command line arguments to your program as usual.
 
 Usage: [ENV_VARS] oteltrace-run <my_program>

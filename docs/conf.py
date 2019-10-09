@@ -144,7 +144,7 @@ html_theme = 'alabaster'
 # documentation.
 #
 html_theme_options = {
-    'description': 'Datadog\'s Python tracing client',
+    'description': 'OpenTelemetry\'s Python tracing client',
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
@@ -287,7 +287,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'oteltrace.tex', u'oteltrace Documentation',
-     u'Datadog, Inc', 'manual'),
+     u'OpenTelemetry, Inc', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

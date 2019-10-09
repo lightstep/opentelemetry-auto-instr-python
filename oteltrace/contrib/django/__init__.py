@@ -24,7 +24,7 @@ Django setting. For example, your ``settings.py`` may contain::
         'TAGS': {'env': 'production'},
     }
 
-If you need to access to Datadog settings, you can::
+If you need to access to OpenTelemetry settings, you can::
 
     from oteltrace.contrib.django.conf import settings
 

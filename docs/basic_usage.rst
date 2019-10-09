@@ -21,7 +21,7 @@ For example, if the command to run your application is::
 
 $ python app.py
 
-then to auto-instrument using Datadog, the corresponding command is::
+then to auto-instrument using OpenTelemetry, the corresponding command is::
 
 $ oteltrace-run python app.py
 
@@ -98,7 +98,7 @@ you may require::
   # do some operation(s) of interest in between
 
   # NOTE: make sure to call span.finish() or the entire trace will not be sent
-  # to Datadog
+  # to OpenTelemetry
   span.finish()
 
 API details of the decorator can be found here:

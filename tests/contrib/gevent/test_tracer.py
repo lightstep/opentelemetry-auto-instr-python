@@ -348,7 +348,7 @@ class TestGeventTracer(TestCase):
         """A helper to assert the parenting of a trace when greenlets are
         spawned within another greenlet.
 
-        This is meant to help maintain compatibility between the Datadog and
+        This is meant to help maintain compatibility between the OpenTelemetry and
         OpenTracing tracer implementations.
 
         Note that for gevent there is differing behaviour between the context
@@ -386,7 +386,7 @@ class TestGeventTracer(TestCase):
         assert worker_2.resource == 'greenlet.worker2'
 
     def test_trace_spawn_multiple_greenlets_multiple_traces_dd(self):
-        """Datadog version of the same test."""
+        """OpenTelemetry version of the same test."""
         def entrypoint():
             with self.tracer.trace('greenlet.main') as span:
                 span.resource = 'base'
