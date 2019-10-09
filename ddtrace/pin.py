@@ -9,8 +9,8 @@ log = get_logger(__name__)
 
 # To set attributes on wrapt proxy objects use this prefix:
 # http://wrapt.readthedocs.io/en/latest/wrappers.html
-_DD_PIN_NAME = '_datadog_pin'
-_DD_PIN_PROXY_NAME = '_self_' + _DD_PIN_NAME
+_OTEL_PIN_NAME = '_datadog_pin'
+_OTEL_PIN_PROXY_NAME = '_self_' + _OTEL_PIN_NAME
 
 
 class Pin(object):
@@ -92,7 +92,7 @@ class Pin(object):
         if hasattr(obj, '__getddpin__'):
             return obj.__getddpin__()
 
-        pin_name = _DD_PIN_PROXY_NAME if isinstance(obj, wrapt.ObjectProxy) else _DD_PIN_NAME
+        pin_name = _OTEL_PIN_PROXY_NAME if isinstance(obj, wrapt.ObjectProxy) else _OTEL_PIN_NAME
         pin = getattr(obj, pin_name, None)
         # detect if the PIN has been inherited from a class
         if pin is not None and pin._target != id(obj):
@@ -139,7 +139,7 @@ class Pin(object):
             if hasattr(obj, '__setddpin__'):
                 return obj.__setddpin__(self)
 
-            pin_name = _DD_PIN_PROXY_NAME if isinstance(obj, wrapt.ObjectProxy) else _DD_PIN_NAME
+            pin_name = _OTEL_PIN_PROXY_NAME if isinstance(obj, wrapt.ObjectProxy) else _OTEL_PIN_NAME
 
             # set the target reference; any get_from, clones and retarget the new PIN
             self._target = id(obj)
@@ -150,7 +150,7 @@ class Pin(object):
     def remove_from(self, obj):
         # Remove pin from the object.
         try:
-            pin_name = _DD_PIN_PROXY_NAME if isinstance(obj, wrapt.ObjectProxy) else _DD_PIN_NAME
+            pin_name = _OTEL_PIN_PROXY_NAME if isinstance(obj, wrapt.ObjectProxy) else _OTEL_PIN_NAME
 
             pin = Pin.get_from(obj)
             if pin is not None:

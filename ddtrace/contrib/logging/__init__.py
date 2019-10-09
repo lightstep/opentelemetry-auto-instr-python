@@ -13,7 +13,7 @@ ddtrace-run
 -----------
 
 When using ``ddtrace-run``, enable patching by setting the environment variable
-``DD_LOGS_INJECTION=true``. The logger by default will have a format that
+``OTEL_LOGS_INJECTION=true``. The logger by default will have a format that
 includes trace information::
 
     import logging

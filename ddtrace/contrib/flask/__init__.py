@@ -41,7 +41,7 @@ Configuration
 
    Whether to generate APM events for Flask in Trace Search & Analytics.
 
-   Can also be enabled with the ``DD_FLASK_ANALYTICS_ENABLED`` environment variable.
+   Can also be enabled with the ``OTEL_FLASK_ANALYTICS_ENABLED`` environment variable.
 
    Default: ``None``
 

@@ -125,7 +125,7 @@ class DDLoggerTestCase(BaseTestCase):
         self.assertIsNone(log.parent)
 
         # Override rate limit from environment variable
-        with self.override_env(dict(DD_LOGGING_RATE_LIMIT='10')):
+        with self.override_env(dict(OTEL_LOGGING_RATE_LIMIT='10')):
             log = DDLogger('test.logger')
             self.assertEqual(log.rate_limit, 10)
 

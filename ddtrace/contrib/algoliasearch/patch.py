@@ -4,7 +4,7 @@ from ddtrace.settings import config
 from ddtrace.utils.wrappers import unwrap as _u
 from ddtrace.vendor.wrapt import wrap_function_wrapper as _w
 
-DD_PATCH_ATTR = '_datadog_patch'
+OTEL_PATCH_ATTR = '_datadog_patch'
 
 SERVICE_NAME = 'algoliasearch'
 APP_NAME = 'algoliasearch'
@@ -28,7 +28,7 @@ def patch():
     if algoliasearch_version == (0, 0):
         return
 
-    if getattr(algoliasearch, DD_PATCH_ATTR, False):
+    if getattr(algoliasearch, OTEL_PATCH_ATTR, False):
         return
 
     setattr(algoliasearch, '_datadog_patch', True)
@@ -53,8 +53,8 @@ def unpatch():
     if algoliasearch_version == (0, 0):
         return
 
-    if getattr(algoliasearch, DD_PATCH_ATTR, False):
-        setattr(algoliasearch, DD_PATCH_ATTR, False)
+    if getattr(algoliasearch, OTEL_PATCH_ATTR, False):
+        setattr(algoliasearch, OTEL_PATCH_ATTR, False)
 
     if algoliasearch_version < (2, 0) and algoliasearch_version >= (1, 0):
         _u(algoliasearch.index.Index, 'search')
@@ -68,7 +68,7 @@ def unpatch():
 # DEV: this maps serves the dual purpose of enumerating the algoliasearch.search() query_args that
 # will be sent along as tags, as well as converting arguments names into tag names compliant with
 # tag naming recommendations set out here: https://docs.datadoghq.com/tagging/
-QUERY_ARGS_DD_TAG_MAP = {
+QUERY_ARGS_OTEL_TAG_MAP = {
     'page': 'page',
     'hitsPerPage': 'hits_per_page',
     'attributesToRetrieve': 'attributes_to_retrieve',
@@ -113,7 +113,7 @@ def _patched_search(func, instance, wrapt_args, wrapt_kwargs):
         query_args = wrapt_kwargs.get(function_query_arg_name, wrapt_args[1] if len(wrapt_args) > 1 else None)
 
         if query_args and isinstance(query_args, dict):
-            for query_arg, tag_name in QUERY_ARGS_DD_TAG_MAP.items():
+            for query_arg, tag_name in QUERY_ARGS_OTEL_TAG_MAP.items():
                 value = query_args.get(query_arg)
                 if value is not None:
                     span.set_tag('query.args.{}'.format(tag_name), value)

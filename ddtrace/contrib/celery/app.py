@@ -1,7 +1,7 @@
 from celery import signals
 
 from ddtrace import Pin, config
-from ddtrace.pin import _DD_PIN_NAME
+from ddtrace.pin import _OTEL_PIN_NAME
 from ddtrace.ext import AppTypes
 
 from .constants import APP
@@ -51,7 +51,7 @@ def unpatch_app(app):
 
     pin = Pin.get_from(app)
     if pin is not None:
-        delattr(app, _DD_PIN_NAME)
+        delattr(app, _OTEL_PIN_NAME)
 
     signals.task_prerun.disconnect(trace_prerun)
     signals.task_postrun.disconnect(trace_postrun)

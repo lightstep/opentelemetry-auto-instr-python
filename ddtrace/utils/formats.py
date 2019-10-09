@@ -8,14 +8,14 @@ def get_env(integration, variable, default=None):
     for consistency between integrations. The implementation is backward compatible
     with legacy nomenclature:
         * `OPENTELEMETRY_` is a legacy prefix with lower priority
-        * `DD_` environment variables have the highest priority
+        * `OTEL_` environment variables have the highest priority
         * the environment variable is built concatenating `integration` and `variable`
           arguments
         * return `default` otherwise
     """
     key = '{}_{}'.format(integration, variable).upper()
     legacy_env = 'OPENTELEMETRY_{}'.format(key)
-    env = 'DD_{}'.format(key)
+    env = 'OTEL_{}'.format(key)
 
     value = os.getenv(env)
     legacy = os.getenv(legacy_env)
@@ -23,7 +23,7 @@ def get_env(integration, variable, default=None):
         # Deprecation: `OPENTELEMETRY_` variables are deprecated
         deprecation(
             name='OPENTELEMETRY_',
-            message='Use `DD_` prefix instead',
+            message='Use `OTEL_` prefix instead',
             version='1.0.0',
         )
 

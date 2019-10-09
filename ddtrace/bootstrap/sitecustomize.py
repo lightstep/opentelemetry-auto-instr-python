@@ -12,7 +12,7 @@ from ddtrace.utils.formats import asbool, get_env
 from ddtrace.internal.logger import get_logger
 
 logs_injection = asbool(get_env('logs', 'injection'))
-DD_LOG_FORMAT = '%(asctime)s %(levelname)s [%(name)s] [%(filename)s:%(lineno)d] {}- %(message)s'.format(
+OTEL_LOG_FORMAT = '%(asctime)s %(levelname)s [%(name)s] [%(filename)s:%(lineno)d] {}- %(message)s'.format(
     '[dd.trace_id=%(dd.trace_id)s dd.span_id=%(dd.span_id)s] ' if logs_injection else ''
 )
 
@@ -30,9 +30,9 @@ debug = os.environ.get('OPENTELEMETRY_TRACE_DEBUG')
 # upon initializing it the first time.
 # See https://github.com/python/cpython/blob/112e4afd582515fcdcc0cde5012a4866e5cfda12/Lib/logging/__init__.py#L1550
 if debug and debug.lower() == 'true':
-    logging.basicConfig(level=logging.DEBUG, format=DD_LOG_FORMAT)
+    logging.basicConfig(level=logging.DEBUG, format=OTEL_LOG_FORMAT)
 else:
-    logging.basicConfig(format=DD_LOG_FORMAT)
+    logging.basicConfig(format=OTEL_LOG_FORMAT)
 
 log = get_logger(__name__)
 
@@ -65,7 +65,7 @@ def update_patched_modules():
 
 def add_global_tags(tracer):
     tags = {}
-    for tag in os.environ.get('DD_TRACE_GLOBAL_TAGS', '').split(','):
+    for tag in os.environ.get('OTEL_TRACE_GLOBAL_TAGS', '').split(','):
         tag_name, _, tag_value = tag.partition(':')
         if not tag_name or not tag_value:
             log.debug('skipping malformed tracer tag')
@@ -81,7 +81,7 @@ try:
 
     # Respect OPENTELEMETRY_* environment variables in global tracer configuration
     # TODO: these variables are deprecated; use utils method and update our documentation
-    # correct prefix should be DD_*
+    # correct prefix should be OTEL_*
     enabled = os.environ.get('OPENTELEMETRY_TRACE_ENABLED')
     priority_sampling = os.environ.get('OPENTELEMETRY_PRIORITY_SAMPLING')
     opts = {}
@@ -112,7 +112,7 @@ try:
     if 'OPENTELEMETRY_ENV' in os.environ:
         tracer.set_tags({'env': os.environ['OPENTELEMETRY_ENV']})
 
-    if 'DD_TRACE_GLOBAL_TAGS' in os.environ:
+    if 'OTEL_TRACE_GLOBAL_TAGS' in os.environ:
         add_global_tags(tracer)
 
     # Ensure sitecustomize.py is properly called if available in application directories:

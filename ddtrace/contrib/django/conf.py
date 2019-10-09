@@ -93,18 +93,18 @@ class DatadogSettings(object):
         if os.environ.get('OPENTELEMETRY_SERVICE_NAME'):
             self.defaults['DEFAULT_SERVICE'] = os.environ.get('OPENTELEMETRY_SERVICE_NAME')
 
-        host = os.environ.get('DD_AGENT_HOST', os.environ.get('OPENTELEMETRY_TRACE_AGENT_HOSTNAME'))
+        host = os.environ.get('OTEL_AGENT_HOST', os.environ.get('OPENTELEMETRY_TRACE_AGENT_HOSTNAME'))
         if host:
             self.defaults['AGENT_HOSTNAME'] = host
 
-        port = os.environ.get('DD_TRACE_AGENT_PORT', os.environ.get('OPENTELEMETRY_TRACE_AGENT_PORT'))
+        port = os.environ.get('OTEL_TRACE_AGENT_PORT', os.environ.get('OPENTELEMETRY_TRACE_AGENT_PORT'))
         if port:
             # if the agent port is a string, the underlying library that creates the socket
             # stops working
             try:
                 port = int(port)
             except ValueError:
-                log.warning('DD_TRACE_AGENT_PORT is not an integer value; default to 8126')
+                log.warning('OTEL_TRACE_AGENT_PORT is not an integer value; default to 8126')
             else:
                 self.defaults['AGENT_PORT'] = port
 

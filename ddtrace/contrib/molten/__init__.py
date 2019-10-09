@@ -27,7 +27,7 @@ Configuration
 
    Whether to generate APM events in Trace Search & Analytics.
 
-   Can also be enabled with the ``DD_MOLTEN_ANALYTICS_ENABLED`` environment variable.
+   Can also be enabled with the ``OTEL_MOLTEN_ANALYTICS_ENABLED`` environment variable.
 
    Default: ``None``
 
@@ -35,7 +35,7 @@ Configuration
 
    The service name reported for your Molten app.
 
-   Can also be configured via the ``DD_MOLTEN_SERVICE_NAME`` environment variable.
+   Can also be configured via the ``OTEL_MOLTEN_SERVICE_NAME`` environment variable.
 
    Default: ``'molten'``
 """

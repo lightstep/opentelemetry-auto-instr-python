@@ -1,7 +1,7 @@
 import pymemcache
 
 from ddtrace.ext import memcached as memcachedx
-from ddtrace.pin import Pin, _DD_PIN_NAME, _DD_PIN_PROXY_NAME
+from ddtrace.pin import Pin, _OTEL_PIN_NAME, _OTEL_PIN_PROXY_NAME
 from .client import WrappedClient
 
 _Client = pymemcache.client.base.Client
@@ -28,5 +28,5 @@ def unpatch():
     setattr(pymemcache.client.base, 'Client', _Client)
 
     # Remove any pins that may exist on the pymemcache reference
-    setattr(pymemcache, _DD_PIN_NAME, None)
-    setattr(pymemcache, _DD_PIN_PROXY_NAME, None)
+    setattr(pymemcache, _OTEL_PIN_NAME, None)
+    setattr(pymemcache, _OTEL_PIN_PROXY_NAME, None)

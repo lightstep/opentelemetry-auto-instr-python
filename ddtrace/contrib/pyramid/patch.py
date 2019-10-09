@@ -1,6 +1,6 @@
 import os
 
-from .trace import trace_pyramid, DD_TWEEN_NAME
+from .trace import trace_pyramid, OTEL_TWEEN_NAME
 from .constants import (
     SETTINGS_SERVICE, SETTINGS_DISTRIBUTED_TRACING,
     SETTINGS_ANALYTICS_ENABLED, SETTINGS_ANALYTICS_SAMPLE_RATE,
@@ -12,17 +12,17 @@ from pyramid.path import caller_package
 
 from ddtrace.vendor import wrapt
 
-DD_PATCH = '_datadog_patch'
+OTEL_PATCH = '_datadog_patch'
 
 
 def patch():
     """
     Patch pyramid.config.Configurator
     """
-    if getattr(pyramid.config, DD_PATCH, False):
+    if getattr(pyramid.config, OTEL_PATCH, False):
         return
 
-    setattr(pyramid.config, DD_PATCH, True)
+    setattr(pyramid.config, OTEL_PATCH, True)
     _w = wrapt.wrap_function_wrapper
     _w('pyramid.config', 'Configurator.__init__', traced_init)
 
@@ -72,13 +72,13 @@ def insert_tween_if_needed(settings):
     # If the list is empty, pyramid does not consider the tweens have been
     # set explicitly.
     # And if our tween is already there, nothing to do
-    if not tweens or not tweens.strip() or DD_TWEEN_NAME in tweens:
+    if not tweens or not tweens.strip() or OTEL_TWEEN_NAME in tweens:
         return
     # pyramid.tweens.EXCVIEW is the name of built-in exception view provided by
     # pyramid.  We need our tween to be before it, otherwise unhandled
     # exceptions will be caught before they reach our tween.
     idx = tweens.find(pyramid.tweens.EXCVIEW)
     if idx == -1:
-        settings['pyramid.tweens'] = tweens + '\n' + DD_TWEEN_NAME
+        settings['pyramid.tweens'] = tweens + '\n' + OTEL_TWEEN_NAME
     else:
-        settings['pyramid.tweens'] = tweens[:idx] + DD_TWEEN_NAME + '\n' + tweens[idx:]
+        settings['pyramid.tweens'] = tweens[:idx] + OTEL_TWEEN_NAME + '\n' + tweens[idx:]

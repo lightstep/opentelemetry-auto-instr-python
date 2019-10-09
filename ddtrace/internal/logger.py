@@ -70,8 +70,8 @@ class DDLogger(logging.Logger):
         self.buckets = collections.defaultdict(lambda: DDLogger.LoggingBucket(0, 0))
 
         # Allow 1 log record per name/level/pathname/lineno every 60 seconds by default
-        # Allow configuring via `DD_LOGGING_RATE_LIMIT`
-        # DEV: `DD_LOGGING_RATE_LIMIT=0` means to disable all rate limiting
+        # Allow configuring via `OTEL_LOGGING_RATE_LIMIT`
+        # DEV: `OTEL_LOGGING_RATE_LIMIT=0` means to disable all rate limiting
         self.rate_limit = int(get_env('logging', 'rate_limit', default=60))
 
     def handle(self, record):
@@ -87,7 +87,7 @@ class DDLogger(logging.Logger):
         :param record: The log record being logged
         :type record: ``logging.LogRecord``
         """
-        # If rate limiting has been disabled (`DD_LOGGING_RATE_LIMIT=0`) then apply no rate limit
+        # If rate limiting has been disabled (`OTEL_LOGGING_RATE_LIMIT=0`) then apply no rate limit
         if not self.rate_limit:
             super(DDLogger, self).handle(record)
             return

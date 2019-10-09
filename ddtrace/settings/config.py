@@ -22,7 +22,7 @@ class Config(object):
         self._config = {}
         self._http = HttpConfig()
         # Master switch for turning on and off trace search by default
-        # this weird invocation of get_env is meant to read the DD_ANALYTICS_ENABLED
+        # this weird invocation of get_env is meant to read the OTEL_ANALYTICS_ENABLED
         # legacy environment variable. It should be removed in the future
         legacy_config_value = get_env('analytics', 'enabled', default=False)
 

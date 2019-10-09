@@ -22,8 +22,8 @@ from .constants import (
 
 log = get_logger(__name__)
 
-DD_TWEEN_NAME = 'ddtrace.contrib.pyramid:trace_tween_factory'
-DD_SPAN = '_datadog_span'
+OTEL_TWEEN_NAME = 'ddtrace.contrib.pyramid:trace_tween_factory'
+OTEL_SPAN = '_datadog_span'
 
 
 def trace_pyramid(config):
@@ -32,7 +32,7 @@ def trace_pyramid(config):
 
 def includeme(config):
     # Add our tween just before the default exception handler
-    config.add_tween(DD_TWEEN_NAME, over=pyramid.tweens.EXCVIEW)
+    config.add_tween(OTEL_TWEEN_NAME, over=pyramid.tweens.EXCVIEW)
     # ensure we only patch the renderer once.
     if not isinstance(pyramid.renderers.RendererHelper.render, wrapt.ObjectProxy):
         wrapt.wrap_function_wrapper('pyramid.renderers', 'RendererHelper.render', trace_render)
@@ -44,7 +44,7 @@ def trace_render(func, instance, args, kwargs):
     if not request:
         log.debug('No request passed to render, will not be traced')
         return func(*args, **kwargs)
-    span = getattr(request, DD_SPAN, None)
+    span = getattr(request, OTEL_SPAN, None)
     if not span:
         log.debug('No span found in request, will not be traced')
         return func(*args, **kwargs)
@@ -85,7 +85,7 @@ def trace_tween_factory(handler, registry):
                         settings.get(SETTINGS_ANALYTICS_SAMPLE_RATE, True)
                     )
 
-                setattr(request, DD_SPAN, span)  # used to find the tracer in templates
+                setattr(request, OTEL_SPAN, span)  # used to find the tracer in templates
                 response = None
                 try:
                     response = handler(request)

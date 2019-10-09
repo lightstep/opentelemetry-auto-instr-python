@@ -29,7 +29,7 @@ class TestUtils(unittest.TestCase):
 
     def test_get_env_found(self):
         # ensure `get_env` returns a value if the environment variable is set
-        os.environ['DD_REQUESTS_DISTRIBUTED_TRACING'] = '1'
+        os.environ['OTEL_REQUESTS_DISTRIBUTED_TRACING'] = '1'
         value = get_env('requests', 'distributed_tracing')
         self.assertEqual(value, '1')
 
@@ -43,11 +43,11 @@ class TestUtils(unittest.TestCase):
             self.assertEqual(value, '1')
             self.assertEqual(len(w), 1)
             self.assertTrue(issubclass(w[-1].category, DeprecationWarning))
-            self.assertTrue('Use `DD_` prefix instead' in str(w[-1].message))
+            self.assertTrue('Use `OTEL_` prefix instead' in str(w[-1].message))
 
     def test_get_env_key_priority(self):
-        # ensure `get_env` use `DD_` with highest priority
-        os.environ['DD_REQUESTS_DISTRIBUTED_TRACING'] = 'highest'
+        # ensure `get_env` use `OTEL_` with highest priority
+        os.environ['OTEL_REQUESTS_DISTRIBUTED_TRACING'] = 'highest'
         os.environ['OPENTELEMETRY_REQUESTS_DISTRIBUTED_TRACING'] = 'lowest'
         value = get_env('requests', 'distributed_tracing')
         self.assertEqual(value, 'highest')

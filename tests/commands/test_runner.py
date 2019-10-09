@@ -111,11 +111,11 @@ class DdtraceRunTest(BaseTestCase):
 
     def test_host_port_from_env_dd(self):
         """
-        DD_AGENT_HOST|DD_TRACE_AGENT_PORT point to the tracer
+        OTEL_AGENT_HOST|OTEL_TRACE_AGENT_PORT point to the tracer
         to the correct host/port for submission
         """
-        with self.override_env(dict(DD_AGENT_HOST='172.10.0.1',
-                                    DD_TRACE_AGENT_PORT='8120')):
+        with self.override_env(dict(OTEL_AGENT_HOST='172.10.0.1',
+                                    OTEL_TRACE_AGENT_PORT='8120')):
             out = subprocess.check_output(
                 ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_hostname.py']
             )
@@ -129,12 +129,12 @@ class DdtraceRunTest(BaseTestCase):
 
     def test_runtime_metrics(self):
         """
-        DD_AGENT_HOST|DD_DOGSTATSD_PORT point to the tracer
+        OTEL_AGENT_HOST|OTEL_DOGSTATSD_PORT point to the tracer
         to the correct host/port for submission
         """
-        with self.override_env(dict(DD_RUNTIME_METRICS_ENABLED='True',
-                                    DD_AGENT_HOST='172.10.0.1',
-                                    DD_DOGSTATSD_PORT='8120')):
+        with self.override_env(dict(OTEL_RUNTIME_METRICS_ENABLED='True',
+                                    OTEL_AGENT_HOST='172.10.0.1',
+                                    OTEL_DOGSTATSD_PORT='8120')):
             out = subprocess.check_output(
                 ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_dogstatsd.py']
             )
@@ -245,7 +245,7 @@ class DdtraceRunTest(BaseTestCase):
     def test_global_trace_tags(self):
         """ Ensure global tags are passed in from environment
         """
-        with self.override_env(dict(DD_TRACE_GLOBAL_TAGS='a:True,b:0,c:C')):
+        with self.override_env(dict(OTEL_TRACE_GLOBAL_TAGS='a:True,b:0,c:C')):
             out = subprocess.check_output(
                 ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_global_tags.py']
             )
@@ -254,7 +254,7 @@ class DdtraceRunTest(BaseTestCase):
     def test_logs_injection(self):
         """ Ensure logs injection works
         """
-        with self.override_env(dict(DD_LOGS_INJECTION='true')):
+        with self.override_env(dict(OTEL_LOGS_INJECTION='true')):
             out = subprocess.check_output(
                 ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_logs_injection.py']
             )

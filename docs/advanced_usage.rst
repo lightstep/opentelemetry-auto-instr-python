@@ -189,7 +189,7 @@ Trace Search & Analytics
 
 Use `Trace Search & Analytics <https://docs.datadoghq.com/tracing/visualization/search/>`_ to filter application performance metrics and APM Events by user-defined tags. An APM event is generated every time a trace is generated.
 
-Enabling APM events for all web frameworks can be accomplished by setting the environment variable ``DD_TRACE_ANALYTICS_ENABLED=true``:
+Enabling APM events for all web frameworks can be accomplished by setting the environment variable ``OTEL_TRACE_ANALYTICS_ENABLED=true``:
 
 * :ref:`aiohttp`
 * :ref:`bottle`
@@ -203,54 +203,54 @@ Enabling APM events for all web frameworks can be accomplished by setting the en
 * :ref:`tornado`
 
 
-For most libraries, APM events can be enabled with the environment variable ``DD_{INTEGRATION}_ANALYTICS_ENABLED=true``:
+For most libraries, APM events can be enabled with the environment variable ``OTEL_{INTEGRATION}_ANALYTICS_ENABLED=true``:
 
 +----------------------+----------------------------------------+
 |       Library        |          Environment Variable          |
 +======================+========================================+
-| :ref:`aiobotocore`   | ``DD_AIOBOTOCORE_ANALYTICS_ENABLED``   |
+| :ref:`aiobotocore`   | ``OTEL_AIOBOTOCORE_ANALYTICS_ENABLED``   |
 +----------------------+----------------------------------------+
-| :ref:`aiopg`         | ``DD_AIOPG_ANALYTICS_ENABLED``         |
+| :ref:`aiopg`         | ``OTEL_AIOPG_ANALYTICS_ENABLED``         |
 +----------------------+----------------------------------------+
-| :ref:`boto`          | ``DD_BOTO_ANALYTICS_ENABLED``          |
+| :ref:`boto`          | ``OTEL_BOTO_ANALYTICS_ENABLED``          |
 +----------------------+----------------------------------------+
-| :ref:`botocore`      | ``DD_BOTOCORE_ANALYTICS_ENABLED``      |
+| :ref:`botocore`      | ``OTEL_BOTOCORE_ANALYTICS_ENABLED``      |
 +----------------------+----------------------------------------+
-| :ref:`bottle`        | ``DD_BOTTLE_ANALYTICS_ENABLED``        |
+| :ref:`bottle`        | ``OTEL_BOTTLE_ANALYTICS_ENABLED``        |
 +----------------------+----------------------------------------+
-| :ref:`cassandra`     | ``DD_CASSANDRA_ANALYTICS_ENABLED``     |
+| :ref:`cassandra`     | ``OTEL_CASSANDRA_ANALYTICS_ENABLED``     |
 +----------------------+----------------------------------------+
-| :ref:`elasticsearch` | ``DD_ELASTICSEARCH_ANALYTICS_ENABLED`` |
+| :ref:`elasticsearch` | ``OTEL_ELASTICSEARCH_ANALYTICS_ENABLED`` |
 +----------------------+----------------------------------------+
-| :ref:`falcon`        | ``DD_FALCON_ANALYTICS_ENABLED``        |
+| :ref:`falcon`        | ``OTEL_FALCON_ANALYTICS_ENABLED``        |
 +----------------------+----------------------------------------+
-| :ref:`flask`         | ``DD_FLASK_ANALYTICS_ENABLED``         |
+| :ref:`flask`         | ``OTEL_FLASK_ANALYTICS_ENABLED``         |
 +----------------------+----------------------------------------+
-| :ref:`flask_cache`   | ``DD_FLASK_CACHE_ANALYTICS_ENABLED``   |
+| :ref:`flask_cache`   | ``OTEL_FLASK_CACHE_ANALYTICS_ENABLED``   |
 +----------------------+----------------------------------------+
-| :ref:`grpc`          | ``DD_GRPC_ANALYTICS_ENABLED``          |
+| :ref:`grpc`          | ``OTEL_GRPC_ANALYTICS_ENABLED``          |
 +----------------------+----------------------------------------+
-| :ref:`httplib`       | ``DD_HTTPLIB_ANALYTICS_ENABLED``       |
+| :ref:`httplib`       | ``OTEL_HTTPLIB_ANALYTICS_ENABLED``       |
 +----------------------+----------------------------------------+
-| :ref:`kombu`         | ``DD_KOMBU_ANALYTICS_ENABLED``         |
+| :ref:`kombu`         | ``OTEL_KOMBU_ANALYTICS_ENABLED``         |
 +----------------------+----------------------------------------+
-| :ref:`molten`        | ``DD_MOLTEN_ANALYTICS_ENABLED``        |
+| :ref:`molten`        | ``OTEL_MOLTEN_ANALYTICS_ENABLED``        |
 +----------------------+----------------------------------------+
-| :ref:`pylibmc`       | ``DD_PYLIBMC_ANALYTICS_ENABLED``       |
+| :ref:`pylibmc`       | ``OTEL_PYLIBMC_ANALYTICS_ENABLED``       |
 +----------------------+----------------------------------------+
-| :ref:`pylons`        | ``DD_PYLONS_ANALYTICS_ENABLED``        |
+| :ref:`pylons`        | ``OTEL_PYLONS_ANALYTICS_ENABLED``        |
 +----------------------+----------------------------------------+
-| :ref:`pymemcache`    | ``DD_PYMEMCACHE_ANALYTICS_ENABLED``    |
+| :ref:`pymemcache`    | ``OTEL_PYMEMCACHE_ANALYTICS_ENABLED``    |
 +----------------------+----------------------------------------+
-| :ref:`pymongo`       | ``DD_PYMONGO_ANALYTICS_ENABLED``       |
+| :ref:`pymongo`       | ``OTEL_PYMONGO_ANALYTICS_ENABLED``       |
 +----------------------+----------------------------------------+
-| :ref:`redis`         | ``DD_REDIS_ANALYTICS_ENABLED``         |
+| :ref:`redis`         | ``OTEL_REDIS_ANALYTICS_ENABLED``         |
 +----------------------+----------------------------------------+
-| :ref:`rediscluster`  | ``DD_REDISCLUSTER_ANALYTICS_ENABLED``  |
+| :ref:`rediscluster`  | ``OTEL_REDISCLUSTER_ANALYTICS_ENABLED``  |
 +----------------------+----------------------------------------+
-| :ref:`sqlalchemy`    | ``DD_SQLALCHEMY_ANALYTICS_ENABLED``    |
+| :ref:`sqlalchemy`    | ``OTEL_SQLALCHEMY_ANALYTICS_ENABLED``    |
 +----------------------+----------------------------------------+
-| :ref:`vertica`       | ``DD_VERTICA_ANALYTICS_ENABLED``       |
+| :ref:`vertica`       | ``OTEL_VERTICA_ANALYTICS_ENABLED``       |
 +----------------------+----------------------------------------+
 
 For datastore libraries that extend another, use the setting for the underlying library:
@@ -258,17 +258,17 @@ For datastore libraries that extend another, use the setting for the underlying 
 +------------------------+----------------------------------+
 |        Library         |       Environment Variable       |
 +========================+==================================+
-| :ref:`mongoengine`     | ``DD_PYMONGO_ANALYTICS_ENABLED`` |
+| :ref:`mongoengine`     | ``OTEL_PYMONGO_ANALYTICS_ENABLED`` |
 +------------------------+----------------------------------+
-| :ref:`mysql-connector` | ``DD_DBAPI2_ANALYTICS_ENABLED``  |
+| :ref:`mysql-connector` | ``OTEL_DBAPI2_ANALYTICS_ENABLED``  |
 +------------------------+----------------------------------+
-| :ref:`mysqldb`         | ``DD_DBAPI2_ANALYTICS_ENABLED``  |
+| :ref:`mysqldb`         | ``OTEL_DBAPI2_ANALYTICS_ENABLED``  |
 +------------------------+----------------------------------+
-| :ref:`psycopg2`        | ``DD_DBAPI2_ANALYTICS_ENABLED``  |
+| :ref:`psycopg2`        | ``OTEL_DBAPI2_ANALYTICS_ENABLED``  |
 +------------------------+----------------------------------+
-| :ref:`pymysql`         | ``DD_DBAPI2_ANALYTICS_ENABLED``  |
+| :ref:`pymysql`         | ``OTEL_DBAPI2_ANALYTICS_ENABLED``  |
 +------------------------+----------------------------------+
-| :ref:`sqllite`         | ``DD_DBAPI2_ANALYTICS_ENABLED``  |
+| :ref:`sqllite`         | ``OTEL_DBAPI2_ANALYTICS_ENABLED``  |
 +------------------------+----------------------------------+
 
 Where environment variables are not used for configuring the tracer, the instructions for configuring trace analytics is provided in the library documentation:
@@ -556,7 +556,7 @@ The available environment variables for ``ddtrace-run`` are:
   will submit to  (default: 8126)
 * ``OPENTELEMETRY_PRIORITY_SAMPLING`` (default: true): enables :ref:`Priority
   Sampling`
-* ``DD_LOGS_INJECTION`` (default: false): enables :ref:`Logs Injection`
+* ``OTEL_LOGS_INJECTION`` (default: false): enables :ref:`Logs Injection`
 
 ``ddtrace-run`` respects a variety of common entrypoints for web applications:
 
