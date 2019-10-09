@@ -13,7 +13,6 @@ from .sampler import AllSampler, RateSampler, RateByServiceSampler
 from .span import Span
 from .utils.formats import get_env
 from .utils.deprecation import deprecated
-#from .vendor.dogstatsd import DogStatsd
 from .writer import AgentWriter
 from . import compat
 
@@ -61,9 +60,7 @@ class Tracer(object):
         # traces
         self._pid = getpid()
         self._runtime_worker = None
-        self._dogstatsd_client = None
-        #self._dogstatsd_host = self.DEFAULT_HOSTNAME
-        #self._dogstatsd_port = self.DEFAULT_DOGSTATSD_PORT
+        self._metrics_reporter = None
 
     def get_call_context(self, *args, **kwargs):
         """
@@ -88,8 +85,7 @@ class Tracer(object):
         """Returns the current Tracer Context Provider"""
         return self._context_provider
 
-    def configure(self, enabled=None, dogstatsd_host=None,
-                  dogstatsd_port=None, sampler=None, context_provider=None, wrap_executor=None,
+    def configure(self, enabled=None, sampler=None, context_provider=None, wrap_executor=None,
                   priority_sampling=None, settings=None, collect_metrics=None):
         """
         Configure an existing Tracer the easy way.
@@ -137,12 +133,11 @@ class Tracer(object):
         if wrap_executor is not None:
             self._wrap_executor = wrap_executor
 
+        # TODO: use opentelemetry-python metrics API?
         #if collect_metrics and self._runtime_worker is None:
-        #    self._dogstatsd_host = dogstatsd_host or self._dogstatsd_host
-        #    self._dogstatsd_port = dogstatsd_port or self._dogstatsd_port
         #    # start dogstatsd client if not already running
-        #    if not self._dogstatsd_client:
-        #        self._start_dogstatsd_client()
+        #    if not self._metrics_reporter:
+        #        #self._metrics_reporter = FakeMetricsClient()
         #
         #    self._start_runtime_worker()
 
@@ -270,7 +265,7 @@ class Tracer(object):
     def _update_dogstatsd_constant_tags(self):
         """ Prepare runtime tags for ddstatsd.
         """
-        if not self._dogstatsd_client:
+        if not self._metrics_reporter:
             return
 
         # DEV: ddstatsd expects tags in the form ['key1:value1', 'key2:value2', ...]
@@ -279,21 +274,10 @@ class Tracer(object):
             for k, v in RuntimeTags()
         ]
         log.debug('Updating constant tags {}'.format(tags))
-        self._dogstatsd_client.constant_tags = tags
-
-    def _start_dogstatsd_client(self):
-        # start dogstatsd as client with constant tags
-        log.debug('Connecting to DogStatsd on {}:{}'.format(
-            self._dogstatsd_host,
-            self._dogstatsd_port
-        ))
-        self._dogstatsd_client = DogStatsd(
-            host=self._dogstatsd_host,
-            port=self._dogstatsd_port,
-        )
+        self._metrics_reporter.constant_tags = tags
 
     def _start_runtime_worker(self):
-        self._runtime_worker = RuntimeWorker(self._dogstatsd_client)
+        self._runtime_worker = RuntimeWorker(self._metrics_reporter)
         self._runtime_worker.start()
 
     def _check_new_process(self):

@@ -60,19 +60,19 @@ class RuntimeWorker(_worker.PeriodicWorkerThread):
 
     FLUSH_INTERVAL = 10
 
-    def __init__(self, statsd_client, flush_interval=None):
+    def __init__(self, metrics_reporter, flush_interval=None):
         flush_interval = self.FLUSH_INTERVAL if flush_interval is None else flush_interval
         super(RuntimeWorker, self).__init__(interval=flush_interval,
                                             name=self.__class__.__name__)
-        self._statsd_client = statsd_client
+        self._metrics_reporter = metrics_reporter
         self._runtime_metrics = RuntimeMetrics()
 
     def _write_metric(self, key, value):
         log.debug('Writing metric {}:{}'.format(key, value))
-        self._statsd_client.gauge(key, value)
+        self._metrics_reporter.gauge(key, value)
 
     def flush(self):
-        if not self._statsd_client:
+        if not self._metrics_reporter:
             log.warning('Attempted flush with uninitialized or failed statsd client')
             return
 
