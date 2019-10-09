@@ -1,14 +1,14 @@
 # 3p
 import pytest
-from ddtrace.vendor import wrapt
+from oteltrace.vendor import wrapt
 
 # project
-import ddtrace
-from ddtrace import Pin, config
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.vertica.patch import patch, unpatch
-from ddtrace.ext import errors
-from ddtrace.utils.merge import deepmerge
+import oteltrace
+from oteltrace import Pin, config
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.vertica.patch import patch, unpatch
+from oteltrace.ext import errors
+from oteltrace.utils.merge import deepmerge
 
 # testing
 from tests.base import BaseTracerTestCase
@@ -27,7 +27,7 @@ def test_tracer(request):
 
 @pytest.fixture(scope='function')
 def test_conn(request, test_tracer):
-    ddtrace.tracer = test_tracer
+    oteltrace.tracer = test_tracer
     patch()
 
     import vertica_python  # must happen AFTER installing with patch()

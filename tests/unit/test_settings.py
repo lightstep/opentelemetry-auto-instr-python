@@ -1,4 +1,4 @@
-from ddtrace.settings import Config, HttpConfig, IntegrationConfig
+from oteltrace.settings import Config, HttpConfig, IntegrationConfig
 
 from ..base import BaseTestCase
 

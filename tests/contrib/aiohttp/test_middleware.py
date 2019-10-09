@@ -2,10 +2,10 @@ import asyncio
 
 from aiohttp.test_utils import unittest_run_loop
 
-from ddtrace.contrib.aiohttp.middlewares import trace_app, trace_middleware
-from ddtrace.ext import http
-from ddtrace.sampler import RateSampler
-from ddtrace.constants import SAMPLING_PRIORITY_KEY, ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.aiohttp.middlewares import trace_app, trace_middleware
+from oteltrace.ext import http
+from oteltrace.sampler import RateSampler
+from oteltrace.constants import SAMPLING_PRIORITY_KEY, ANALYTICS_SAMPLE_RATE_KEY
 
 from opentracing.scope_managers.asyncio import AsyncioScopeManager
 from tests.opentracer.utils import init_tracer

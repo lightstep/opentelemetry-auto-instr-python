@@ -1,6 +1,6 @@
 import falcon
 
-from ddtrace.contrib.falcon import TraceMiddleware
+from oteltrace.contrib.falcon import TraceMiddleware
 
 from . import resources
 

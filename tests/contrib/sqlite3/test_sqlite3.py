@@ -3,12 +3,12 @@ import sqlite3
 import time
 
 # project
-import ddtrace
-from ddtrace import Pin
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.sqlite3 import connection_factory
-from ddtrace.contrib.sqlite3.patch import patch, unpatch, TracedSQLiteCursor
-from ddtrace.ext import errors
+import oteltrace
+from oteltrace import Pin
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.sqlite3 import connection_factory
+from oteltrace.contrib.sqlite3.patch import patch, unpatch, TracedSQLiteCursor
+from oteltrace.ext import errors
 
 # testing
 from tests.opentracer.utils import init_tracer
@@ -36,15 +36,15 @@ class TestSQLite(BaseTracerTestCase):
         assert not self.spans
 
     def test_service_info(self):
-        backup_tracer = ddtrace.tracer
-        ddtrace.tracer = self.tracer
+        backup_tracer = oteltrace.tracer
+        oteltrace.tracer = self.tracer
 
         sqlite3.connect(':memory:')
 
         services = self.tracer.writer.pop_services()
         self.assertEqual(services, {})
 
-        ddtrace.tracer = backup_tracer
+        oteltrace.tracer = backup_tracer
 
     def test_sqlite(self):
         # ensure we can trace multiple services without stomping

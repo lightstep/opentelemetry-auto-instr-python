@@ -1,8 +1,8 @@
 from celery import Celery
 
-from ddtrace import Pin
-from ddtrace.compat import PY2
-from ddtrace.contrib.celery import patch, unpatch
+from oteltrace import Pin
+from oteltrace.compat import PY2
+from oteltrace.contrib.celery import patch, unpatch
 
 from ..config import REDIS_CONFIG
 from ...base import BaseTracerTestCase

@@ -1,10 +1,10 @@
 import aiobotocore
 from botocore.errorfactory import ClientError
 
-from ddtrace.contrib.aiobotocore.patch import patch, unpatch
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.ext import http
-from ddtrace.compat import stringify
+from oteltrace.contrib.aiobotocore.patch import patch, unpatch
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.ext import http
+from oteltrace.compat import stringify
 
 from .utils import aiobotocore_client
 from ..asyncio.utils import AsyncioTestCase, mark_asyncio

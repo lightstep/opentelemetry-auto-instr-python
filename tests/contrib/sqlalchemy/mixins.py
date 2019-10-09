@@ -12,8 +12,8 @@ from sqlalchemy import (
 )
 
 # project
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.sqlalchemy import trace_engine
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.sqlalchemy import trace_engine
 
 # testing
 from tests.opentracer.utils import init_tracer

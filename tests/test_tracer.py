@@ -6,8 +6,8 @@ from os import getpid
 
 from unittest.case import SkipTest
 
-from ddtrace.ext import system
-from ddtrace.context import Context
+from oteltrace.ext import system
+from oteltrace.context import Context
 
 from .base import BaseTracerTestCase
 from .utils.tracer import DummyTracer

@@ -1,11 +1,11 @@
 import gevent
 import gevent.pool
-import ddtrace
+import oteltrace
 
-from ddtrace.constants import SAMPLING_PRIORITY_KEY
-from ddtrace.context import Context
-from ddtrace.contrib.gevent import patch, unpatch
-from ddtrace.ext.priority import USER_KEEP
+from oteltrace.constants import SAMPLING_PRIORITY_KEY
+from oteltrace.context import Context
+from oteltrace.contrib.gevent import patch, unpatch
+from oteltrace.ext.priority import USER_KEEP
 
 from unittest import TestCase
 from opentracing.scope_managers.gevent import GeventScopeManager
@@ -23,8 +23,8 @@ class TestGeventTracer(TestCase):
     def setUp(self):
         # use a dummy tracer
         self.tracer = get_dummy_tracer()
-        self._original_tracer = ddtrace.tracer
-        ddtrace.tracer = self.tracer
+        self._original_tracer = oteltrace.tracer
+        oteltrace.tracer = self.tracer
         # trace gevent
         patch()
 
@@ -32,7 +32,7 @@ class TestGeventTracer(TestCase):
         # clean the active Context
         self.tracer.context_provider.activate(None)
         # restore the original tracer
-        ddtrace.tracer = self._original_tracer
+        oteltrace.tracer = self._original_tracer
         # untrace gevent
         unpatch()
 

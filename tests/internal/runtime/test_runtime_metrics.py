@@ -1,17 +1,17 @@
 import time
 
-from ddtrace.internal.runtime.runtime_metrics import (
+from oteltrace.internal.runtime.runtime_metrics import (
     RuntimeTags,
     RuntimeMetrics,
     RuntimeWorker,
 )
-from ddtrace.internal.runtime.constants import (
+from oteltrace.internal.runtime.constants import (
     DEFAULT_RUNTIME_METRICS,
     DEFAULT_RUNTIME_TAGS,
     GC_COUNT_GEN0,
     SERVICE
 )
-from ddtrace.vendor.dogstatsd import DogStatsd
+from oteltrace.vendor.dogstatsd import DogStatsd
 
 from ...base import (
     BaseTestCase,

@@ -3,7 +3,7 @@ import importlib
 import sys
 import unittest
 
-from ddtrace.vendor import wrapt
+from oteltrace.vendor import wrapt
 
 from tests.subprocesstest import SubprocessTestCase, run_in_subprocess
 
@@ -102,7 +102,7 @@ class PatchTestCase(object):
 
         A simple implementation inheriting this TestCase looks like::
 
-            from ddtrace.contrib.redis import unpatch
+            from oteltrace.contrib.redis import unpatch
 
             class RedisPatchTestCase(PatchTestCase.Base):
                 __integration_name__ = 'redis'
@@ -146,7 +146,7 @@ class PatchTestCase(object):
             super(PatchTestCase.Base, self).__init__(*args, **kwargs)
 
         def patch(self, *args, **kwargs):
-            from ddtrace import patch
+            from oteltrace import patch
             return patch(*args, **kwargs)
 
         def _gen_test_attrs(self, ops):
@@ -270,7 +270,7 @@ class PatchTestCase(object):
         def test_import_patch(self):
             """
             The integration should test that each class, method or function that
-            is to be patched is in fact done so when ddtrace.patch() is called
+            is to be patched is in fact done so when oteltrace.patch() is called
             before the module is imported.
 
             For example:
@@ -278,7 +278,7 @@ class PatchTestCase(object):
             an appropriate ``test_patch_import`` would be::
 
                 import redis
-                ddtrace.patch(redis=True)
+                oteltrace.patch(redis=True)
                 self.assert_module_patched(redis)
             """
             self.assert_not_module_imported(self.__module_name__)
@@ -291,13 +291,13 @@ class PatchTestCase(object):
         def test_patch_import(self):
             """
             The integration should test that each class, method or function that
-            is to be patched is in fact done so when ddtrace.patch() is called
+            is to be patched is in fact done so when oteltrace.patch() is called
             after the module is imported.
 
             an appropriate ``test_patch_import`` would be::
 
                 import redis
-                ddtrace.patch(redis=True)
+                oteltrace.patch(redis=True)
                 self.assert_module_patched(redis)
             """
             self.assert_not_module_imported(self.__module_name__)
@@ -315,9 +315,9 @@ class PatchTestCase(object):
             An example for what this might look like for the redis integration::
 
                 import redis
-                ddtrace.patch(redis=True)
+                oteltrace.patch(redis=True)
                 self.assert_module_patched(redis)
-                ddtrace.patch(redis=True)
+                oteltrace.patch(redis=True)
                 self.assert_not_module_double_patched(redis)
             """
             self.assert_not_module_imported(self.__module_name__)
@@ -336,10 +336,10 @@ class PatchTestCase(object):
 
             An example for what this might look like for the redis integration::
 
-                ddtrace.patch(redis=True)
+                oteltrace.patch(redis=True)
                 import redis
                 self.assert_module_patched(redis)
-                ddtrace.patch(redis=True)
+                oteltrace.patch(redis=True)
                 self.assert_not_module_double_patched(redis)
             """
             self.assert_not_module_imported(self.__module_name__)
@@ -358,8 +358,8 @@ class PatchTestCase(object):
 
             An example for what this might look like for the redis integration::
 
-                ddtrace.patch(redis=True)
-                ddtrace.patch(redis=True)
+                oteltrace.patch(redis=True)
+                oteltrace.patch(redis=True)
                 import redis
                 self.assert_not_double_wrapped(redis.StrictRedis.execute_command)
             """
@@ -380,11 +380,11 @@ class PatchTestCase(object):
             For example::
 
                 import redis
-                from ddtrace.contrib.redis import unpatch
+                from oteltrace.contrib.redis import unpatch
 
-                ddtrace.patch(redis=True)
+                oteltrace.patch(redis=True)
                 unpatch()
-                ddtrace.patch(redis=True)
+                oteltrace.patch(redis=True)
                 self.assert_module_patched(redis)
             """
             self.assert_not_module_imported(self.__module_name__)
@@ -405,12 +405,12 @@ class PatchTestCase(object):
 
             For example::
 
-                from ddtrace.contrib.redis import unpatch
+                from oteltrace.contrib.redis import unpatch
 
-                ddtrace.patch(redis=True)
+                oteltrace.patch(redis=True)
                 import redis
                 unpatch()
-                ddtrace.patch(redis=True)
+                oteltrace.patch(redis=True)
                 self.assert_module_patched(redis)
             """
             self.assert_not_module_imported(self.__module_name__)
@@ -431,12 +431,12 @@ class PatchTestCase(object):
 
             For example::
 
-                from ddtrace.contrib.redis import unpatch
+                from oteltrace.contrib.redis import unpatch
 
-                ddtrace.patch(redis=True)
+                oteltrace.patch(redis=True)
                 import redis
                 unpatch()
-                ddtrace.patch(redis=True)
+                oteltrace.patch(redis=True)
                 self.assert_module_patched(redis)
             """
             self.assert_not_module_imported(self.__module_name__)
@@ -456,11 +456,11 @@ class PatchTestCase(object):
 
             For example::
 
-                from ddtrace.contrib.redis import unpatch
+                from oteltrace.contrib.redis import unpatch
 
-                ddtrace.patch(redis=True)
+                oteltrace.patch(redis=True)
                 unpatch()
-                ddtrace.patch(redis=True)
+                oteltrace.patch(redis=True)
                 import redis
                 self.assert_module_patched(redis)
             """
@@ -478,9 +478,9 @@ class PatchTestCase(object):
 
             For example::
 
-                from ddtrace.contrib.redis import unpatch
+                from oteltrace.contrib.redis import unpatch
                 unpatch()
-                ddtrace.patch(redis=True)
+                oteltrace.patch(redis=True)
                 import redis
                 self.assert_not_module_patched(redis)
             """
@@ -499,8 +499,8 @@ class PatchTestCase(object):
 
             For example::
 
-                ddtrace.patch(redis=True)
-                from ddtrace.contrib.redis import unpatch
+                oteltrace.patch(redis=True)
+                from oteltrace.contrib.redis import unpatch
                 unpatch()
                 import redis
                 self.assert_not_module_patched(redis)
@@ -520,8 +520,8 @@ class PatchTestCase(object):
             For example::
 
                 import redis
-                from ddtrace.contrib.redis import unpatch
-                ddtrace.patch(redis=True)
+                from oteltrace.contrib.redis import unpatch
+                oteltrace.patch(redis=True)
                 unpatch()
                 self.assert_not_module_patched(redis)
             """
@@ -541,8 +541,8 @@ class PatchTestCase(object):
             For example::
 
                 import redis
-                from ddtrace.contrib.redis import unpatch
-                ddtrace.patch(redis=True)
+                from oteltrace.contrib.redis import unpatch
+                oteltrace.patch(redis=True)
                 unpatch()
                 self.assert_not_module_patched(redis)
             """
@@ -562,8 +562,8 @@ class PatchTestCase(object):
 
             For example::
 
-                from ddtrace.contrib.redis import unpatch
-                ddtrace.patch(redis=True)
+                from oteltrace.contrib.redis import unpatch
+                oteltrace.patch(redis=True)
                 import redis
                 unpatch()
                 self.assert_not_module_patched(redis)
@@ -583,9 +583,9 @@ class PatchTestCase(object):
             For example::
 
                 import redis
-                from ddtrace.contrib.redis import unpatch
+                from oteltrace.contrib.redis import unpatch
 
-                ddtrace.patch(redis=True)
+                oteltrace.patch(redis=True)
                 self.assert_module_patched(redis)
                 unpatch()
                 self.assert_not_module_patched(redis)
@@ -608,9 +608,9 @@ class PatchTestCase(object):
 
             For example::
 
-                from ddtrace.contrib.redis import unpatch
+                from oteltrace.contrib.redis import unpatch
 
-                ddtrace.patch(redis=True)
+                oteltrace.patch(redis=True)
                 unpatch()
                 import redis
                 self.assert_not_module_patched(redis)
@@ -632,9 +632,9 @@ class PatchTestCase(object):
 
             For example::
 
-                from ddtrace.contrib.redis import unpatch
+                from oteltrace.contrib.redis import unpatch
 
-                ddtrace.patch(redis=True)
+                oteltrace.patch(redis=True)
                 unpatch()
                 unpatch()
                 import redis

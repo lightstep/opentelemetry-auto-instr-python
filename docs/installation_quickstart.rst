@@ -15,21 +15,21 @@ Installation
 
 Install with :code:`pip`::
 
-$ pip install ddtrace
+$ pip install oteltrace
 
 We strongly suggest pinning the version of the library you deploy.
 
 Quickstart
 ----------
 
-Getting started with ``ddtrace`` is as easy as prefixing your python
-entry-point command with ``ddtrace-run``.
+Getting started with ``oteltrace`` is as easy as prefixing your python
+entry-point command with ``oteltrace-run``.
 
 For example if you start your application with ``python app.py`` then run::
 
-  $ ddtrace-run python app.py
+  $ oteltrace-run python app.py
 
-For more advanced usage of ``ddtrace-run`` refer to the documentation :ref:`here<ddtracerun>`.
+For more advanced usage of ``oteltrace-run`` refer to the documentation :ref:`here<oteltracerun>`.
 
 To find out how to trace your own code manually refer to the documentation :ref:`here<basic usage>`.
 
@@ -37,22 +37,22 @@ To find out how to trace your own code manually refer to the documentation :ref:
 OpenTracing
 -----------
 
-``ddtrace`` also provides an OpenTracing API to the Datadog tracer so
+``oteltrace`` also provides an OpenTracing API to the Datadog tracer so
 that you can use the Datadog tracer in your OpenTracing-compatible
 applications.
 
 Installation
 ^^^^^^^^^^^^
 
-Include OpenTracing with ``ddtrace``::
+Include OpenTracing with ``oteltrace``::
 
-  $ pip install ddtrace[opentracing]
+  $ pip install oteltrace[opentracing]
 
-To include the OpenTracing dependency in your project with ``ddtrace``, ensure
+To include the OpenTracing dependency in your project with ``oteltrace``, ensure
 you have the following in ``setup.py``::
 
     install_requires=[
-        "ddtrace[opentracing]",
+        "oteltrace[opentracing]",
     ],
 
 Configuration
@@ -64,7 +64,7 @@ overwrite the global ``opentracing.tracer`` reference.
 
 Typically this method looks something like::
 
-    from ddtrace.opentracer import Tracer, set_global_tracer
+    from oteltrace.opentracer import Tracer, set_global_tracer
 
     def init_tracer(service_name):
         """
@@ -81,5 +81,5 @@ Typically this method looks something like::
         set_global_tracer(tracer)
         return tracer
 
-For more advanced usage of OpenTracing in ``ddtrace`` refer to the
+For more advanced usage of OpenTracing in ``oteltrace`` refer to the
 documentation :ref:`here<adv_opentracing>`.

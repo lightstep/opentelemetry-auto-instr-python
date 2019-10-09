@@ -1,14 +1,14 @@
 import bottle
-import ddtrace
+import oteltrace
 import webtest
 
 from tests.opentracer.utils import init_tracer
 from ...base import BaseTracerTestCase
 
-from ddtrace import compat
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.bottle import TracePlugin
-from ddtrace.ext import http
+from oteltrace import compat
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.bottle import TracePlugin
+from oteltrace.ext import http
 
 SERVICE = 'bottle-app'
 
@@ -21,14 +21,14 @@ class TraceBottleTest(BaseTracerTestCase):
         super(TraceBottleTest, self).setUp()
 
         # provide a dummy tracer
-        self._original_tracer = ddtrace.tracer
-        ddtrace.tracer = self.tracer
+        self._original_tracer = oteltrace.tracer
+        oteltrace.tracer = self.tracer
         # provide a Bottle app
         self.app = bottle.Bottle()
 
     def tearDown(self):
         # restore the tracer
-        ddtrace.tracer = self._original_tracer
+        oteltrace.tracer = self._original_tracer
 
     def _trace_app(self, tracer=None):
         self.app.install(TracePlugin(service=SERVICE, tracer=tracer))

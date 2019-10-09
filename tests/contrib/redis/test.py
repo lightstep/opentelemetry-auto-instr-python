@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import redis
 
-from ddtrace import Pin, compat
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.redis import get_traced_redis
-from ddtrace.contrib.redis.patch import patch, unpatch
+from oteltrace import Pin, compat
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.redis import get_traced_redis
+from oteltrace.contrib.redis.patch import patch, unpatch
 
 from tests.opentracer.utils import init_tracer
 from ..config import REDIS_CONFIG

@@ -9,11 +9,11 @@ from pymemcache.exceptions import (
 )
 import pytest
 import unittest
-from ddtrace.vendor import wrapt
+from oteltrace.vendor import wrapt
 
 # project
-from ddtrace import Pin
-from ddtrace.contrib.pymemcache.patch import patch, unpatch
+from oteltrace import Pin
+from oteltrace.contrib.pymemcache.patch import patch, unpatch
 from .utils import MockSocket, _str
 from .test_client_mixin import PymemcacheClientTestCaseMixin, TEST_HOST, TEST_PORT
 

@@ -3,8 +3,8 @@ import aiohttp_jinja2
 
 from aiohttp.test_utils import unittest_run_loop
 
-from ddtrace.pin import Pin
-from ddtrace.contrib.aiohttp.patch import patch, unpatch
+from oteltrace.pin import Pin
+from oteltrace.contrib.aiohttp.patch import patch, unpatch
 
 from .utils import TraceTestCase
 from .app.web import set_filesystem_loader, set_package_loader

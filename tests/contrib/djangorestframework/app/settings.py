@@ -91,7 +91,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
 
     # tracer app
-    'ddtrace.contrib.django',
+    'oteltrace.contrib.django',
 
     # djangorestframework
     'rest_framework'

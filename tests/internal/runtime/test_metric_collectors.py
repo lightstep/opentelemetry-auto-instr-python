@@ -1,10 +1,10 @@
-from ddtrace.internal.runtime.metric_collectors import (
+from oteltrace.internal.runtime.metric_collectors import (
     RuntimeMetricCollector,
     GCRuntimeMetricCollector,
     PSUtilRuntimeMetricCollector,
 )
 
-from ddtrace.internal.runtime.constants import (
+from oteltrace.internal.runtime.constants import (
     GC_COUNT_GEN0,
     GC_RUNTIME_METRICS,
     PSUTIL_RUNTIME_METRICS,

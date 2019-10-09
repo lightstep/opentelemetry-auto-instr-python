@@ -1,4 +1,4 @@
-from ddtrace.filters import FilterRequestsOnUrl
+from oteltrace.filters import FilterRequestsOnUrl
 
 from .utils import TornadoTestCase
 

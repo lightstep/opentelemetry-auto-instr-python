@@ -1,5 +1,5 @@
 # project
-from ddtrace.contrib.django.conf import DatadogSettings
+from oteltrace.contrib.django.conf import DatadogSettings
 
 # testing
 from .utils import DjangoTraceTestCase

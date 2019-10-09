@@ -1,6 +1,6 @@
 import asyncio
 
-from ddtrace.provider import DefaultContextProvider
+from oteltrace.provider import DefaultContextProvider
 from .utils import AsyncioTestCase, mark_asyncio
 
 

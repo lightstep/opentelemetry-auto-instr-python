@@ -2,8 +2,8 @@ import os
 import unittest
 import warnings
 
-from ddtrace.utils.deprecation import deprecation, deprecated, format_message
-from ddtrace.utils.formats import asbool, get_env, flatten_dict
+from oteltrace.utils.deprecation import deprecation, deprecated, format_message
+from oteltrace.utils.formats import asbool, get_env, flatten_dict
 
 
 class TestUtils(unittest.TestCase):

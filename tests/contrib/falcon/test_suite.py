@@ -1,6 +1,6 @@
-from ddtrace import config
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.ext import errors as errx, http as httpx
+from oteltrace import config
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.ext import errors as errx, http as httpx
 
 from tests.opentracer.utils import init_tracer
 

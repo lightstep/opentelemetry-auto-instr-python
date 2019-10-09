@@ -1,5 +1,5 @@
 from functools import partial
-from ddtrace.utils.importlib import func_name
+from oteltrace.utils.importlib import func_name
 
 
 class SomethingCallable(object):

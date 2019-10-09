@@ -3,7 +3,7 @@ import unittest
 
 from celery import Celery
 
-from ddtrace.contrib.celery import patch_task, unpatch_task, unpatch
+from oteltrace.contrib.celery import patch_task, unpatch_task, unpatch
 
 
 class CeleryDeprecatedTaskPatch(unittest.TestCase):

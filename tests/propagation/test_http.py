@@ -1,7 +1,7 @@
 from unittest import TestCase
 from tests.test_tracer import get_dummy_tracer
 
-from ddtrace.propagation.http import (
+from oteltrace.propagation.http import (
     HTTPPropagator,
     HTTP_HEADER_TRACE_ID,
     HTTP_HEADER_PARENT_ID,

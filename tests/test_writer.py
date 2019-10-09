@@ -2,8 +2,8 @@ from unittest import TestCase
 
 import pytest
 
-from ddtrace.span import Span
-from ddtrace.writer import AsyncWorker, Q, Empty
+from oteltrace.span import Span
+from oteltrace.writer import AsyncWorker, Q, Empty
 
 
 class RemoveAllFilter():

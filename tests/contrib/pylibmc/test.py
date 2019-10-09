@@ -6,11 +6,11 @@ from unittest.case import SkipTest
 import pylibmc
 
 # project
-from ddtrace import Pin
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.pylibmc import TracedClient
-from ddtrace.contrib.pylibmc.patch import patch, unpatch
-from ddtrace.ext import memcached
+from oteltrace import Pin
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.pylibmc import TracedClient
+from oteltrace.contrib.pylibmc.patch import patch, unpatch
+from oteltrace.ext import memcached
 
 # testing
 from ...opentracer.utils import init_tracer

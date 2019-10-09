@@ -3,8 +3,8 @@ from django.apps import apps
 from django.test import TestCase
 
 # project
-from ddtrace.tracer import Tracer
-from ddtrace.contrib.django.conf import settings
+from oteltrace.tracer import Tracer
+from oteltrace.contrib.django.conf import settings
 
 # testing
 from ...test_tracer import DummyWriter

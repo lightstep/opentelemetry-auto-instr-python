@@ -10,10 +10,10 @@ from unittest import TestCase
 import pytest
 
 from tests.test_tracer import get_dummy_tracer
-from ddtrace.api import API, Response
-from ddtrace.compat import iteritems, httplib, PY3
-from ddtrace.internal.runtime.container import CGroupInfo
-from ddtrace.vendor.six.moves import BaseHTTPServer, socketserver
+from oteltrace.api import API, Response
+from oteltrace.compat import iteritems, httplib, PY3
+from oteltrace.internal.runtime.container import CGroupInfo
+from oteltrace.vendor.six.moves import BaseHTTPServer, socketserver
 
 
 class _BaseHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
@@ -182,7 +182,7 @@ class APITests(TestCase):
                 msg = log.call_args[0][0] % log.call_args[0][1:]
                 assert re.match(v['log'], msg), msg
 
-    @mock.patch('ddtrace.compat.httplib.HTTPConnection')
+    @mock.patch('oteltrace.compat.httplib.HTTPConnection')
     def test_put_connection_close(self, HTTPConnection):
         """
         When calling API._put
@@ -198,7 +198,7 @@ class APITests(TestCase):
         self.conn.request.assert_called_once()
         self.conn.close.assert_called_once()
 
-    @mock.patch('ddtrace.compat.httplib.HTTPConnection')
+    @mock.patch('oteltrace.compat.httplib.HTTPConnection')
     def test_put_connection_close_exception(self, HTTPConnection):
         """
         When calling API._put raises an exception
@@ -261,7 +261,7 @@ def test_flush_connection_uds(endpoint_uds_server):
     assert response.status == 200
 
 
-@mock.patch('ddtrace.internal.runtime.container.get_container_info')
+@mock.patch('oteltrace.internal.runtime.container.get_container_info')
 def test_api_container_info(get_container_info):
     # When we have container information
     # DEV: `get_container_info` will return a `CGroupInfo` with a `container_id` or `None`

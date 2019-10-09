@@ -1,6 +1,6 @@
 import gc
 
-from ddtrace.contrib.celery.utils import (
+from oteltrace.contrib.celery.utils import (
     tags_from_context,
     retrieve_task_id,
     attach_span,

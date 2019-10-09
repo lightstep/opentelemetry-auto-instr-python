@@ -2,11 +2,11 @@ from __future__ import division
 
 import unittest
 
-from ddtrace.span import Span
-from ddtrace.sampler import RateSampler, AllSampler, RateByServiceSampler
-from ddtrace.compat import iteritems
+from oteltrace.span import Span
+from oteltrace.sampler import RateSampler, AllSampler, RateByServiceSampler
+from oteltrace.compat import iteritems
 from tests.test_tracer import get_dummy_tracer
-from ddtrace.constants import SAMPLING_PRIORITY_KEY, SAMPLE_RATE_METRIC_KEY
+from oteltrace.constants import SAMPLING_PRIORITY_KEY, SAMPLE_RATE_METRIC_KEY
 
 
 class RateSamplerTest(unittest.TestCase):

@@ -1,4 +1,4 @@
-from ddtrace import Pin
+from oteltrace import Pin
 
 if __name__ == '__main__':
     # have to import celery in order to have the post-import hooks run

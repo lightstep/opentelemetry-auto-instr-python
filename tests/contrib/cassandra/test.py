@@ -9,11 +9,11 @@ from cassandra.cluster import Cluster, ResultSet
 from cassandra.query import BatchStatement, SimpleStatement
 
 # project
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.cassandra.patch import patch, unpatch
-from ddtrace.contrib.cassandra.session import get_traced_cassandra, SERVICE
-from ddtrace.ext import net, cassandra as cassx, errors
-from ddtrace import config, Pin
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.cassandra.patch import patch, unpatch
+from oteltrace.contrib.cassandra.session import get_traced_cassandra, SERVICE
+from oteltrace.ext import net, cassandra as cassx, errors
+from oteltrace import config, Pin
 
 # testing
 from tests.contrib.config import CASSANDRA_CONFIG
@@ -236,7 +236,7 @@ class CassandraBase(object):
         session, tracer = self._traced_session()
         future = session.execute_async(self.TEST_QUERY)
         future.result()
-        span = getattr(future, '_ddtrace_current_span', None)
+        span = getattr(future, '_oteltrace_current_span', None)
         assert span is None
 
     def test_paginated_query(self):

@@ -9,10 +9,10 @@ import boto.elasticache
 from moto import mock_s3, mock_ec2, mock_lambda, mock_sts
 
 # project
-from ddtrace import Pin
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.boto.patch import patch, unpatch
-from ddtrace.ext import http
+from oteltrace import Pin
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.boto.patch import patch, unpatch
+from oteltrace.ext import http
 
 # testing
 from unittest import skipUnless

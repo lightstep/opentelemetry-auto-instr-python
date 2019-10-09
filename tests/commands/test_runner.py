@@ -10,14 +10,14 @@ def inject_sitecustomize(path):
     the current PYTHONPATH.
 
     :param path: package path containing ``sitecustomize.py`` module, starting
-                 from the ddtrace root folder
+                 from the oteltrace root folder
     :returns: a cloned environment that includes an altered PYTHONPATH with
               the given `sitecustomize.py`
     """
-    from ddtrace import __file__ as root_file
+    from oteltrace import __file__ as root_file
     root_folder = os.path.dirname(root_file)
     # Copy the current environment and replace the PYTHONPATH. This is
-    # required otherwise `ddtrace` scripts are not found when `env` kwarg is
+    # required otherwise `oteltrace` scripts are not found when `env` kwarg is
     # passed
     env = os.environ.copy()
     sitecustomize = os.path.join(root_folder, '..', path)
@@ -36,7 +36,7 @@ class DdtraceRunTest(BaseTestCase):
         """
         with self.override_env(dict(OPENTELEMETRY_SERVICE_NAME='my_test_service')):
             out = subprocess.check_output(
-                ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_service.py']
+                ['oteltrace-run', 'python', 'tests/commands/oteltrace_run_service.py']
             )
             assert out.startswith(b'Test success')
 
@@ -46,7 +46,7 @@ class DdtraceRunTest(BaseTestCase):
         """
         with self.override_env(dict(OPENTELEMETRY_ENV='test')):
             out = subprocess.check_output(
-                ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_env.py']
+                ['oteltrace-run', 'python', 'tests/commands/oteltrace_run_env.py']
             )
             assert out.startswith(b'Test success')
 
@@ -56,28 +56,28 @@ class DdtraceRunTest(BaseTestCase):
         """
         with self.override_env(dict(OPENTELEMETRY_TRACE_ENABLED='false')):
             out = subprocess.check_output(
-                ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_disabled.py']
+                ['oteltrace-run', 'python', 'tests/commands/oteltrace_run_disabled.py']
             )
             assert out.startswith(b'Test success')
 
         with self.override_env(dict(OPENTELEMETRY_TRACE_ENABLED='true')):
             out = subprocess.check_output(
-                ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_enabled.py']
+                ['oteltrace-run', 'python', 'tests/commands/oteltrace_run_enabled.py']
             )
             assert out.startswith(b'Test success')
 
     def test_patched_modules(self):
         """
-        Using `ddtrace-run` registers some generic patched modules
+        Using `oteltrace-run` registers some generic patched modules
         """
         out = subprocess.check_output(
-            ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_patched_modules.py']
+            ['oteltrace-run', 'python', 'tests/commands/oteltrace_run_patched_modules.py']
         )
         assert out.startswith(b'Test success')
 
     def test_integration(self):
         out = subprocess.check_output(
-            ['ddtrace-run', 'python', '-m', 'tests.commands.ddtrace_run_integration']
+            ['oteltrace-run', 'python', '-m', 'tests.commands.oteltrace_run_integration']
         )
         assert out.startswith(b'Test success')
 
@@ -87,13 +87,13 @@ class DdtraceRunTest(BaseTestCase):
         """
         with self.override_env(dict(OPENTELEMETRY_TRACE_DEBUG='false')):
             out = subprocess.check_output(
-                ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_no_debug.py']
+                ['oteltrace-run', 'python', 'tests/commands/oteltrace_run_no_debug.py']
             )
             assert out.startswith(b'Test success')
 
         with self.override_env(dict(OPENTELEMETRY_TRACE_DEBUG='true')):
             out = subprocess.check_output(
-                ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_debug.py']
+                ['oteltrace-run', 'python', 'tests/commands/oteltrace_run_debug.py']
             )
             assert out.startswith(b'Test success')
 
@@ -105,7 +105,7 @@ class DdtraceRunTest(BaseTestCase):
         with self.override_env(dict(OPENTELEMETRY_TRACE_AGENT_HOSTNAME='172.10.0.1',
                                     OPENTELEMETRY_TRACE_AGENT_PORT='8120')):
             out = subprocess.check_output(
-                ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_hostname.py']
+                ['oteltrace-run', 'python', 'tests/commands/oteltrace_run_hostname.py']
             )
             assert out.startswith(b'Test success')
 
@@ -117,13 +117,13 @@ class DdtraceRunTest(BaseTestCase):
         with self.override_env(dict(OTEL_AGENT_HOST='172.10.0.1',
                                     OTEL_TRACE_AGENT_PORT='8120')):
             out = subprocess.check_output(
-                ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_hostname.py']
+                ['oteltrace-run', 'python', 'tests/commands/oteltrace_run_hostname.py']
             )
             assert out.startswith(b'Test success')
 
-            # Do we get the same results without `ddtrace-run`?
+            # Do we get the same results without `oteltrace-run`?
             out = subprocess.check_output(
-                ['python', 'tests/commands/ddtrace_run_hostname.py']
+                ['python', 'tests/commands/oteltrace_run_hostname.py']
             )
             assert out.startswith(b'Test success')
 
@@ -136,7 +136,7 @@ class DdtraceRunTest(BaseTestCase):
                                     OTEL_AGENT_HOST='172.10.0.1',
                                     OTEL_DOGSTATSD_PORT='8120')):
             out = subprocess.check_output(
-                ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_dogstatsd.py']
+                ['oteltrace-run', 'python', 'tests/commands/oteltrace_run_dogstatsd.py']
             )
             assert out.startswith(b'Test success')
 
@@ -146,7 +146,7 @@ class DdtraceRunTest(BaseTestCase):
         """
         with self.override_env(dict(OPENTELEMETRY_PRIORITY_SAMPLING='True')):
             out = subprocess.check_output(
-                ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_priority_sampling.py']
+                ['oteltrace-run', 'python', 'tests/commands/oteltrace_run_priority_sampling.py']
             )
             assert out.startswith(b'Test success')
 
@@ -154,7 +154,7 @@ class DdtraceRunTest(BaseTestCase):
         """
         OPENTELEMETRY_PATCH_MODULES overrides the defaults for patch_all()
         """
-        from ddtrace.bootstrap.sitecustomize import EXTRA_PATCHED_MODULES, update_patched_modules
+        from oteltrace.bootstrap.sitecustomize import EXTRA_PATCHED_MODULES, update_patched_modules
         orig = EXTRA_PATCHED_MODULES.copy()
 
         # empty / malformed strings are no-ops
@@ -193,14 +193,14 @@ class DdtraceRunTest(BaseTestCase):
             assert EXTRA_PATCHED_MODULES['boto'] is True
             assert EXTRA_PATCHED_MODULES['django'] is False
 
-    def test_sitecustomize_without_ddtrace_run_command(self):
+    def test_sitecustomize_without_oteltrace_run_command(self):
         # [Regression test]: ensure `sitecustomize` path is removed only if it's
         # present otherwise it will cause:
         #   ValueError: list.remove(x): x not in list
         # as mentioned here: https://github.com/DataDog/dd-trace-py/pull/516
         env = inject_sitecustomize('')
         out = subprocess.check_output(
-            ['python', 'tests/commands/ddtrace_minimal.py'],
+            ['python', 'tests/commands/oteltrace_minimal.py'],
             env=env,
         )
         # `out` contains the `loaded` status of the module
@@ -213,7 +213,7 @@ class DdtraceRunTest(BaseTestCase):
         # defined in users' PYTHONPATH.
         env = inject_sitecustomize('tests/commands/bootstrap')
         out = subprocess.check_output(
-            ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_sitecustomize.py'],
+            ['oteltrace-run', 'python', 'tests/commands/oteltrace_run_sitecustomize.py'],
             env=env,
         )
         assert out.startswith(b'Test success')
@@ -222,32 +222,32 @@ class DdtraceRunTest(BaseTestCase):
         # ensure `sitecustomize.py` is not loaded if `-S` is used
         env = inject_sitecustomize('tests/commands/bootstrap')
         out = subprocess.check_output(
-            ['ddtrace-run', 'python', '-S', 'tests/commands/ddtrace_run_sitecustomize.py', '-S'],
+            ['oteltrace-run', 'python', '-S', 'tests/commands/oteltrace_run_sitecustomize.py', '-S'],
             env=env,
         )
         assert out.startswith(b'Test success')
 
     def test_argv_passed(self):
         out = subprocess.check_output(
-            ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_argv.py', 'foo', 'bar']
+            ['oteltrace-run', 'python', 'tests/commands/oteltrace_run_argv.py', 'foo', 'bar']
         )
         assert out.startswith(b'Test success')
 
     def test_got_app_name(self):
         """
-        apps run with ddtrace-run have a proper app name
+        apps run with oteltrace-run have a proper app name
         """
         out = subprocess.check_output(
-            ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_app_name.py']
+            ['oteltrace-run', 'python', 'tests/commands/oteltrace_run_app_name.py']
         )
-        assert out.startswith(b'ddtrace_run_app_name.py')
+        assert out.startswith(b'oteltrace_run_app_name.py')
 
     def test_global_trace_tags(self):
         """ Ensure global tags are passed in from environment
         """
         with self.override_env(dict(OTEL_TRACE_GLOBAL_TAGS='a:True,b:0,c:C')):
             out = subprocess.check_output(
-                ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_global_tags.py']
+                ['oteltrace-run', 'python', 'tests/commands/oteltrace_run_global_tags.py']
             )
             assert out.startswith(b'Test success')
 
@@ -256,6 +256,6 @@ class DdtraceRunTest(BaseTestCase):
         """
         with self.override_env(dict(OTEL_LOGS_INJECTION='true')):
             out = subprocess.check_output(
-                ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_logs_injection.py']
+                ['oteltrace-run', 'python', 'tests/commands/oteltrace_run_logs_injection.py']
             )
             assert out.startswith(b'Test success')

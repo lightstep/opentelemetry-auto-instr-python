@@ -1,8 +1,8 @@
 import MySQLdb
 
-from ddtrace import Pin
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.mysqldb.patch import patch, unpatch
+from oteltrace import Pin
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.mysqldb.patch import patch, unpatch
 
 from tests.opentracer.utils import init_tracer
 from ..config import MYSQL_CONFIG

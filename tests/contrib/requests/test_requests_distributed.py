@@ -1,6 +1,6 @@
 from requests_mock import Adapter
 
-from ddtrace import config
+from oteltrace import config
 
 from ...base import BaseTracerTestCase
 from .test_requests import BaseRequestTestCase

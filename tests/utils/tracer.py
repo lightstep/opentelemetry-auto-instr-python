@@ -1,8 +1,8 @@
 from collections import deque
-from ddtrace.encoding import JSONEncoder, MsgpackEncoder
-from ddtrace.tracer import Tracer
-from ddtrace.writer import AgentWriter
-from ddtrace.compat import PY3
+from oteltrace.encoding import JSONEncoder, MsgpackEncoder
+from oteltrace.tracer import Tracer
+from oteltrace.writer import AgentWriter
+from oteltrace.compat import PY3
 
 
 class DummyWriter(AgentWriter):

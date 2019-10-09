@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 import kombu
 
-from ddtrace import Pin
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.kombu.patch import patch, unpatch
-from ddtrace.contrib.kombu import utils
-from ddtrace.ext import kombu as kombux
+from oteltrace import Pin
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.kombu.patch import patch, unpatch
+from oteltrace.contrib.kombu import utils
+from oteltrace.ext import kombu as kombux
 from ..config import RABBITMQ_CONFIG
 from ...base import BaseTracerTestCase
 

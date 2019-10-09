@@ -1,7 +1,7 @@
 import celery
 from celery.exceptions import Retry
 
-from ddtrace.contrib.celery import patch, unpatch
+from oteltrace.contrib.celery import patch, unpatch
 
 from .base import CeleryBaseTestCase
 

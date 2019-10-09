@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 # project
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.ext import net
-from ddtrace.contrib.flask_cache import get_traced_cache
-from ddtrace.contrib.flask_cache.tracers import TYPE, CACHE_BACKEND
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.ext import net
+from oteltrace.contrib.flask_cache import get_traced_cache
+from oteltrace.contrib.flask_cache.tracers import TYPE, CACHE_BACKEND
 
 # 3rd party
 from flask import Flask

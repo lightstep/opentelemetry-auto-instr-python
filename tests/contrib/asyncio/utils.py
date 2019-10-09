@@ -2,7 +2,7 @@ import asyncio
 
 from functools import wraps
 
-from ddtrace.contrib.asyncio import context_provider
+from oteltrace.contrib.asyncio import context_provider
 
 from ...base import BaseTracerTestCase
 

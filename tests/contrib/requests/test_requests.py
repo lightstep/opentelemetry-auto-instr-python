@@ -3,11 +3,11 @@ import requests
 from requests import Session
 from requests.exceptions import MissingSchema
 
-from ddtrace import config
-from ddtrace import Pin
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.requests import patch, unpatch
-from ddtrace.ext import errors, http
+from oteltrace import config
+from oteltrace import Pin
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.requests import patch, unpatch
+from oteltrace.ext import errors, http
 
 from tests.opentracer.utils import init_tracer
 

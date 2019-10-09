@@ -1,11 +1,11 @@
-from ddtrace.span import Span
+from oteltrace.span import Span
 
 NO_CHILDREN = object()
 
 
 class TestSpan(Span):
     """
-    Test wrapper for a :class:`ddtrace.span.Span` that provides additional functions and assertions
+    Test wrapper for a :class:`oteltrace.span.Span` that provides additional functions and assertions
 
     Example::
 
@@ -22,8 +22,8 @@ class TestSpan(Span):
         """
         Constructor for TestSpan
 
-        :param span: The :class:`ddtrace.span.Span` to wrap
-        :type span: :class:`ddtrace.span.Span`
+        :param span: The :class:`oteltrace.span.Span` to wrap
+        :type span: :class:`oteltrace.span.Span`
         """
         if isinstance(span, TestSpan):
             span = span._span
@@ -33,7 +33,7 @@ class TestSpan(Span):
 
     def __getattr__(self, key):
         """
-        First look for property on the base :class:`ddtrace.span.Span` otherwise return this object's attribute
+        First look for property on the base :class:`oteltrace.span.Span` otherwise return this object's attribute
         """
         if hasattr(self._span, key):
             return getattr(self._span, key)
@@ -41,12 +41,12 @@ class TestSpan(Span):
         return self.__getattribute__(key)
 
     def __setattr__(self, key, value):
-        """Pass through all assignment to the base :class:`ddtrace.span.Span`"""
+        """Pass through all assignment to the base :class:`oteltrace.span.Span`"""
         return setattr(self._span, key, value)
 
     def __eq__(self, other):
         """
-        Custom equality code to ensure we are using the base :class:`ddtrace.span.Span.__eq__`
+        Custom equality code to ensure we are using the base :class:`oteltrace.span.Span.__eq__`
 
         :param other: The object to check equality with
         :type other: object
@@ -218,7 +218,7 @@ class TestSpanContainer(object):
         """
         internal helper to ensure the list of spans are all :class:`tests.utils.span.TestSpan`
 
-        :param spans: List of :class:`ddtrace.span.Span` or :class:`tests.utils.span.TestSpan`
+        :param spans: List of :class:`oteltrace.span.Span` or :class:`tests.utils.span.TestSpan`
         :type spans: list
         :returns: A list og :class:`tests.utils.span.TestSpan`
         :rtype: list
@@ -335,7 +335,7 @@ class TestSpanNode(TestSpan, TestSpanContainer):
     """
     A :class:`tests.utils.span.TestSpan` which is used as part of a span tree.
 
-    Each :class:`tests.utils.span.TestSpanNode` represents the current :class:`ddtrace.span.Span`
+    Each :class:`tests.utils.span.TestSpanNode` represents the current :class:`oteltrace.span.Span`
     along with any children who have that span as it's parent.
 
     This class can be used to assert on the parent/child relationships between spans.

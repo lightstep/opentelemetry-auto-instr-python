@@ -1,18 +1,18 @@
 import unittest
-from ddtrace import Pin
+from oteltrace import Pin
 
 
 class CeleryPatchTest(unittest.TestCase):
     def test_patch_after_import(self):
         import celery
-        from ddtrace import patch
+        from oteltrace import patch
         patch(celery=True)
 
         app = celery.Celery()
         assert Pin.get_from(app) is not None
 
     def test_patch_before_import(self):
-        from ddtrace import patch
+        from oteltrace import patch
         patch(celery=True)
         import celery
 

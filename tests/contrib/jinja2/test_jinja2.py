@@ -4,8 +4,8 @@ import unittest
 # 3rd party
 import jinja2
 
-from ddtrace import Pin, config
-from ddtrace.contrib.jinja2 import patch, unpatch
+from oteltrace import Pin, config
+from oteltrace.contrib.jinja2 import patch, unpatch
 from tests.test_tracer import get_dummy_tracer
 
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))

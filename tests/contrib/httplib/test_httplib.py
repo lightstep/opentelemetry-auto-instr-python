@@ -3,15 +3,15 @@ import contextlib
 import sys
 
 # Third party
-from ddtrace.vendor import wrapt
+from oteltrace.vendor import wrapt
 
 # Project
-from ddtrace import config
-from ddtrace.compat import httplib, PY2
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.httplib import patch, unpatch
-from ddtrace.contrib.httplib.patch import should_skip_request
-from ddtrace.pin import Pin
+from oteltrace import config
+from oteltrace.compat import httplib, PY2
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.httplib import patch, unpatch
+from oteltrace.contrib.httplib.patch import should_skip_request
+from oteltrace.pin import Pin
 
 from tests.opentracer.utils import init_tracer
 
@@ -351,7 +351,7 @@ class HTTPLibTestCase(HTTPLibBaseMixin, BaseTracerTestCase):
 
         # Enabled when configured
         with self.override_config('hhtplib', {}):
-            from ddtrace.settings import IntegrationConfig
+            from oteltrace.settings import IntegrationConfig
             integration_config = config.httplib  # type: IntegrationConfig
             integration_config.http.trace_headers(['my-header', 'access-control-allow-origin'])
             conn = self.get_http_connection(SOCKET)

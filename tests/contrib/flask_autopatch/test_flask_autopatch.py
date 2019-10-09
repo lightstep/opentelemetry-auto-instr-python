@@ -3,9 +3,9 @@ import unittest
 
 import flask
 
-from ddtrace.vendor import wrapt
-from ddtrace.ext import http
-from ddtrace import Pin
+from oteltrace.vendor import wrapt
+from oteltrace.ext import http
+from oteltrace import Pin
 
 from ...test_tracer import get_dummy_tracer
 
@@ -19,11 +19,11 @@ class FlaskAutopatchTestCase(unittest.TestCase):
 
     def test_patched(self):
         """
-        When using ddtrace-run
+        When using oteltrace-run
             Then the `flask` module is patched
         """
         # DEV: We have great test coverage in tests.contrib.flask,
-        #      we only need basic tests here to assert `ddtrace-run` patched thingsa
+        #      we only need basic tests here to assert `oteltrace-run` patched thingsa
 
         # Assert module is marked as patched
         self.assertTrue(flask._datadog_patch)
@@ -38,7 +38,7 @@ class FlaskAutopatchTestCase(unittest.TestCase):
 
     def test_request(self):
         """
-        When using ddtrace-run
+        When using oteltrace-run
             When making a request to flask app
                 We generate the expected spans
         """

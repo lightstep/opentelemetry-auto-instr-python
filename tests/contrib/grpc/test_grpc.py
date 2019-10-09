@@ -1,10 +1,10 @@
 import grpc
 from grpc.framework.foundation import logging_pool
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.grpc import patch, unpatch
-from ddtrace.contrib.grpc import constants
-from ddtrace.ext import errors
-from ddtrace import Pin
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.grpc import patch, unpatch
+from oteltrace.contrib.grpc import constants
+from oteltrace.ext import errors
+from oteltrace import Pin
 
 from ...base import BaseTracerTestCase
 

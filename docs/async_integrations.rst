@@ -6,7 +6,7 @@ Asynchronous Libraries
 asyncio
 ^^^^^^^
 
-.. automodule:: ddtrace.contrib.asyncio
+.. automodule:: oteltrace.contrib.asyncio
 
 
 .. _gevent:
@@ -14,5 +14,5 @@ asyncio
 gevent
 ^^^^^^
 
-.. automodule:: ddtrace.contrib.gevent
+.. automodule:: oteltrace.contrib.gevent
 

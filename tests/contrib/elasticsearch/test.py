@@ -2,12 +2,12 @@ import datetime
 import unittest
 
 # project
-from ddtrace import Pin
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.ext import http
-from ddtrace.contrib.elasticsearch import get_traced_transport
-from ddtrace.contrib.elasticsearch.elasticsearch import elasticsearch
-from ddtrace.contrib.elasticsearch.patch import patch, unpatch
+from oteltrace import Pin
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.ext import http
+from oteltrace.contrib.elasticsearch import get_traced_transport
+from oteltrace.contrib.elasticsearch.elasticsearch import elasticsearch
+from oteltrace.contrib.elasticsearch.patch import patch, unpatch
 
 # testing
 from tests.opentracer.utils import init_tracer
@@ -21,8 +21,8 @@ class ElasticsearchTest(unittest.TestCase):
     Elasticsearch integration test suite.
     Need a running ElasticSearch
     """
-    ES_INDEX = 'ddtrace_index'
-    ES_TYPE = 'ddtrace_type'
+    ES_INDEX = 'oteltrace_index'
+    ES_TYPE = 'oteltrace_type'
 
     TEST_SERVICE = 'test'
     TEST_PORT = str(ELASTICSEARCH_CONFIG['port'])
@@ -192,8 +192,8 @@ class ElasticsearchPatchTest(BaseTracerTestCase):
     Test cases with patching.
     Will merge when patching will be the default/only way.
     """
-    ES_INDEX = 'ddtrace_index'
-    ES_TYPE = 'ddtrace_type'
+    ES_INDEX = 'oteltrace_index'
+    ES_TYPE = 'oteltrace_type'
 
     TEST_SERVICE = 'test'
     TEST_PORT = str(ELASTICSEARCH_CONFIG['port'])

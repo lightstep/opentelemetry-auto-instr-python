@@ -119,7 +119,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
 
     # tracer app
-    'ddtrace.contrib.django',
+    'oteltrace.contrib.django',
 ]
 
 OPENTELEMETRY_TRACE = {

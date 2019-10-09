@@ -18,16 +18,16 @@ import redis
 
 
 # project
-import ddtrace
+import oteltrace
 from tests.contrib import config
 
 
 # verbosity
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
-ddtrace.tracer.debug_logging = False
+oteltrace.tracer.debug_logging = False
 
-ddtrace.patch_all()
-ddtrace.tracer.writer = None
+oteltrace.patch_all()
+oteltrace.tracer.writer = None
 
 
 class KitchenSink(object):

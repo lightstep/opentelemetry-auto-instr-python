@@ -3,14 +3,14 @@ from django.test import modify_settings
 from django.db import connections
 
 # project
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY, SAMPLING_PRIORITY_KEY
-from ddtrace.contrib.django.db import unpatch_conn
-from ddtrace.ext import errors, http
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY, SAMPLING_PRIORITY_KEY
+from oteltrace.contrib.django.db import unpatch_conn
+from oteltrace.ext import errors, http
 
 # testing
 from tests.opentracer.utils import init_tracer
 from .compat import reverse
-from .utils import DjangoTraceTestCase, override_ddtrace_settings
+from .utils import DjangoTraceTestCase, override_oteltrace_settings
 
 
 class DjangoMiddlewareTest(DjangoTraceTestCase):
@@ -69,7 +69,7 @@ class DjangoMiddlewareTest(DjangoTraceTestCase):
         self.assertIsNone(sp_template.get_metric(ANALYTICS_SAMPLE_RATE_KEY))
         self.assertIsNone(sp_database.get_metric(ANALYTICS_SAMPLE_RATE_KEY))
 
-    @override_ddtrace_settings(ANALYTICS_ENABLED=True, ANALYTICS_SAMPLE_RATE=0.5)
+    @override_oteltrace_settings(ANALYTICS_ENABLED=True, ANALYTICS_SAMPLE_RATE=0.5)
     def test_analytics_global_on_integration_on(self):
         """
         When making a request
@@ -112,7 +112,7 @@ class DjangoMiddlewareTest(DjangoTraceTestCase):
         self.assertIsNone(sp_template.get_metric(ANALYTICS_SAMPLE_RATE_KEY))
         self.assertIsNone(sp_database.get_metric(ANALYTICS_SAMPLE_RATE_KEY))
 
-    @override_ddtrace_settings(ANALYTICS_ENABLED=True, ANALYTICS_SAMPLE_RATE=0.5)
+    @override_oteltrace_settings(ANALYTICS_ENABLED=True, ANALYTICS_SAMPLE_RATE=0.5)
     def test_analytics_global_off_integration_on(self):
         """
         When making a request
@@ -134,7 +134,7 @@ class DjangoMiddlewareTest(DjangoTraceTestCase):
         self.assertIsNone(sp_template.get_metric(ANALYTICS_SAMPLE_RATE_KEY))
         self.assertIsNone(sp_database.get_metric(ANALYTICS_SAMPLE_RATE_KEY))
 
-    @override_ddtrace_settings(ANALYTICS_ENABLED=True, ANALYTICS_SAMPLE_RATE=None)
+    @override_oteltrace_settings(ANALYTICS_ENABLED=True, ANALYTICS_SAMPLE_RATE=None)
     def test_analytics_global_off_integration_on_and_none(self):
         """
         When making a request
@@ -286,7 +286,7 @@ class DjangoMiddlewareTest(DjangoTraceTestCase):
         assert sp_request.get_tag('http.status_code') == '200'
         assert sp_request.get_tag('django.user.is_authenticated') is None
 
-    @override_ddtrace_settings(DISTRIBUTED_TRACING=True)
+    @override_oteltrace_settings(DISTRIBUTED_TRACING=True)
     def test_middleware_propagation(self):
         # ensures that we properly propagate http context
         url = reverse('users-list')

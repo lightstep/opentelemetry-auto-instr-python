@@ -4,10 +4,10 @@ from pyramid.httpexceptions import HTTPException
 import pytest
 import webtest
 
-from ddtrace import compat
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.pyramid.patch import insert_tween_if_needed
-from ddtrace.ext import http
+from oteltrace import compat
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.pyramid.patch import insert_tween_if_needed
+from oteltrace.ext import http
 
 from .app import create_app
 
@@ -272,9 +272,9 @@ class PyramidTestCase(PyramidBase):
         assert s.meta.get(http.URL) == 'http://localhost/404/raise_exception'
 
     def test_insert_tween_if_needed_already_set(self):
-        settings = {'pyramid.tweens': 'ddtrace.contrib.pyramid:trace_tween_factory'}
+        settings = {'pyramid.tweens': 'oteltrace.contrib.pyramid:trace_tween_factory'}
         insert_tween_if_needed(settings)
-        assert settings['pyramid.tweens'] == 'ddtrace.contrib.pyramid:trace_tween_factory'
+        assert settings['pyramid.tweens'] == 'oteltrace.contrib.pyramid:trace_tween_factory'
 
     def test_insert_tween_if_needed_none(self):
         settings = {'pyramid.tweens': ''}
@@ -286,7 +286,7 @@ class PyramidTestCase(PyramidBase):
         insert_tween_if_needed(settings)
         assert (
             settings['pyramid.tweens'] ==
-            'ddtrace.contrib.pyramid:trace_tween_factory\npyramid.tweens.excview_tween_factory'
+            'oteltrace.contrib.pyramid:trace_tween_factory\npyramid.tweens.excview_tween_factory'
         )
 
     def test_insert_tween_if_needed_excview_and_other(self):
@@ -295,7 +295,7 @@ class PyramidTestCase(PyramidBase):
         assert (
             settings['pyramid.tweens'] ==
             'a.first.tween\n'
-            'ddtrace.contrib.pyramid:trace_tween_factory\n'
+            'oteltrace.contrib.pyramid:trace_tween_factory\n'
             'pyramid.tweens.excview_tween_factory\n'
             'a.last.tween\n')
 
@@ -304,7 +304,7 @@ class PyramidTestCase(PyramidBase):
         insert_tween_if_needed(settings)
         assert (
             settings['pyramid.tweens'] ==
-            'a.random.tween\nand.another.one\nddtrace.contrib.pyramid:trace_tween_factory'
+            'a.random.tween\nand.another.one\noteltrace.contrib.pyramid:trace_tween_factory'
         )
 
     def test_include_conflicts(self):

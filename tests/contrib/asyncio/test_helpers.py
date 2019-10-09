@@ -1,7 +1,7 @@
 import asyncio
 
-from ddtrace.context import Context
-from ddtrace.contrib.asyncio import helpers
+from oteltrace.context import Context
+from oteltrace.contrib.asyncio import helpers
 from .utils import AsyncioTestCase, mark_asyncio
 
 

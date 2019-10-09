@@ -1,9 +1,9 @@
 import logging
 
-from ddtrace.helpers import get_correlation_ids
-from ddtrace.compat import StringIO
-from ddtrace.contrib.logging import patch, unpatch
-from ddtrace.vendor import wrapt
+from oteltrace.helpers import get_correlation_ids
+from oteltrace.compat import StringIO
+from oteltrace.contrib.logging import patch, unpatch
+from oteltrace.vendor import wrapt
 
 from ...base import BaseTracerTestCase
 

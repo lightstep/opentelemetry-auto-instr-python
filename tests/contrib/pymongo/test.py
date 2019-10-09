@@ -6,11 +6,11 @@ import unittest
 import pymongo
 
 # project
-from ddtrace import Pin
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.ext import mongo as mongox
-from ddtrace.contrib.pymongo.client import trace_mongo_client, normalize_filter
-from ddtrace.contrib.pymongo.patch import patch, unpatch
+from oteltrace import Pin
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.ext import mongo as mongox
+from oteltrace.contrib.pymongo.client import trace_mongo_client, normalize_filter
+from oteltrace.contrib.pymongo.patch import patch, unpatch
 
 # testing
 from tests.opentracer.utils import init_tracer

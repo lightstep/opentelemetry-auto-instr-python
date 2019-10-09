@@ -1,7 +1,7 @@
 import logging
 import mock
 
-from ddtrace.internal.logger import DDLogger, get_logger
+from oteltrace.internal.logger import DDLogger, get_logger
 
 from ..base import BaseTestCase
 
@@ -31,7 +31,7 @@ class DDLoggerTestCase(BaseTestCase):
     ):
         return logger.makeRecord(logger.name, level, fn, lno, msg, args, exc_info, func, extra)
 
-    @mock.patch('ddtrace.internal.logger.DDLogger.handle')
+    @mock.patch('oteltrace.internal.logger.DDLogger.handle')
     def assert_log_records(self, log, expected_levels, handle):
         for name in ALL_LEVEL_NAMES:
             method = getattr(log, name)

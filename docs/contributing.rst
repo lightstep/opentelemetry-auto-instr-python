@@ -48,8 +48,8 @@ That ensures that:
 Internal API
 ============
 
-The `ddtrace.internal` module contains code that must only be used inside
-`ddtrace` itself. Relying on the API of this module is dangerous and can break
+The `oteltrace.internal` module contains code that must only be used inside
+`oteltrace` itself. Relying on the API of this module is dangerous and can break
 at anytime. Don't do it.
 
 Python Versions and Implementations Support

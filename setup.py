@@ -35,7 +35,7 @@ class Tox(TestCommand):
 long_description = """
 # dd-trace-py
 
-`ddtrace` is Datadog's tracing library for Python.  It is used to trace requests
+`oteltrace` is Datadog's tracing library for Python.  It is used to trace requests
 as they flow across web servers, databases and microservices so that developers
 have great visiblity into bottlenecks and troublesome requests.
 
@@ -57,7 +57,7 @@ documentation][visualization docs].
 
 # Base `setup()` kwargs without any C-extension registering
 setup_kwargs = dict(
-    name='ddtrace',
+    name='oteltrace',
     description='Datadog tracing code',
     url='https://github.com/DataDog/dd-trace-py',
     author='Datadog, Inc.',
@@ -71,7 +71,7 @@ setup_kwargs = dict(
     ],
     extras_require={
         # users can include opentracing by having:
-        # install_requires=['ddtrace[opentracing]', ...]
+        # install_requires=['oteltrace[opentracing]', ...]
         'opentracing': ['opentracing>=2.0.0'],
     },
     # plugin tox
@@ -79,7 +79,7 @@ setup_kwargs = dict(
     cmdclass={'test': Tox},
     entry_points={
         'console_scripts': [
-            'ddtrace-run = ddtrace.commands.ddtrace_run:main'
+            'oteltrace-run = oteltrace.commands.oteltrace_run:main'
         ]
     },
     classifiers=[
@@ -139,8 +139,8 @@ try:
     kwargs = copy.deepcopy(setup_kwargs)
     kwargs['ext_modules'] = [
         Extension(
-            'ddtrace.vendor.wrapt._wrappers',
-            sources=['ddtrace/vendor/wrapt/_wrappers.c'],
+            'oteltrace.vendor.wrapt._wrappers',
+            sources=['oteltrace/vendor/wrapt/_wrappers.c'],
         ),
     ]
     # DEV: Make sure `cmdclass` exists

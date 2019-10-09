@@ -5,10 +5,10 @@ import aiohttp_jinja2
 from urllib import request
 from aiohttp.test_utils import unittest_run_loop
 
-from ddtrace.pin import Pin
-from ddtrace.provider import DefaultContextProvider
-from ddtrace.contrib.aiohttp.patch import patch, unpatch
-from ddtrace.contrib.aiohttp.middlewares import trace_app
+from oteltrace.pin import Pin
+from oteltrace.provider import DefaultContextProvider
+from oteltrace.contrib.aiohttp.patch import patch, unpatch
+from oteltrace.contrib.aiohttp.middlewares import trace_app
 
 from .utils import TraceTestCase
 

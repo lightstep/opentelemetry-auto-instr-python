@@ -1,6 +1,6 @@
 import aiobotocore
 
-from ddtrace.contrib.aiobotocore.patch import patch, unpatch
+from oteltrace.contrib.aiobotocore.patch import patch, unpatch
 
 from ..utils import aiobotocore_client
 from ...asyncio.utils import AsyncioTestCase, mark_asyncio

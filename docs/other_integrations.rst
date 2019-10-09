@@ -11,7 +11,7 @@ Boto
 aiobotocore
 ^^^^^^^^^^^
 
-.. automodule:: ddtrace.contrib.aiobotocore
+.. automodule:: oteltrace.contrib.aiobotocore
 
 
 .. _boto2:
@@ -19,7 +19,7 @@ aiobotocore
 Boto2
 ^^^^^
 
-.. automodule:: ddtrace.contrib.boto
+.. automodule:: oteltrace.contrib.boto
 
 
 .. _botocore:
@@ -27,7 +27,7 @@ Boto2
 Botocore
 ^^^^^^^^
 
-.. automodule:: ddtrace.contrib.botocore
+.. automodule:: oteltrace.contrib.botocore
 
 
 
@@ -36,7 +36,7 @@ Botocore
 Futures
 -------
 
-.. automodule:: ddtrace.contrib.futures
+.. automodule:: oteltrace.contrib.futures
 
 
 .. _celery:
@@ -44,7 +44,7 @@ Futures
 Celery
 ------
 
-.. automodule:: ddtrace.contrib.celery
+.. automodule:: oteltrace.contrib.celery
 
 
 .. _kombu:
@@ -52,7 +52,7 @@ Celery
 Kombu
 ------
 
-.. automodule:: ddtrace.contrib.kombu
+.. automodule:: oteltrace.contrib.kombu
 
 
 .. _httplib:
@@ -60,32 +60,32 @@ Kombu
 httplib
 -------
 
-.. automodule:: ddtrace.contrib.httplib
+.. automodule:: oteltrace.contrib.httplib
 
 .. _requests:
 
 Requests
 --------
 
-.. automodule:: ddtrace.contrib.requests
+.. automodule:: oteltrace.contrib.requests
 
 .. _grpc:
 
 Grpc
 ----
 
-.. automodule:: ddtrace.contrib.grpc
+.. automodule:: oteltrace.contrib.grpc
 
 .. _jinja2:
 
 Jinja2
 ------
 
-.. automodule:: ddtrace.contrib.jinja2
+.. automodule:: oteltrace.contrib.jinja2
 
 .. _mako:
 
 Mako
 ------
 
-.. automodule:: ddtrace.contrib.mako
+.. automodule:: oteltrace.contrib.mako

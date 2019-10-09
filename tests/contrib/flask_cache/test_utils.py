@@ -1,9 +1,9 @@
 import unittest
 
 # project
-from ddtrace.tracer import Tracer
-from ddtrace.contrib.flask_cache import get_traced_cache
-from ddtrace.contrib.flask_cache.utils import _extract_conn_tags, _resource_from_cache_prefix
+from oteltrace.tracer import Tracer
+from oteltrace.contrib.flask_cache import get_traced_cache
+from oteltrace.contrib.flask_cache.utils import _extract_conn_tags, _resource_from_cache_prefix
 
 # 3rd party
 from flask import Flask

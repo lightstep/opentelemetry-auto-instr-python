@@ -2,10 +2,10 @@ import asyncio
 
 from asyncio import BaseEventLoop
 
-from ddtrace.context import Context
-from ddtrace.provider import DefaultContextProvider
-from ddtrace.contrib.asyncio.patch import patch, unpatch
-from ddtrace.contrib.asyncio.helpers import set_call_context
+from oteltrace.context import Context
+from oteltrace.provider import DefaultContextProvider
+from oteltrace.contrib.asyncio.patch import patch, unpatch
+from oteltrace.contrib.asyncio.helpers import set_call_context
 
 from tests.opentracer.utils import init_tracer
 from .utils import AsyncioTestCase, mark_asyncio

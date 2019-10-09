@@ -5,8 +5,8 @@ import asyncio
 import aiopg
 
 # project
-from ddtrace.contrib.aiopg.patch import patch, unpatch
-from ddtrace import Pin
+from oteltrace.contrib.aiopg.patch import patch, unpatch
+from oteltrace import Pin
 
 # testing
 from tests.contrib.config import POSTGRES_CONFIG

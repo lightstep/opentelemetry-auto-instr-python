@@ -1,4 +1,4 @@
-from ddtrace.constants import SAMPLING_PRIORITY_KEY, ORIGIN_KEY
+from oteltrace.constants import SAMPLING_PRIORITY_KEY, ORIGIN_KEY
 
 from .utils import PyramidTestCase, PyramidBase
 

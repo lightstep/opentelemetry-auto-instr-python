@@ -5,12 +5,12 @@ from django.apps import apps
 from django.test import TestCase
 
 # project
-from ddtrace.tracer import Tracer
-from ddtrace.contrib.django.conf import settings
-from ddtrace.contrib.django.db import patch_db, unpatch_db
-from ddtrace.contrib.django.cache import unpatch_cache
-from ddtrace.contrib.django.templates import unpatch_template
-from ddtrace.contrib.django.middleware import remove_exception_middleware, remove_trace_middleware
+from oteltrace.tracer import Tracer
+from oteltrace.contrib.django.conf import settings
+from oteltrace.contrib.django.db import patch_db, unpatch_db
+from oteltrace.contrib.django.cache import unpatch_cache
+from oteltrace.contrib.django.templates import unpatch_template
+from oteltrace.contrib.django.middleware import remove_exception_middleware, remove_trace_middleware
 
 # testing
 from ...base import BaseTestCase
@@ -45,7 +45,7 @@ class DjangoTraceTestCase(BaseTestCase, TestCase):
         self.tracer.writer.pop_traces()
 
 
-class override_ddtrace_settings(object):
+class override_oteltrace_settings(object):
     def __init__(self, *args, **kwargs):
         self.items = list(kwargs.items())
 

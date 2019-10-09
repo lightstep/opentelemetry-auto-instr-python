@@ -3,18 +3,18 @@
 Basic Usage
 ===========
 
-With ``ddtrace`` installed, the application can be instrumented.
+With ``oteltrace`` installed, the application can be instrumented.
 
 
 Auto Instrumentation
 --------------------
 
-``ddtrace-run``
+``oteltrace-run``
 ^^^^^^^^^^^^^^^
 
-Python applications can easily be instrumented with ``ddtrace`` by using the
-included ``ddtrace-run`` command. Simply prefix your Python execution command
-with ``ddtrace-run`` in order to auto-instrument the libraries in your
+Python applications can easily be instrumented with ``oteltrace`` by using the
+included ``oteltrace-run`` command. Simply prefix your Python execution command
+with ``oteltrace-run`` in order to auto-instrument the libraries in your
 application.
 
 For example, if the command to run your application is::
@@ -23,21 +23,21 @@ $ python app.py
 
 then to auto-instrument using Datadog, the corresponding command is::
 
-$ ddtrace-run python app.py
+$ oteltrace-run python app.py
 
-For more advanced usage of ``ddtrace-run`` refer to the documentation :ref:`here<ddtracerun>`.
+For more advanced usage of ``oteltrace-run`` refer to the documentation :ref:`here<oteltracerun>`.
 
 ``patch_all``
 ^^^^^^^^^^^^^
 
 To manually invoke the automatic instrumentation use ``patch_all``::
 
-  from ddtrace import patch_all
+  from oteltrace import patch_all
   patch_all()
 
 To toggle instrumentation for a particular module::
 
-  from ddtrace import patch_all
+  from oteltrace import patch_all
   patch_all(redis=False, cassandra=False)
 
 By default all supported libraries will be patched when
@@ -54,14 +54,14 @@ documentation.
 Manual Instrumentation
 ----------------------
 
-If you would like to extend the functionality of the ``ddtrace`` library or gain
+If you would like to extend the functionality of the ``oteltrace`` library or gain
 finer control over instrumenting your application, several techniques are
 provided by the library.
 
 Decorator
 ^^^^^^^^^
 
-``ddtrace`` provides a decorator that can be used to trace a particular method
+``oteltrace`` provides a decorator that can be used to trace a particular method
 in your application::
 
   @tracer.wrap()
@@ -70,12 +70,12 @@ in your application::
     # ...
     # ...
 
-API details of the decorator can be found here :py:meth:`ddtrace.Tracer.wrap`.
+API details of the decorator can be found here :py:meth:`oteltrace.Tracer.wrap`.
 
 Context Manager
 ^^^^^^^^^^^^^^^
 
-To trace an arbitrary block of code, you can use the :py:mod:`ddtrace.Span`
+To trace an arbitrary block of code, you can use the :py:mod:`oteltrace.Span`
 context manager::
 
   # trace some interesting operation
@@ -84,7 +84,7 @@ context manager::
     # ...
     # ...
 
-Further API details can be found here :py:meth:`ddtrace.Tracer`.
+Further API details can be found here :py:meth:`oteltrace.Tracer`.
 
 Using the API
 ^^^^^^^^^^^^^
@@ -103,5 +103,5 @@ you may require::
 
 API details of the decorator can be found here:
 
-- :py:meth:`ddtrace.Tracer.trace`
-- :py:meth:`ddtrace.Span.finish`.
+- :py:meth:`oteltrace.Tracer.trace`
+- :py:meth:`oteltrace.Span.finish`.

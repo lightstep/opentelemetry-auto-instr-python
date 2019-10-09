@@ -7,9 +7,9 @@ import aiopg
 from psycopg2 import extras
 
 # project
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.aiopg.patch import patch, unpatch
-from ddtrace import Pin
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.aiopg.patch import patch, unpatch
+from oteltrace import Pin
 
 # testing
 from tests.opentracer.utils import init_tracer

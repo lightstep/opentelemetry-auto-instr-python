@@ -5,10 +5,10 @@ Agent Configuration
 -------------------
 
 If the Datadog Agent is on a separate host from your application, you can modify
-the default ``ddtrace.tracer`` object to utilize another hostname and port. Here
+the default ``oteltrace.tracer`` object to utilize another hostname and port. Here
 is a small example showcasing this::
 
-    from ddtrace import tracer
+    from oteltrace import tracer
 
     tracer.configure(hostname=<YOUR_HOST>, port=<YOUR_PORT>)
 
@@ -16,7 +16,7 @@ By default, these will be set to ``localhost`` and ``8126`` respectively.
 
 You can also use a Unix Domain Socket to connect to the agent::
 
-    from ddtrace import tracer
+    from oteltrace import tracer
 
     tracer.configure(uds_path="/path/to/socket")
 
@@ -29,7 +29,7 @@ To trace requests across hosts, the spans on the secondary hosts must be linked 
 - On the server side, it means to read propagated attributes and set them to the active tracing context.
 - On the client side, it means to propagate the attributes, commonly as a header/metadata.
 
-`ddtrace` already provides default propagators but you can also implement your own.
+`oteltrace` already provides default propagators but you can also implement your own.
 
 Web Frameworks
 ^^^^^^^^^^^^^^
@@ -72,7 +72,7 @@ on the other side, the metadata is retrieved and the trace can continue.
 To propagate the tracing information, HTTP headers are used to transmit the
 required metadata to piece together the trace.
 
-.. autoclass:: ddtrace.propagation.http.HTTPPropagator
+.. autoclass:: oteltrace.propagation.http.HTTPPropagator
     :members:
 
 Custom
@@ -159,7 +159,7 @@ stored and remain incomplete.
 If you change the priority, we recommend you do it as soon as possible, when the
 root span has just been created::
 
-    from ddtrace.ext.priority import USER_REJECT, USER_KEEP
+    from oteltrace.ext.priority import USER_REJECT, USER_KEEP
 
     context = tracer.context_provider.active()
 
@@ -176,7 +176,7 @@ dropped in the client.
 
 The ``RateSampler`` randomly samples a percentage of traces::
 
-    from ddtrace.sampler import RateSampler
+    from oteltrace.sampler import RateSampler
 
     # Sample rate is between 0 (nothing sampled) to 1 (everything sampled).
     # Keep 20% of the traces.
@@ -282,7 +282,7 @@ Where environment variables are not used for configuring the tracer, the instruc
 Resolving deprecation warnings
 ------------------------------
 Before upgrading, it’s a good idea to resolve any deprecation warnings raised by your project.
-These warnings must be fixed before upgrading, otherwise the ``ddtrace`` library
+These warnings must be fixed before upgrading, otherwise the ``oteltrace`` library
 will not work as expected. Our deprecation messages include the version where
 the behavior is altered or removed.
 
@@ -318,7 +318,7 @@ discarded depending on the output.
 The library comes with a ``FilterRequestsOnUrl`` filter that can be used to
 filter out incoming requests to specific urls:
 
-.. autoclass:: ddtrace.filters.FilterRequestsOnUrl
+.. autoclass:: oteltrace.filters.FilterRequestsOnUrl
     :members:
 
 **Write a custom filter**
@@ -345,7 +345,7 @@ next step of the pipeline or ``None`` if the trace should be discarded::
 Logs Injection
 --------------
 
-.. automodule:: ddtrace.contrib.logging
+.. automodule:: oteltrace.contrib.logging
 
 Http layer
 ----------
@@ -362,7 +362,7 @@ Configuration can be provided both at the global level and at the integration le
 
 Examples::
 
-    from ddtrace import config
+    from oteltrace import config
 
     # Global config
     config.trace_headers([
@@ -444,7 +444,7 @@ To explicitly trace::
 
   import time
   import opentracing
-  from ddtrace.opentracer import Tracer, set_global_tracer
+  from oteltrace.opentracer import Tracer, set_global_tracer
 
   def init_tracer(service_name):
       config = {
@@ -470,7 +470,7 @@ To trace a function using the span context manager::
 
   import time
   import opentracing
-  from ddtrace.opentracer import Tracer, set_global_tracer
+  from oteltrace.opentracer import Tracer, set_global_tracer
 
   def init_tracer(service_name):
       config = {
@@ -503,37 +503,37 @@ See also the `Python OpenTracing`_ repository for usage of the tracer.
 
 The Datadog OpenTracing tracer can be used alongside the Datadog tracer. This
 provides the advantage of providing tracing information collected by
-``ddtrace`` in addition to OpenTracing.  The simplest way to do this is to use
-the :ref:`ddtrace-run<ddtracerun>` command to invoke your OpenTraced
+``oteltrace`` in addition to OpenTracing.  The simplest way to do this is to use
+the :ref:`oteltrace-run<oteltracerun>` command to invoke your OpenTraced
 application.
 
 
 **Opentracer API**
 
-.. autoclass:: ddtrace.opentracer.Tracer
+.. autoclass:: oteltrace.opentracer.Tracer
     :members:
     :special-members: __init__
 
 
-.. _ddtracerun:
+.. _oteltracerun:
 
-``ddtrace-run``
+``oteltrace-run``
 ---------------
 
-``ddtrace-run`` will trace :ref:`supported<Supported Libraries>` web frameworks
+``oteltrace-run`` will trace :ref:`supported<Supported Libraries>` web frameworks
 and database modules without the need for changing your code::
 
-  $ ddtrace-run -h
+  $ oteltrace-run -h
 
   Execute the given Python program, after configuring it
   to emit Datadog traces.
 
   Append command line arguments to your program as usual.
 
-  Usage: [ENV_VARS] ddtrace-run <my_program>
+  Usage: [ENV_VARS] oteltrace-run <my_program>
 
 
-The available environment variables for ``ddtrace-run`` are:
+The available environment variables for ``oteltrace-run`` are:
 
 * ``OPENTELEMETRY_TRACE_ENABLED=true|false`` (default: true): Enable web framework and
   library instrumentation. When false, your application code will not generate
@@ -558,24 +558,24 @@ The available environment variables for ``ddtrace-run`` are:
   Sampling`
 * ``OTEL_LOGS_INJECTION`` (default: false): enables :ref:`Logs Injection`
 
-``ddtrace-run`` respects a variety of common entrypoints for web applications:
+``oteltrace-run`` respects a variety of common entrypoints for web applications:
 
-- ``ddtrace-run python my_app.py``
-- ``ddtrace-run python manage.py runserver``
-- ``ddtrace-run gunicorn myapp.wsgi:application``
-- ``ddtrace-run uwsgi --http :9090 --wsgi-file my_app.py``
+- ``oteltrace-run python my_app.py``
+- ``oteltrace-run python manage.py runserver``
+- ``oteltrace-run gunicorn myapp.wsgi:application``
+- ``oteltrace-run uwsgi --http :9090 --wsgi-file my_app.py``
 
 
 Pass along command-line arguments as your program would normally expect them::
 
-$ ddtrace-run gunicorn myapp.wsgi:application --max-requests 1000 --statsd-host localhost:8125
+$ oteltrace-run gunicorn myapp.wsgi:application --max-requests 1000 --statsd-host localhost:8125
 
 If you're running in a Kubernetes cluster and still don't see your traces, make
 sure your application has a route to the tracing Agent. An easy way to test
 this is with a::
 
 $ pip install ipython
-$ OPENTELEMETRY_TRACE_DEBUG=true ddtrace-run ipython
+$ OPENTELEMETRY_TRACE_DEBUG=true oteltrace-run ipython
 
 Because iPython uses SQLite, it will be automatically instrumented and your
 traces should be sent off. If an error occurs, a message will be displayed in
@@ -587,20 +587,20 @@ API
 
 ``Tracer``
 ^^^^^^^^^^
-.. autoclass:: ddtrace.Tracer
+.. autoclass:: oteltrace.Tracer
     :members:
     :special-members: __init__
 
 
 ``Span``
 ^^^^^^^^
-.. autoclass:: ddtrace.Span
+.. autoclass:: oteltrace.Span
     :members:
     :special-members: __init__
 
 ``Pin``
 ^^^^^^^
-.. autoclass:: ddtrace.Pin
+.. autoclass:: oteltrace.Pin
     :members:
     :special-members: __init__
 
@@ -609,11 +609,11 @@ API
 ``patch_all``
 ^^^^^^^^^^^^^
 
-.. autofunction:: ddtrace.monkey.patch_all
+.. autofunction:: oteltrace.monkey.patch_all
 
 ``patch``
 ^^^^^^^^^
-.. autofunction:: ddtrace.monkey.patch
+.. autofunction:: oteltrace.monkey.patch
 
 .. toctree::
    :maxdepth: 2

@@ -3,7 +3,7 @@ import os
 import sys
 import unittest
 
-import ddtrace
+import oteltrace
 
 from ..utils.tracer import DummyTracer
 from ..utils.span import TestSpanContainer, TestSpan, NO_CHILDREN
@@ -54,16 +54,16 @@ class BaseTestCase(unittest.TestCase):
             # Your test
         """
         # DEV: Uses dict as interface but internally handled as attributes on Config instance
-        analytics_enabled_original = ddtrace.config.analytics_enabled
-        report_hostname_original = ddtrace.config.report_hostname
+        analytics_enabled_original = oteltrace.config.analytics_enabled
+        report_hostname_original = oteltrace.config.report_hostname
 
-        ddtrace.config.analytics_enabled = values.get('analytics_enabled', analytics_enabled_original)
-        ddtrace.config.report_hostname = values.get('report_hostname', report_hostname_original)
+        oteltrace.config.analytics_enabled = values.get('analytics_enabled', analytics_enabled_original)
+        oteltrace.config.report_hostname = values.get('report_hostname', report_hostname_original)
         try:
             yield
         finally:
-            ddtrace.config.analytics_enabled = analytics_enabled_original
-            ddtrace.config.report_hostname = report_hostname_original
+            oteltrace.config.analytics_enabled = analytics_enabled_original
+            oteltrace.config.report_hostname = report_hostname_original
 
     @staticmethod
     @contextlib.contextmanager
@@ -73,7 +73,7 @@ class BaseTestCase(unittest.TestCase):
         >>> with self.override_config('flask', dict(service_name='test-service')):
             # Your test
         """
-        options = getattr(ddtrace.config, integration)
+        options = getattr(oteltrace.config, integration)
 
         original = dict(
             (key, options.get(key))
@@ -150,10 +150,10 @@ class BaseTracerTestCase(TestSpanContainer, BaseTestCase):
 
     @contextlib.contextmanager
     def override_global_tracer(self, tracer=None):
-        original = ddtrace.tracer
+        original = oteltrace.tracer
         tracer = tracer or self.tracer
-        setattr(ddtrace, 'tracer', tracer)
+        setattr(oteltrace, 'tracer', tracer)
         try:
             yield
         finally:
-            setattr(ddtrace, 'tracer', original)
+            setattr(oteltrace, 'tracer', original)

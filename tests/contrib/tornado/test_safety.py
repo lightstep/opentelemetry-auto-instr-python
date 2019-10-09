@@ -3,8 +3,8 @@ import threading
 from tornado import httpclient
 from tornado.testing import gen_test
 
-from ddtrace.contrib.tornado import patch, unpatch
-from ddtrace.ext import http
+from oteltrace.contrib.tornado import patch, unpatch
+from oteltrace.ext import http
 
 from . import web
 from .web.app import CustomDefaultHandler

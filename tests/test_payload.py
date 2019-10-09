@@ -1,8 +1,8 @@
 import math
 
-from ddtrace.encoding import get_encoder, JSONEncoder
-from ddtrace.payload import Payload, PayloadFull
-from ddtrace.span import Span
+from oteltrace.encoding import get_encoder, JSONEncoder
+from oteltrace.payload import Payload, PayloadFull
+from oteltrace.span import Span
 
 from .base import BaseTracerTestCase
 

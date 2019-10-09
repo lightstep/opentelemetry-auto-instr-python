@@ -3,19 +3,19 @@ import json
 import time
 import logging
 import mock
-import ddtrace
+import oteltrace
 
 from unittest import TestCase, skip, skipUnless
 
-from ddtrace.api import API, Response
-from ddtrace.ext import http
-from ddtrace.filters import FilterRequestsOnUrl
-from ddtrace.constants import FILTERS_KEY
-from ddtrace.tracer import Tracer
-from ddtrace.encoding import JSONEncoder, MsgpackEncoder, get_encoder
-from ddtrace.compat import httplib, PYTHON_INTERPRETER, PYTHON_VERSION
-from ddtrace.internal.runtime.container import CGroupInfo
-from ddtrace.vendor import msgpack
+from oteltrace.api import API, Response
+from oteltrace.ext import http
+from oteltrace.filters import FilterRequestsOnUrl
+from oteltrace.constants import FILTERS_KEY
+from oteltrace.tracer import Tracer
+from oteltrace.encoding import JSONEncoder, MsgpackEncoder, get_encoder
+from oteltrace.compat import httplib, PYTHON_INTERPRETER, PYTHON_VERSION
+from oteltrace.internal.runtime.container import CGroupInfo
+from oteltrace.vendor import msgpack
 from tests.test_tracer import get_dummy_tracer
 
 
@@ -190,7 +190,7 @@ class TestWorkers(TestCase):
         self.tracer.writer.api = FlawedAPI(Tracer.DEFAULT_HOSTNAME, Tracer.DEFAULT_PORT)
         tracer.trace('client.testing').finish()
 
-        log = logging.getLogger('ddtrace.writer')
+        log = logging.getLogger('oteltrace.writer')
         log_handler = MockedLogHandler(level='DEBUG')
         log.addHandler(log_handler)
 
@@ -236,7 +236,7 @@ class TestAPITransport(TestCase):
     of integration tests so real calls are triggered and you have to execute
     a real trace-agent to let them pass.
     """
-    @mock.patch('ddtrace.internal.runtime.container.get_container_info')
+    @mock.patch('oteltrace.internal.runtime.container.get_container_info')
     def setUp(self, get_container_info):
         """
         Create a tracer without workers, while spying the ``send()`` method
@@ -249,7 +249,7 @@ class TestAPITransport(TestCase):
         self.api_json = API('localhost', 8126, encoder=JSONEncoder())
         self.api_msgpack = API('localhost', 8126, encoder=MsgpackEncoder())
 
-    @mock.patch('ddtrace.api.httplib.HTTPConnection')
+    @mock.patch('oteltrace.api.httplib.HTTPConnection')
     def test_send_presampler_headers(self, mocked_http):
         # register a single trace with a span and send them to the trace agent
         self.tracer.trace('client.testing').finish()
@@ -267,7 +267,7 @@ class TestAPITransport(TestCase):
             'Datadog-Meta-Lang': 'python',
             'Datadog-Meta-Lang-Interpreter': PYTHON_INTERPRETER,
             'Datadog-Meta-Lang-Version': PYTHON_VERSION,
-            'Datadog-Meta-Tracer-Version': ddtrace.__version__,
+            'Datadog-Meta-Tracer-Version': oteltrace.__version__,
             'X-Datadog-Trace-Count': '1',
             'Content-Type': 'application/msgpack',
         }
@@ -277,7 +277,7 @@ class TestAPITransport(TestCase):
         for k, v in expected_headers.items():
             assert v == headers[k]
 
-    @mock.patch('ddtrace.api.httplib.HTTPConnection')
+    @mock.patch('oteltrace.api.httplib.HTTPConnection')
     def test_send_presampler_headers_not_in_services(self, mocked_http):
         # register some services and send them to the trace agent
         services = [{
@@ -422,7 +422,7 @@ class TestAPIDowngrade(TestCase):
         encoder = get_encoder()
         assert isinstance(encoder, MsgpackEncoder)
 
-    @mock.patch('ddtrace.encoding.MSGPACK_ENCODING', False)
+    @mock.patch('oteltrace.encoding.MSGPACK_ENCODING', False)
     def test_get_encoder_fallback(self):
         # get_encoder should return JSONEncoder instance if
         # msgpack or the CPP implementaiton, are not available

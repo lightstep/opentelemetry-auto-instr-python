@@ -1,13 +1,13 @@
 import mock
 
-from ddtrace import helpers
+from oteltrace import helpers
 
 from .base import BaseTracerTestCase
 from .util import override_global_tracer
 
 
 class HelpersTestCase(BaseTracerTestCase):
-    """Test suite for ``ddtrace`` helpers"""
+    """Test suite for ``oteltrace`` helpers"""
     def test_correlation_identifiers(self):
         # ensures the right correlation identifiers are
         # returned when a Trace is active

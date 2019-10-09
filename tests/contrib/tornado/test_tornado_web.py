@@ -1,8 +1,8 @@
 from .web.app import CustomDefaultHandler
 from .utils import TornadoTestCase
 
-from ddtrace.constants import SAMPLING_PRIORITY_KEY, ORIGIN_KEY, ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.ext import http
+from oteltrace.constants import SAMPLING_PRIORITY_KEY, ORIGIN_KEY, ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.ext import http
 
 from opentracing.scope_managers.tornado import TornadoScopeManager
 from tests.opentracer.utils import init_tracer

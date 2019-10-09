@@ -7,7 +7,7 @@ httpbin_local: &httpbin_local
   image: kennethreitz/httpbin@sha256:2c7abc4803080c22928265744410173b6fea3b898872c01c5fd0f0f9df4a59fb
   name: httpbin.org
 test_runner: &test_runner
-  image: datadog/docker-library:ddtrace_py
+  image: datadog/docker-library:oteltrace_py
 restore_cache_step: &restore_cache_step
   restore_cache:
     keys:
@@ -150,14 +150,14 @@ jobs:
       - *persist_to_workspace_step
       - *save_cache_step
 
-  ddtracerun:
+  oteltracerun:
     docker:
       - *test_runner
       - image: redis:4.0-alpine
     resource_class: *resource_class
     steps:
       - checkout
-      - run: scripts/run-tox-scenario '^py..-ddtracerun$'
+      - run: scripts/run-tox-scenario '^py..-oteltracerun$'
       - *persist_to_workspace_step
 
   test_utils:
@@ -845,7 +845,7 @@ workflows:
       - dbapi:
           requires:
             - flake8
-      - ddtracerun:
+      - oteltracerun:
           requires:
             - flake8
       - django:
@@ -981,7 +981,7 @@ workflows:
             - cassandra
             - celery
             - dbapi
-            - ddtracerun
+            - oteltracerun
             - django
             - elasticsearch
             - falcon

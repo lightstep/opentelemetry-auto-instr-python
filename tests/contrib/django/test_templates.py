@@ -4,7 +4,7 @@ import time
 from django.template import Context, Template
 
 # testing
-from .utils import DjangoTraceTestCase, override_ddtrace_settings
+from .utils import DjangoTraceTestCase, override_oteltrace_settings
 
 
 class DjangoTemplateTest(DjangoTraceTestCase):
@@ -32,7 +32,7 @@ class DjangoTemplateTest(DjangoTraceTestCase):
         assert span.get_tag('django.template_name') == 'unknown'
         assert start < span.start < span.start + span.duration < end
 
-    @override_ddtrace_settings(INSTRUMENT_TEMPLATE=False)
+    @override_oteltrace_settings(INSTRUMENT_TEMPLATE=False)
     def test_template_disabled(self):
         # prepare a base template using the default engine
         template = Template('Hello {{name}}!')
