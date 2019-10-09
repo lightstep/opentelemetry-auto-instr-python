@@ -38,7 +38,7 @@ class TestUtils(unittest.TestCase):
         # are used, raising a Deprecation warning
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter('always')
-            os.environ['DATADOG_REQUESTS_DISTRIBUTED_TRACING'] = '1'
+            os.environ['OPENTELEMETRY_REQUESTS_DISTRIBUTED_TRACING'] = '1'
             value = get_env('requests', 'distributed_tracing')
             self.assertEqual(value, '1')
             self.assertEqual(len(w), 1)
@@ -48,7 +48,7 @@ class TestUtils(unittest.TestCase):
     def test_get_env_key_priority(self):
         # ensure `get_env` use `DD_` with highest priority
         os.environ['DD_REQUESTS_DISTRIBUTED_TRACING'] = 'highest'
-        os.environ['DATADOG_REQUESTS_DISTRIBUTED_TRACING'] = 'lowest'
+        os.environ['OPENTELEMETRY_REQUESTS_DISTRIBUTED_TRACING'] = 'lowest'
         value = get_env('requests', 'distributed_tracing')
         self.assertEqual(value, 'highest')
 

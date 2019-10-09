@@ -7,22 +7,22 @@ def get_env(integration, variable, default=None):
     """Retrieves environment variables value for the given integration. It must be used
     for consistency between integrations. The implementation is backward compatible
     with legacy nomenclature:
-        * `DATADOG_` is a legacy prefix with lower priority
+        * `OPENTELEMETRY_` is a legacy prefix with lower priority
         * `DD_` environment variables have the highest priority
         * the environment variable is built concatenating `integration` and `variable`
           arguments
         * return `default` otherwise
     """
     key = '{}_{}'.format(integration, variable).upper()
-    legacy_env = 'DATADOG_{}'.format(key)
+    legacy_env = 'OPENTELEMETRY_{}'.format(key)
     env = 'DD_{}'.format(key)
 
     value = os.getenv(env)
     legacy = os.getenv(legacy_env)
     if legacy:
-        # Deprecation: `DATADOG_` variables are deprecated
+        # Deprecation: `OPENTELEMETRY_` variables are deprecated
         deprecation(
-            name='DATADOG_',
+            name='OPENTELEMETRY_',
             message='Use `DD_` prefix instead',
             version='1.0.0',
         )

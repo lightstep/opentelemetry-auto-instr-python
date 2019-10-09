@@ -535,26 +535,26 @@ and database modules without the need for changing your code::
 
 The available environment variables for ``ddtrace-run`` are:
 
-* ``DATADOG_TRACE_ENABLED=true|false`` (default: true): Enable web framework and
+* ``OPENTELEMETRY_TRACE_ENABLED=true|false`` (default: true): Enable web framework and
   library instrumentation. When false, your application code will not generate
   any traces.
-* ``DATADOG_ENV`` (no default): Set an application's environment e.g. ``prod``,
+* ``OPENTELEMETRY_ENV`` (no default): Set an application's environment e.g. ``prod``,
   ``pre-prod``, ``stage``
-* ``DATADOG_TRACE_DEBUG=true|false`` (default: false): Enable debug logging in
+* ``OPENTELEMETRY_TRACE_DEBUG=true|false`` (default: false): Enable debug logging in
   the tracer
-* ``DATADOG_SERVICE_NAME`` (no default): override the service name to be used
+* ``OPENTELEMETRY_SERVICE_NAME`` (no default): override the service name to be used
   for this program. This value is passed through when setting up middleware for
   web framework integrations (e.g. pylons, flask, django). For tracing without a
   web integration, prefer setting the service name in code.
-* ``DATADOG_PATCH_MODULES=module:patch,module:patch...`` e.g.
+* ``OPENTELEMETRY_PATCH_MODULES=module:patch,module:patch...`` e.g.
   ``boto:true,redis:false``: override the modules patched for this execution of
   the program (default: none)
-* ``DATADOG_TRACE_AGENT_HOSTNAME=localhost``: override the address of the trace
+* ``OPENTELEMETRY_TRACE_AGENT_HOSTNAME=localhost``: override the address of the trace
   agent host that the default tracer will attempt to submit to  (default:
   ``localhost``)
-* ``DATADOG_TRACE_AGENT_PORT=8126``: override the port that the default tracer
+* ``OPENTELEMETRY_TRACE_AGENT_PORT=8126``: override the port that the default tracer
   will submit to  (default: 8126)
-* ``DATADOG_PRIORITY_SAMPLING`` (default: true): enables :ref:`Priority
+* ``OPENTELEMETRY_PRIORITY_SAMPLING`` (default: true): enables :ref:`Priority
   Sampling`
 * ``DD_LOGS_INJECTION`` (default: false): enables :ref:`Logs Injection`
 
@@ -575,7 +575,7 @@ sure your application has a route to the tracing Agent. An easy way to test
 this is with a::
 
 $ pip install ipython
-$ DATADOG_TRACE_DEBUG=true ddtrace-run ipython
+$ OPENTELEMETRY_TRACE_DEBUG=true ddtrace-run ipython
 
 Because iPython uses SQLite, it will be automatically instrumented and your
 traces should be sent off. If an error occurs, a message will be displayed in

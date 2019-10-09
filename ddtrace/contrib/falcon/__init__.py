@@ -18,7 +18,7 @@ You can also use the autopatching functionality::
     app = falcon.API()
 
 To disable distributed tracing when using autopatching, set the
-``DATADOG_FALCON_DISTRIBUTED_TRACING`` environment variable to ``False``.
+``OPENTELEMETRY_FALCON_DISTRIBUTED_TRACING`` environment variable to ``False``.
 
 To enable generating APM events for Trace Search & Analytics, set the
 ``DD_FALCON_ANALYTICS_ENABLED`` environment variable to ``True``.

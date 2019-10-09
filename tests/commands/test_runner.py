@@ -32,9 +32,9 @@ def inject_sitecustomize(path):
 class DdtraceRunTest(BaseTestCase):
     def test_service_name_passthrough(self):
         """
-        $DATADOG_SERVICE_NAME gets passed through to the program
+        $OPENTELEMETRY_SERVICE_NAME gets passed through to the program
         """
-        with self.override_env(dict(DATADOG_SERVICE_NAME='my_test_service')):
+        with self.override_env(dict(OPENTELEMETRY_SERVICE_NAME='my_test_service')):
             out = subprocess.check_output(
                 ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_service.py']
             )
@@ -42,9 +42,9 @@ class DdtraceRunTest(BaseTestCase):
 
     def test_env_name_passthrough(self):
         """
-        $DATADOG_ENV gets passed through to the global tracer as an 'env' tag
+        $OPENTELEMETRY_ENV gets passed through to the global tracer as an 'env' tag
         """
-        with self.override_env(dict(DATADOG_ENV='test')):
+        with self.override_env(dict(OPENTELEMETRY_ENV='test')):
             out = subprocess.check_output(
                 ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_env.py']
             )
@@ -52,15 +52,15 @@ class DdtraceRunTest(BaseTestCase):
 
     def test_env_enabling(self):
         """
-        DATADOG_TRACE_ENABLED=false allows disabling of the global tracer
+        OPENTELEMETRY_TRACE_ENABLED=false allows disabling of the global tracer
         """
-        with self.override_env(dict(DATADOG_TRACE_ENABLED='false')):
+        with self.override_env(dict(OPENTELEMETRY_TRACE_ENABLED='false')):
             out = subprocess.check_output(
                 ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_disabled.py']
             )
             assert out.startswith(b'Test success')
 
-        with self.override_env(dict(DATADOG_TRACE_ENABLED='true')):
+        with self.override_env(dict(OPENTELEMETRY_TRACE_ENABLED='true')):
             out = subprocess.check_output(
                 ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_enabled.py']
             )
@@ -83,15 +83,15 @@ class DdtraceRunTest(BaseTestCase):
 
     def test_debug_enabling(self):
         """
-        DATADOG_TRACE_DEBUG=true allows setting debug_logging of the global tracer
+        OPENTELEMETRY_TRACE_DEBUG=true allows setting debug_logging of the global tracer
         """
-        with self.override_env(dict(DATADOG_TRACE_DEBUG='false')):
+        with self.override_env(dict(OPENTELEMETRY_TRACE_DEBUG='false')):
             out = subprocess.check_output(
                 ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_no_debug.py']
             )
             assert out.startswith(b'Test success')
 
-        with self.override_env(dict(DATADOG_TRACE_DEBUG='true')):
+        with self.override_env(dict(OPENTELEMETRY_TRACE_DEBUG='true')):
             out = subprocess.check_output(
                 ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_debug.py']
             )
@@ -99,11 +99,11 @@ class DdtraceRunTest(BaseTestCase):
 
     def test_host_port_from_env(self):
         """
-        DATADOG_TRACE_AGENT_HOSTNAME|PORT point to the tracer
+        OPENTELEMETRY_TRACE_AGENT_HOSTNAME|PORT point to the tracer
         to the correct host/port for submission
         """
-        with self.override_env(dict(DATADOG_TRACE_AGENT_HOSTNAME='172.10.0.1',
-                                    DATADOG_TRACE_AGENT_PORT='8120')):
+        with self.override_env(dict(OPENTELEMETRY_TRACE_AGENT_HOSTNAME='172.10.0.1',
+                                    OPENTELEMETRY_TRACE_AGENT_PORT='8120')):
             out = subprocess.check_output(
                 ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_hostname.py']
             )
@@ -142,9 +142,9 @@ class DdtraceRunTest(BaseTestCase):
 
     def test_priority_sampling_from_env(self):
         """
-        DATADOG_PRIORITY_SAMPLING enables Distributed Sampling
+        OPENTELEMETRY_PRIORITY_SAMPLING enables Distributed Sampling
         """
-        with self.override_env(dict(DATADOG_PRIORITY_SAMPLING='True')):
+        with self.override_env(dict(OPENTELEMETRY_PRIORITY_SAMPLING='True')):
             out = subprocess.check_output(
                 ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_priority_sampling.py']
             )
@@ -152,43 +152,43 @@ class DdtraceRunTest(BaseTestCase):
 
     def test_patch_modules_from_env(self):
         """
-        DATADOG_PATCH_MODULES overrides the defaults for patch_all()
+        OPENTELEMETRY_PATCH_MODULES overrides the defaults for patch_all()
         """
         from ddtrace.bootstrap.sitecustomize import EXTRA_PATCHED_MODULES, update_patched_modules
         orig = EXTRA_PATCHED_MODULES.copy()
 
         # empty / malformed strings are no-ops
-        with self.override_env(dict(DATADOG_PATCH_MODULES='')):
+        with self.override_env(dict(OPENTELEMETRY_PATCH_MODULES='')):
             update_patched_modules()
             assert orig == EXTRA_PATCHED_MODULES
 
-        with self.override_env(dict(DATADOG_PATCH_MODULES=':')):
+        with self.override_env(dict(OPENTELEMETRY_PATCH_MODULES=':')):
             update_patched_modules()
             assert orig == EXTRA_PATCHED_MODULES
 
-        with self.override_env(dict(DATADOG_PATCH_MODULES=',')):
+        with self.override_env(dict(OPENTELEMETRY_PATCH_MODULES=',')):
             update_patched_modules()
             assert orig == EXTRA_PATCHED_MODULES
 
-        with self.override_env(dict(DATADOG_PATCH_MODULES=',:')):
+        with self.override_env(dict(OPENTELEMETRY_PATCH_MODULES=',:')):
             update_patched_modules()
             assert orig == EXTRA_PATCHED_MODULES
 
         # overrides work in either direction
-        with self.override_env(dict(DATADOG_PATCH_MODULES='django:false')):
+        with self.override_env(dict(OPENTELEMETRY_PATCH_MODULES='django:false')):
             update_patched_modules()
             assert EXTRA_PATCHED_MODULES['django'] is False
 
-        with self.override_env(dict(DATADOG_PATCH_MODULES='boto:true')):
+        with self.override_env(dict(OPENTELEMETRY_PATCH_MODULES='boto:true')):
             update_patched_modules()
             assert EXTRA_PATCHED_MODULES['boto'] is True
 
-        with self.override_env(dict(DATADOG_PATCH_MODULES='django:true,boto:false')):
+        with self.override_env(dict(OPENTELEMETRY_PATCH_MODULES='django:true,boto:false')):
             update_patched_modules()
             assert EXTRA_PATCHED_MODULES['boto'] is False
             assert EXTRA_PATCHED_MODULES['django'] is True
 
-        with self.override_env(dict(DATADOG_PATCH_MODULES='django:false,boto:true')):
+        with self.override_env(dict(OPENTELEMETRY_PATCH_MODULES='django:false,boto:true')):
             update_patched_modules()
             assert EXTRA_PATCHED_MODULES['boto'] is True
             assert EXTRA_PATCHED_MODULES['django'] is False

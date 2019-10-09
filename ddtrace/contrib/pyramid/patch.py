@@ -29,7 +29,7 @@ def patch():
 
 def traced_init(wrapped, instance, args, kwargs):
     settings = kwargs.pop('settings', {})
-    service = os.environ.get('DATADOG_SERVICE_NAME') or 'pyramid'
+    service = os.environ.get('OPENTELEMETRY_SERVICE_NAME') or 'pyramid'
     distributed_tracing = asbool(get_env('pyramid', 'distributed_tracing', True))
     # DEV: integration-specific analytics flag can be not set but still enabled
     # globally for web frameworks

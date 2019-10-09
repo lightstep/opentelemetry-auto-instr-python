@@ -4,7 +4,7 @@ calls.
 
 **Note:** by default the tracer is **disabled** (will not send spans) when
 the Django setting ``DEBUG`` is ``True``. This can be overridden by explicitly enabling
-the tracer with ``DATADOG_TRACE['ENABLED'] = True``, as described below.
+the tracer with ``OPENTELEMETRY_TRACE['ENABLED'] = True``, as described below.
 
 To enable the Django integration, add the application to your installed
 apps, as follows::
@@ -16,10 +16,10 @@ apps, as follows::
         'ddtrace.contrib.django',
     ]
 
-The configuration for this integration is namespaced under the ``DATADOG_TRACE``
+The configuration for this integration is namespaced under the ``OPENTELEMETRY_TRACE``
 Django setting. For example, your ``settings.py`` may contain::
 
-    DATADOG_TRACE = {
+    OPENTELEMETRY_TRACE = {
         'DEFAULT_SERVICE': 'my-django-app',
         'TAGS': {'env': 'production'},
     }

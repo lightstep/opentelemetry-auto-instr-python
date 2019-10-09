@@ -10,7 +10,7 @@ from .utils import quantize_key_values, _resource_from_cache_prefix
 log = get_logger(__name__)
 
 # code instrumentation
-DATADOG_NAMESPACE = '__datadog_original_{method}'
+OPENTELEMETRY_NAMESPACE = '__datadog_original_{method}'
 TRACED_METHODS = [
     'get',
     'set',
@@ -52,7 +52,7 @@ def patch_cache(tracer):
         @wraps(fn)
         def wrapped(self, *args, **kwargs):
             # get the original function method
-            method = getattr(self, DATADOG_NAMESPACE.format(method=method_name))
+            method = getattr(self, OPENTELEMETRY_NAMESPACE.format(method=method_name))
             with tracer.trace('django.cache', span_type=TYPE, service=cache_service_name) as span:
                 # update the resource name and tag the cache backend
                 span.resource = _resource_from_cache_prefix(method_name, self)
@@ -77,11 +77,11 @@ def patch_cache(tracer):
             return
 
         # prevent patching each backend's method more than once
-        if hasattr(cls, DATADOG_NAMESPACE.format(method=method_name)):
+        if hasattr(cls, OPENTELEMETRY_NAMESPACE.format(method=method_name)):
             log.debug('{} already traced'.format(method_name))
         else:
             method = getattr(cls, method_name)
-            setattr(cls, DATADOG_NAMESPACE.format(method=method_name), method)
+            setattr(cls, OPENTELEMETRY_NAMESPACE.format(method=method_name), method)
             setattr(cls, method_name, _trace_operation(method, method_name))
 
     # trace all backends
@@ -93,12 +93,12 @@ def patch_cache(tracer):
 
 
 def unpatch_method(cls, method_name):
-    method = getattr(cls, DATADOG_NAMESPACE.format(method=method_name), None)
+    method = getattr(cls, OPENTELEMETRY_NAMESPACE.format(method=method_name), None)
     if method is None:
         log.debug('nothing to do, the class is not patched')
         return
     setattr(cls, method_name, method)
-    delattr(cls, DATADOG_NAMESPACE.format(method=method_name))
+    delattr(cls, OPENTELEMETRY_NAMESPACE.format(method=method_name))
 
 
 def unpatch_cache():

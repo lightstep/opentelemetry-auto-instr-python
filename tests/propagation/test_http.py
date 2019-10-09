@@ -62,10 +62,10 @@ class TestHttpPropagation(TestCase):
         tracer = get_dummy_tracer()
 
         headers = {
-            'HTTP_X_DATADOG_TRACE_ID': '1234',
-            'HTTP_X_DATADOG_PARENT_ID': '5678',
-            'HTTP_X_DATADOG_SAMPLING_PRIORITY': '1',
-            'HTTP_X_DATADOG_ORIGIN': 'synthetics',
+            'HTTP_X_OPENTELEMETRY_TRACE_ID': '1234',
+            'HTTP_X_OPENTELEMETRY_PARENT_ID': '5678',
+            'HTTP_X_OPENTELEMETRY_SAMPLING_PRIORITY': '1',
+            'HTTP_X_OPENTELEMETRY_ORIGIN': 'synthetics',
         }
 
         propagator = HTTPPropagator()

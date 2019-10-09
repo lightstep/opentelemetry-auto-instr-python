@@ -4,7 +4,7 @@ import os
 import sys
 import logging
 
-debug = os.environ.get('DATADOG_TRACE_DEBUG')
+debug = os.environ.get('OPENTELEMETRY_TRACE_DEBUG')
 if debug and debug.lower() == 'true':
     logging.basicConfig(level=logging.DEBUG)
 
@@ -23,15 +23,15 @@ Usage: [ENV_VARS] ddtrace-run <my_program>
 
 Available environment variables:
 
-    DATADOG_ENV : override an application's environment (no default)
-    DATADOG_TRACE_ENABLED=true|false : override the value of tracer.enabled (default: true)
-    DATADOG_TRACE_DEBUG=true|false : override the value of tracer.debug_logging (default: false)
-    DATADOG_PATCH_MODULES=module:patch,module:patch... e.g. boto:true,redis:false : override the modules patched for this execution of the program (default: none)
-    DATADOG_SERVICE_NAME : override the service name to be used for this program (no default)
+    OPENTELEMETRY_ENV : override an application's environment (no default)
+    OPENTELEMETRY_TRACE_ENABLED=true|false : override the value of tracer.enabled (default: true)
+    OPENTELEMETRY_TRACE_DEBUG=true|false : override the value of tracer.debug_logging (default: false)
+    OPENTELEMETRY_PATCH_MODULES=module:patch,module:patch... e.g. boto:true,redis:false : override the modules patched for this execution of the program (default: none)
+    OPENTELEMETRY_SERVICE_NAME : override the service name to be used for this program (no default)
                            This value is passed through when setting up middleware for web framework integrations.
                            (e.g. pylons, flask, django)
                            For tracing without a web integration, prefer setting the service name in code.
-    DATADOG_PRIORITY_SAMPLING=true|false : (default: false): enables Priority Sampling.
+    OPENTELEMETRY_PRIORITY_SAMPLING=true|false : (default: false): enables Priority Sampling.
 """  # noqa: E501
 
 

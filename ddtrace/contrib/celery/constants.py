@@ -18,5 +18,5 @@ TASK_RETRY_REASON_KEY = 'celery.retry.reason'
 APP = 'celery'
 # `getenv()` call must be kept for backward compatibility; we may remove it
 # later when we do a full migration to the `Config` class
-PRODUCER_SERVICE = getenv('DATADOG_SERVICE_NAME') or 'celery-producer'
-WORKER_SERVICE = getenv('DATADOG_SERVICE_NAME') or 'celery-worker'
+PRODUCER_SERVICE = getenv('OPENTELEMETRY_SERVICE_NAME') or 'celery-producer'
+WORKER_SERVICE = getenv('OPENTELEMETRY_SERVICE_NAME') or 'celery-worker'

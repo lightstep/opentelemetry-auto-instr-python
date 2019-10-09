@@ -93,8 +93,8 @@ services:
         image: datadog/docker-library:ddtrace_py
         environment:
             - TOX_SKIP_DIST=True
-            - TEST_DATADOG_INTEGRATION=1
-            - TEST_DATADOG_INTEGRATION_UDS=1
+            - TEST_OPENTELEMETRY_INTEGRATION=1
+            - TEST_OPENTELEMETRY_INTEGRATION_UDS=1
         network_mode: host
         working_dir: /src
         volumes:

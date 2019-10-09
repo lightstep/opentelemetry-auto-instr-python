@@ -31,7 +31,7 @@ def traced_init(wrapped, instance, args, kwargs):
     wrapped(*args, **kwargs)
 
     # set tracing options and create the TraceMiddleware
-    service = os.environ.get('DATADOG_SERVICE_NAME', 'pylons')
+    service = os.environ.get('OPENTELEMETRY_SERVICE_NAME', 'pylons')
     distributed_tracing = asbool(get_env('pylons', 'distributed_tracing', True))
     Pin(service=service, tracer=tracer).onto(instance)
     traced_app = PylonsTraceMiddleware(instance, tracer, service=service, distributed_tracing=distributed_tracing)

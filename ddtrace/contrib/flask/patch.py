@@ -25,8 +25,8 @@ FLASK_VERSION = 'flask.version'
 # Configure default configuration
 config._add('flask', dict(
     # Flask service configuration
-    # DEV: Environment variable 'DATADOG_SERVICE_NAME' used for backwards compatibility
-    service_name=os.environ.get('DATADOG_SERVICE_NAME') or 'flask',
+    # DEV: Environment variable 'OPENTELEMETRY_SERVICE_NAME' used for backwards compatibility
+    service_name=os.environ.get('OPENTELEMETRY_SERVICE_NAME') or 'flask',
     app='flask',
     app_type=AppTypes.web,
 

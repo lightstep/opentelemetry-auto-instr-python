@@ -1,8 +1,8 @@
 """
-Settings for Datadog tracer are all namespaced in the DATADOG_TRACE setting.
+Settings for Datadog tracer are all namespaced in the OPENTELEMETRY_TRACE setting.
 For example your project's `settings.py` file might look like this:
 
-DATADOG_TRACE = {
+OPENTELEMETRY_TRACE = {
     'TRACER': 'myapp.tracer',
 }
 
@@ -88,16 +88,16 @@ class DatadogSettings(object):
             self._user_settings = self.__check_user_settings(user_settings)
 
         self.defaults = defaults or DEFAULTS
-        if os.environ.get('DATADOG_ENV'):
-            self.defaults['TAGS'].update({'env': os.environ.get('DATADOG_ENV')})
-        if os.environ.get('DATADOG_SERVICE_NAME'):
-            self.defaults['DEFAULT_SERVICE'] = os.environ.get('DATADOG_SERVICE_NAME')
+        if os.environ.get('OPENTELEMETRY_ENV'):
+            self.defaults['TAGS'].update({'env': os.environ.get('OPENTELEMETRY_ENV')})
+        if os.environ.get('OPENTELEMETRY_SERVICE_NAME'):
+            self.defaults['DEFAULT_SERVICE'] = os.environ.get('OPENTELEMETRY_SERVICE_NAME')
 
-        host = os.environ.get('DD_AGENT_HOST', os.environ.get('DATADOG_TRACE_AGENT_HOSTNAME'))
+        host = os.environ.get('DD_AGENT_HOST', os.environ.get('OPENTELEMETRY_TRACE_AGENT_HOSTNAME'))
         if host:
             self.defaults['AGENT_HOSTNAME'] = host
 
-        port = os.environ.get('DD_TRACE_AGENT_PORT', os.environ.get('DATADOG_TRACE_AGENT_PORT'))
+        port = os.environ.get('DD_TRACE_AGENT_PORT', os.environ.get('OPENTELEMETRY_TRACE_AGENT_PORT'))
         if port:
             # if the agent port is a string, the underlying library that creates the socket
             # stops working
@@ -113,7 +113,7 @@ class DatadogSettings(object):
     @property
     def user_settings(self):
         if not hasattr(self, '_user_settings'):
-            self._user_settings = getattr(django_settings, 'DATADOG_TRACE', {})
+            self._user_settings = getattr(django_settings, 'OPENTELEMETRY_TRACE', {})
 
         # TODO[manu]: prevents docs import errors; provide a better implementation
         if 'ENABLED' not in self._user_settings:
@@ -158,5 +158,5 @@ def reload_settings(*args, **kwargs):
     """
     global settings
     setting, value = kwargs['setting'], kwargs['value']
-    if setting == 'DATADOG_TRACE':
+    if setting == 'OPENTELEMETRY_TRACE':
         settings = DatadogSettings(value, DEFAULTS, IMPORT_STRINGS)

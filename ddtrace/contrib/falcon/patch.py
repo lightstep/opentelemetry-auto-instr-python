@@ -22,7 +22,7 @@ def patch():
 
 def traced_init(wrapped, instance, args, kwargs):
     mw = kwargs.pop('middleware', [])
-    service = os.environ.get('DATADOG_SERVICE_NAME') or 'falcon'
+    service = os.environ.get('OPENTELEMETRY_SERVICE_NAME') or 'falcon'
     distributed_tracing = asbool(get_env('falcon', 'distributed_tracing', True))
 
     mw.insert(0, TraceMiddleware(tracer, service, distributed_tracing))

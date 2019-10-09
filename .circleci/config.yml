@@ -114,7 +114,7 @@ jobs:
     docker:
       - <<: *test_runner
         env:
-          TEST_DATADOG_INTEGRATION: 1
+          TEST_OPENTELEMETRY_INTEGRATION: 1
       - image: datadog/docker-dd-agent
         env:
             - DD_APM_ENABLED=true

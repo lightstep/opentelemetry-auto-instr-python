@@ -45,8 +45,8 @@ class FlawedAPI(API):
 
 
 @skipUnless(
-    os.environ.get('TEST_DATADOG_INTEGRATION', False),
-    'You should have a running trace agent and set TEST_DATADOG_INTEGRATION=1 env variable'
+    os.environ.get('TEST_OPENTELEMETRY_INTEGRATION', False),
+    'You should have a running trace agent and set TEST_OPENTELEMETRY_INTEGRATION=1 env variable'
 )
 class TestWorkers(TestCase):
     """
@@ -98,8 +98,8 @@ class TestWorkers(TestCase):
         return None, None
 
     @skipUnless(
-        os.environ.get('TEST_DATADOG_INTEGRATION_UDS', False),
-        'You should have a running trace agent on a socket and set TEST_DATADOG_INTEGRATION_UDS=1 env variable'
+        os.environ.get('TEST_OPENTELEMETRY_INTEGRATION_UDS', False),
+        'You should have a running trace agent on a socket and set TEST_OPENTELEMETRY_INTEGRATION_UDS=1 env variable'
     )
     def test_worker_single_trace_uds(self):
         self.tracer.configure(uds_path='/tmp/ddagent/trace.sock')
@@ -227,8 +227,8 @@ class TestWorkers(TestCase):
 
 
 @skipUnless(
-    os.environ.get('TEST_DATADOG_INTEGRATION', False),
-    'You should have a running trace agent and set TEST_DATADOG_INTEGRATION=1 env variable'
+    os.environ.get('TEST_OPENTELEMETRY_INTEGRATION', False),
+    'You should have a running trace agent and set TEST_OPENTELEMETRY_INTEGRATION=1 env variable'
 )
 class TestAPITransport(TestCase):
     """
@@ -407,8 +407,8 @@ class TestAPITransport(TestCase):
 
 
 @skipUnless(
-    os.environ.get('TEST_DATADOG_INTEGRATION', False),
-    'You should have a running trace agent and set TEST_DATADOG_INTEGRATION=1 env variable'
+    os.environ.get('TEST_OPENTELEMETRY_INTEGRATION', False),
+    'You should have a running trace agent and set TEST_OPENTELEMETRY_INTEGRATION=1 env variable'
 )
 class TestAPIDowngrade(TestCase):
     """
@@ -451,8 +451,8 @@ class TestAPIDowngrade(TestCase):
 
 
 @skipUnless(
-    os.environ.get('TEST_DATADOG_INTEGRATION', False),
-    'You should have a running trace agent and set TEST_DATADOG_INTEGRATION=1 env variable'
+    os.environ.get('TEST_OPENTELEMETRY_INTEGRATION', False),
+    'You should have a running trace agent and set TEST_OPENTELEMETRY_INTEGRATION=1 env variable'
 )
 class TestRateByService(TestCase):
     """
@@ -492,8 +492,8 @@ class TestRateByService(TestCase):
 
 
 @skipUnless(
-    os.environ.get('TEST_DATADOG_INTEGRATION', False),
-    'You should have a running trace agent and set TEST_DATADOG_INTEGRATION=1 env variable'
+    os.environ.get('TEST_OPENTELEMETRY_INTEGRATION', False),
+    'You should have a running trace agent and set TEST_OPENTELEMETRY_INTEGRATION=1 env variable'
 )
 class TestConfigure(TestCase):
     """
