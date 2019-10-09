@@ -109,7 +109,7 @@ class DdtraceRunTest(BaseTestCase):
             )
             assert out.startswith(b'Test success')
 
-    def test_host_port_from_env_dd(self):
+    def test_host_port_from_env_otel(self):
         """
         OTEL_AGENT_HOST|OTEL_TRACE_AGENT_PORT point to the tracer
         to the correct host/port for submission

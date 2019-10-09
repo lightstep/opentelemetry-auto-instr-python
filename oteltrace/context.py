@@ -27,7 +27,7 @@ class Context(object):
     _partial_flush_enabled = asbool(get_env('tracer', 'partial_flush_enabled', 'false'))
     _partial_flush_min_spans = int(get_env('tracer', 'partial_flush_min_spans', 500))
 
-    def __init__(self, trace_id=None, span_id=None, sampling_priority=None, _dd_origin=None):
+    def __init__(self, trace_id=None, span_id=None, sampling_priority=None, _otel_origin=None):
         """
         Initialize a new thread-safe ``Context``.
 
@@ -42,7 +42,7 @@ class Context(object):
         self._parent_trace_id = trace_id
         self._parent_span_id = span_id
         self._sampling_priority = sampling_priority
-        self._dd_origin = _dd_origin
+        self._otel_origin = _otel_origin
 
     @property
     def trace_id(self):
@@ -168,7 +168,7 @@ class Context(object):
                 # attach the sampling priority to the context root span
                 if sampled and sampling_priority is not None and trace:
                     trace[0].set_metric(SAMPLING_PRIORITY_KEY, sampling_priority)
-                origin = self._dd_origin
+                origin = self._otel_origin
                 # attach the origin to the root span tag
                 if sampled and origin is not None and trace:
                     trace[0].set_tag(ORIGIN_KEY, origin)
@@ -196,7 +196,7 @@ class Context(object):
                     # attach the sampling priority to the context root span
                     if sampled and sampling_priority is not None and trace:
                         trace[0].set_metric(SAMPLING_PRIORITY_KEY, sampling_priority)
-                    origin = self._dd_origin
+                    origin = self._otel_origin
                     # attach the origin to the root span tag
                     if sampled and origin is not None and trace:
                         trace[0].set_tag(ORIGIN_KEY, origin)

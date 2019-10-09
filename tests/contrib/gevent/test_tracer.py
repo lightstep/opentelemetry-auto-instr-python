@@ -385,7 +385,7 @@ class TestGeventTracer(TestCase):
         assert worker_2.name == 'greenlet.worker2'
         assert worker_2.resource == 'greenlet.worker2'
 
-    def test_trace_spawn_multiple_greenlets_multiple_traces_dd(self):
+    def test_trace_spawn_multiple_greenlets_multiple_traces_otel(self):
         """OpenTelemetry version of the same test."""
         def entrypoint():
             with self.tracer.trace('greenlet.main') as span:

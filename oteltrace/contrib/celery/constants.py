@@ -1,7 +1,7 @@
 from os import getenv
 
 # Celery Context key
-CTX_KEY = '__dd_task_span'
+CTX_KEY = '__otel_task_span'
 
 # Span names
 PRODUCER_ROOT_SPAN = 'celery.apply'

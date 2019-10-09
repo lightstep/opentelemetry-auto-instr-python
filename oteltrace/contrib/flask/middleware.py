@@ -32,9 +32,9 @@ class TraceMiddleware(object):
         self.use_signals = use_signals
 
         # safe-guard to avoid double instrumentation
-        if getattr(app, '__dd_instrumentation', False):
+        if getattr(app, '__otel_instrumentation', False):
             return
-        setattr(app, '__dd_instrumentation', True)
+        setattr(app, '__otel_instrumentation', True)
 
         # Install hooks which time requests.
         self.app.before_request(self._before_request)

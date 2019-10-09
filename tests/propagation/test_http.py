@@ -21,7 +21,7 @@ class TestHttpPropagation(TestCase):
 
         with tracer.trace('global_root_span') as span:
             span.context.sampling_priority = 2
-            span.context._dd_origin = 'synthetics'
+            span.context._otel_origin = 'synthetics'
             headers = {}
             propagator = HTTPPropagator()
             propagator.inject(span.context, headers)
@@ -34,7 +34,7 @@ class TestHttpPropagation(TestCase):
             )
             assert (
                 headers[HTTP_HEADER_ORIGIN] ==
-                span.context._dd_origin
+                span.context._otel_origin
             )
 
     def test_extract(self):
@@ -55,7 +55,7 @@ class TestHttpPropagation(TestCase):
             assert span.trace_id == 1234
             assert span.parent_id == 5678
             assert span.context.sampling_priority == 1
-            assert span.context._dd_origin == 'synthetics'
+            assert span.context._otel_origin == 'synthetics'
 
     def test_WSGI_extract(self):
         """Ensure we support the WSGI formatted headers as well."""
@@ -76,4 +76,4 @@ class TestHttpPropagation(TestCase):
             assert span.trace_id == 1234
             assert span.parent_id == 5678
             assert span.context.sampling_priority == 1
-            assert span.context._dd_origin == 'synthetics'
+            assert span.context._otel_origin == 'synthetics'

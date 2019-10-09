@@ -172,7 +172,7 @@ class TestSpan(Span):
         Example::
 
             span = TestSpan(span)
-            span.assert_metrics({'_dd1.sr.eausr': 1})
+            span.assert_metrics({'_otel1.sr.eausr': 1})
 
         :param metrics: Property/Value pairs to evaluate on this span
         :type metrics: dict

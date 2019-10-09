@@ -373,7 +373,7 @@ class TestTraceMiddleware(TraceTestCase):
 
     @unittest_run_loop
     @asyncio.coroutine
-    def test_parenting_200_dd(self):
+    def test_parenting_200_otel(self):
         with self.tracer.trace('aiohttp_op'):
             request = yield from self.client.request('GET', '/')
             assert 200 == request.status

@@ -92,11 +92,11 @@ class APIOtel(object):
             #print("there are {} spans in this trace".format(len(trace)))
             for span in trace:
                 #print("sending span: {}".format(trace))
-                spans.append(self._ddog_to_otel_span(span))
+                spans.append(self._otelog_to_otel_span(span))
         self._exporter.export(spans)
         return responses
 
-    def _ddog_to_otel_span(self, ddog_span):
+    def _otelog_to_otel_span(self, ddog_span):
         # create out-of-band span (it would be better to create a SpanView)
 
         # context for current span
