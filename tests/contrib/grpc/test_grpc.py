@@ -273,9 +273,9 @@ class GrpcTestCase(BaseTracerTestCase):
         assert len(spans) == 2
         server_span, client_span = spans
 
-        assert 'x-datadog-trace-id={}'.format(client_span.trace_id) in response.message
-        assert 'x-datadog-parent-id={}'.format(client_span.span_id) in response.message
-        assert 'x-datadog-sampling-priority=1' in response.message
+        assert 'x-opentelemetry-trace-id={}'.format(client_span.trace_id) in response.message
+        assert 'x-opentelemetry-parent-id={}'.format(client_span.span_id) in response.message
+        assert 'x-opentelemetry-sampling-priority=1' in response.message
 
     def test_unary_abort(self):
         with grpc.secure_channel('localhost:%d' % (_GRPC_PORT), credentials=grpc.ChannelCredentials(None)) as channel:
@@ -365,7 +365,7 @@ class _HelloServicer(HelloServicer):
             message = ';'.join(
                 w.key + '=' + w.value
                 for w in metadata
-                if w.key.startswith('x-datadog')
+                if w.key.startswith('x-opentelemetry')
             )
             return HelloReply(message=message)
 

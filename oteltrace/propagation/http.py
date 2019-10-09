@@ -7,10 +7,10 @@ log = get_logger(__name__)
 
 # HTTP headers one should set for distributed tracing.
 # These are cross-language (eg: Python, Go and other implementations should honor these)
-HTTP_HEADER_TRACE_ID = 'x-datadog-trace-id'
-HTTP_HEADER_PARENT_ID = 'x-datadog-parent-id'
-HTTP_HEADER_SAMPLING_PRIORITY = 'x-datadog-sampling-priority'
-HTTP_HEADER_ORIGIN = 'x-datadog-origin'
+HTTP_HEADER_TRACE_ID = 'x-opentelemetry-trace-id'
+HTTP_HEADER_PARENT_ID = 'x-opentelemetry-parent-id'
+HTTP_HEADER_SAMPLING_PRIORITY = 'x-opentelemetry-sampling-priority'
+HTTP_HEADER_ORIGIN = 'x-opentelemetry-origin'
 
 
 # Note that due to WSGI spec we have to also check for uppercased and prefixed
@@ -138,7 +138,7 @@ class HTTPPropagator(object):
         except Exception as error:
             try:
                 log.debug(
-                    'invalid x-datadog-* headers, trace-id: %s, parent-id: %s, priority: %s, origin: %s, error: %s',
+                    'invalid x-opentelemetry-* headers, trace-id: %s, parent-id: %s, priority: %s, origin: %s, error: %s',
                     headers.get(HTTP_HEADER_TRACE_ID, 0),
                     headers.get(HTTP_HEADER_PARENT_ID, 0),
                     headers.get(HTTP_HEADER_SAMPLING_PRIORITY),

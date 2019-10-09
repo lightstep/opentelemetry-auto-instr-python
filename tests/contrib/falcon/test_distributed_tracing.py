@@ -17,8 +17,8 @@ class DistributedTracingTestCase(testing.TestCase):
 
     def test_distributred_tracing(self):
         headers = {
-            'x-datadog-trace-id': '100',
-            'x-datadog-parent-id': '42',
+            'x-opentelemetry-trace-id': '100',
+            'x-opentelemetry-parent-id': '42',
         }
         out = self.simulate_get('/200', headers=headers)
         assert out.status_code == 200
@@ -36,8 +36,8 @@ class DistributedTracingTestCase(testing.TestCase):
         self.tracer = get_dummy_tracer()
         self.api = get_app(tracer=self.tracer, distributed_tracing=False)
         headers = {
-            'x-datadog-trace-id': '100',
-            'x-datadog-parent-id': '42',
+            'x-opentelemetry-trace-id': '100',
+            'x-opentelemetry-parent-id': '42',
         }
         out = self.simulate_get('/200', headers=headers)
         assert out.status_code == 200

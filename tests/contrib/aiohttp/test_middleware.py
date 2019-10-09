@@ -220,8 +220,8 @@ class TestTraceMiddleware(TraceTestCase):
     def test_distributed_tracing(self):
         # distributed tracing is enabled by default
         tracing_headers = {
-            'x-datadog-trace-id': '100',
-            'x-datadog-parent-id': '42',
+            'x-opentelemetry-trace-id': '100',
+            'x-opentelemetry-parent-id': '42',
         }
 
         request = yield from self.client.request('GET', '/', headers=tracing_headers)
@@ -244,9 +244,9 @@ class TestTraceMiddleware(TraceTestCase):
         self.tracer.priority_sampler = RateSampler(0.1)
 
         tracing_headers = {
-            'x-datadog-trace-id': '100',
-            'x-datadog-parent-id': '42',
-            'x-datadog-sampling-priority': '1',
+            'x-opentelemetry-trace-id': '100',
+            'x-opentelemetry-parent-id': '42',
+            'x-opentelemetry-sampling-priority': '1',
         }
 
         request = yield from self.client.request('GET', '/', headers=tracing_headers)
@@ -269,9 +269,9 @@ class TestTraceMiddleware(TraceTestCase):
         self.tracer.priority_sampler = RateSampler(0.9)
 
         tracing_headers = {
-            'x-datadog-trace-id': '100',
-            'x-datadog-parent-id': '42',
-            'x-datadog-sampling-priority': '0',
+            'x-opentelemetry-trace-id': '100',
+            'x-opentelemetry-parent-id': '42',
+            'x-opentelemetry-sampling-priority': '0',
         }
 
         request = yield from self.client.request('GET', '/', headers=tracing_headers)
@@ -294,8 +294,8 @@ class TestTraceMiddleware(TraceTestCase):
         # pass headers for distributed tracing
         self.app['opentelemetry_trace']['distributed_tracing_enabled'] = False
         tracing_headers = {
-            'x-datadog-trace-id': '100',
-            'x-datadog-parent-id': '42',
+            'x-opentelemetry-trace-id': '100',
+            'x-opentelemetry-parent-id': '42',
         }
 
         request = yield from self.client.request('GET', '/', headers=tracing_headers)
@@ -318,9 +318,9 @@ class TestTraceMiddleware(TraceTestCase):
 
         # activate distributed tracing
         tracing_headers = {
-            'x-datadog-trace-id': '100',
-            'x-datadog-parent-id': '42',
-            'x-datadog-sampling-priority': '0',
+            'x-opentelemetry-trace-id': '100',
+            'x-opentelemetry-parent-id': '42',
+            'x-opentelemetry-sampling-priority': '0',
         }
 
         request = yield from self.client.request('GET', '/sub_span', headers=tracing_headers)

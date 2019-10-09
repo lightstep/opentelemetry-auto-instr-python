@@ -43,8 +43,8 @@ class TraceBottleDistributedTest(BaseTracerTestCase):
         self._trace_app_distributed(self.tracer)
 
         # make a request
-        headers = {'x-datadog-trace-id': '123',
-                   'x-datadog-parent-id': '456'}
+        headers = {'x-opentelemetry-trace-id': '123',
+                   'x-opentelemetry-parent-id': '456'}
         resp = self.app.get('/hi/dougie', headers=headers)
         assert resp.status_int == 200
         assert compat.to_unicode(resp.body) == u'hi dougie'
@@ -70,8 +70,8 @@ class TraceBottleDistributedTest(BaseTracerTestCase):
         self._trace_app_not_distributed(self.tracer)
 
         # make a request
-        headers = {'x-datadog-trace-id': '123',
-                   'x-datadog-parent-id': '456'}
+        headers = {'x-opentelemetry-trace-id': '123',
+                   'x-opentelemetry-parent-id': '456'}
         resp = self.app.get('/hi/dougie', headers=headers)
         assert resp.status_int == 200
         assert compat.to_unicode(resp.body) == u'hi dougie'

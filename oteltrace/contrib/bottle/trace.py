@@ -30,7 +30,7 @@ class TracePlugin(object):
 
             resource = '{} {}'.format(request.method, route.rule)
 
-            # Propagate headers such as x-datadog-trace-id.
+            # Propagate headers such as x-opentelemetry-trace-id.
             if self.distributed_tracing:
                 propagator = HTTPPropagator()
                 context = propagator.extract(request.headers)

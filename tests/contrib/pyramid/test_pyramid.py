@@ -29,10 +29,10 @@ class TestPyramidDistributedTracingDefault(PyramidBase):
         # ensure the Context is properly created
         # if distributed tracing is enabled
         headers = {
-            'x-datadog-trace-id': '100',
-            'x-datadog-parent-id': '42',
-            'x-datadog-sampling-priority': '2',
-            'x-datadog-origin': 'synthetics',
+            'x-opentelemetry-trace-id': '100',
+            'x-opentelemetry-parent-id': '42',
+            'x-opentelemetry-sampling-priority': '2',
+            'x-opentelemetry-origin': 'synthetics',
         }
         self.app.get('/', headers=headers, status=200)
         writer = self.tracer.writer
@@ -57,10 +57,10 @@ class TestPyramidDistributedTracingDisabled(PyramidBase):
     def test_distributed_tracing_disabled(self):
         # we do not inherit context if distributed tracing is disabled
         headers = {
-            'x-datadog-trace-id': '100',
-            'x-datadog-parent-id': '42',
-            'x-datadog-sampling-priority': '2',
-            'x-datadog-origin': 'synthetics',
+            'x-opentelemetry-trace-id': '100',
+            'x-opentelemetry-parent-id': '42',
+            'x-opentelemetry-sampling-priority': '2',
+            'x-opentelemetry-origin': 'synthetics',
         }
         self.app.get('/', headers=headers, status=200)
         writer = self.tracer.writer

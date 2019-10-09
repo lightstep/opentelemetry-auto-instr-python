@@ -241,9 +241,9 @@ class TestTornadoWeb(TornadoTestCase):
     def test_propagation(self):
         # it should trace a handler that returns 200 with a propagated context
         headers = {
-            'x-datadog-trace-id': '1234',
-            'x-datadog-parent-id': '4567',
-            'x-datadog-sampling-priority': '2'
+            'x-opentelemetry-trace-id': '1234',
+            'x-opentelemetry-parent-id': '4567',
+            'x-opentelemetry-sampling-priority': '2'
         }
         response = self.fetch('/success/', headers=headers)
         assert 200 == response.code
@@ -417,10 +417,10 @@ class TestNoPropagationTornadoWeb(TornadoTestCase):
     def test_no_propagation(self):
         # it should not propagate the HTTP context
         headers = {
-            'x-datadog-trace-id': '1234',
-            'x-datadog-parent-id': '4567',
-            'x-datadog-sampling-priority': '2',
-            'x-datadog-origin': 'synthetics',
+            'x-opentelemetry-trace-id': '1234',
+            'x-opentelemetry-parent-id': '4567',
+            'x-opentelemetry-sampling-priority': '2',
+            'x-opentelemetry-origin': 'synthetics',
         }
         response = self.fetch('/success/', headers=headers)
         assert 200 == response.code

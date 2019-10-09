@@ -12,18 +12,18 @@ class TestRequestsDistributed(BaseRequestTestCase, BaseTracerTestCase):
         # This is because the parent_id can only been known within such a callback,
         # as it's defined on the requests span, which is not available when calling register_uri
         headers = request.headers
-        assert 'x-datadog-trace-id' in headers
-        assert 'x-datadog-parent-id' in headers
-        assert str(root_span.trace_id) == headers['x-datadog-trace-id']
+        assert 'x-opentelemetry-trace-id' in headers
+        assert 'x-opentelemetry-parent-id' in headers
+        assert str(root_span.trace_id) == headers['x-opentelemetry-trace-id']
         req_span = root_span.context.get_current_span()
         assert 'requests.request' == req_span.name
-        assert str(req_span.span_id) == headers['x-datadog-parent-id']
+        assert str(req_span.span_id) == headers['x-opentelemetry-parent-id']
         return True
 
     def headers_not_here(self, tracer, request):
         headers = request.headers
-        assert 'x-datadog-trace-id' not in headers
-        assert 'x-datadog-parent-id' not in headers
+        assert 'x-opentelemetry-trace-id' not in headers
+        assert 'x-opentelemetry-parent-id' not in headers
         return True
 
     def test_propagation_default(self):

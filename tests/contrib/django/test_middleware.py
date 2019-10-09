@@ -291,9 +291,9 @@ class DjangoMiddlewareTest(DjangoTraceTestCase):
         # ensures that we properly propagate http context
         url = reverse('users-list')
         headers = {
-            'x-datadog-trace-id': '100',
-            'x-datadog-parent-id': '42',
-            'x-datadog-sampling-priority': '2',
+            'x-opentelemetry-trace-id': '100',
+            'x-opentelemetry-parent-id': '42',
+            'x-opentelemetry-sampling-priority': '2',
         }
         response = self.client.get(url, **headers)
         assert response.status_code == 200
@@ -312,9 +312,9 @@ class DjangoMiddlewareTest(DjangoTraceTestCase):
         # ensures that we properly propagate http context
         url = reverse('users-list')
         headers = {
-            'x-datadog-trace-id': '100',
-            'x-datadog-parent-id': '42',
-            'x-datadog-sampling-priority': '2',
+            'x-opentelemetry-trace-id': '100',
+            'x-opentelemetry-parent-id': '42',
+            'x-opentelemetry-sampling-priority': '2',
         }
         response = self.client.get(url, **headers)
         assert response.status_code == 200

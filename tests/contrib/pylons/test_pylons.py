@@ -339,9 +339,9 @@ class PylonsTestCase(BaseTracerTestCase):
     def test_distributed_tracing_default(self):
         # ensure by default, distributed tracing is not enabled
         headers = {
-            'x-datadog-trace-id': '100',
-            'x-datadog-parent-id': '42',
-            'x-datadog-sampling-priority': '2',
+            'x-opentelemetry-trace-id': '100',
+            'x-opentelemetry-parent-id': '42',
+            'x-opentelemetry-sampling-priority': '2',
         }
         res = self.app.get(url_for(controller='root', action='index'), headers=headers)
         assert res.status == 200
@@ -360,9 +360,9 @@ class PylonsTestCase(BaseTracerTestCase):
         middleware = self.app.app
         middleware._distributed_tracing = False
         headers = {
-            'x-datadog-trace-id': '100',
-            'x-datadog-parent-id': '42',
-            'x-datadog-sampling-priority': '2',
+            'x-opentelemetry-trace-id': '100',
+            'x-opentelemetry-parent-id': '42',
+            'x-opentelemetry-sampling-priority': '2',
         }
 
         res = self.app.get(url_for(controller='root', action='index'), headers=headers)

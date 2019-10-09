@@ -41,10 +41,10 @@ class TestHttpPropagation(TestCase):
         tracer = get_dummy_tracer()
 
         headers = {
-            'x-datadog-trace-id': '1234',
-            'x-datadog-parent-id': '5678',
-            'x-datadog-sampling-priority': '1',
-            'x-datadog-origin': 'synthetics',
+            'x-opentelemetry-trace-id': '1234',
+            'x-opentelemetry-parent-id': '5678',
+            'x-opentelemetry-sampling-priority': '1',
+            'x-opentelemetry-origin': 'synthetics',
         }
 
         propagator = HTTPPropagator()

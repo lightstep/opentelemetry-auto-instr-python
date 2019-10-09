@@ -318,9 +318,9 @@ class TestFlask(TestCase):
 
     def test_propagation(self):
         rv = self.app.get('/', headers={
-            'x-datadog-trace-id': '1234',
-            'x-datadog-parent-id': '4567',
-            'x-datadog-sampling-priority': '2'
+            'x-opentelemetry-trace-id': '1234',
+            'x-opentelemetry-parent-id': '4567',
+            'x-opentelemetry-sampling-priority': '2'
         })
 
         # ensure request worked
