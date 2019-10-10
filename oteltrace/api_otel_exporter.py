@@ -71,8 +71,8 @@ class APIOtel(object):
 
     def __init__(self):
         self._exporter = load_exporter()
-        if self._exporter is None:
-            raise ValueError("Exporter is None")
+        #if self._exporter is None:
+        #    raise ValueError("Exporter is None")
 
     def send_traces(self, traces):
         """Send traces to the API.

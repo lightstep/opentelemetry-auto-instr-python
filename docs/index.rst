@@ -1,7 +1,7 @@
 .. include:: ./shared.rst
 
 OpenTelemetry Python Trace Client
-===========================
+=================================
 
 ``oteltrace`` is OpenTelemetry's Python tracing client. It is used to trace requests as
 they flow across web servers, databases and microservices. This enables
@@ -140,5 +140,4 @@ Indices and tables
     async_integrations
     other_integrations
     basic_usage
-    advanced_usage
     contributing

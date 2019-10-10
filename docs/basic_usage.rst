@@ -10,7 +10,7 @@ Auto Instrumentation
 --------------------
 
 ``oteltrace-run``
-^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
 
 Python applications can easily be instrumented with ``oteltrace`` by using the
 included ``oteltrace-run`` command. Simply prefix your Python execution command
@@ -25,10 +25,32 @@ then to auto-instrument using OpenTelemetry, the corresponding command is::
 
 $ oteltrace-run python app.py
 
-For more advanced usage of ``oteltrace-run`` refer to the documentation :ref:`here<oteltracerun>`.
+Exporter Configuration
+**********************
+
+``oteltrace-run`` uses opentelemetry-python SDK exporters to send the traces to
+different backends.
+The exporter to be used is configured using the following env variables:
+
+* ``OTEL_EXPORTER_MODULE`` specifies the python module where the exporter is implemented.
+* ``OTEL_EXPORTER_FACTORY`` defines a function to be called to get an instance of the exporter.
+
+The specific configuration for each type of exporter is defined by using the
+``OTEL_EXPORTER_OPTIONS_*`` env variables.
+The text after ``OTEL_EXPORTER_OPTIONS_`` will be passed to
+``OTEL_EXPORTER_FACTORY`` as kwargs.
+
+Propagator Configuration
+************************
+
+``oteltrace-run`` supports different formats to distribute the trace context.
+The propagator used is defined by the ``OTEL_TRACER_PROPAGATOR`` env variable.
+Currently ``w3c`` (default), ``b3`` and ``datadog`` are supported.
 
 ``patch_all``
 ^^^^^^^^^^^^^
+
+TODO: how to configure exporters in this case?
 
 To manually invoke the automatic instrumentation use ``patch_all``::
 
@@ -51,57 +73,4 @@ More information about ``patch_all`` is available in our :ref:`patch_all` API
 documentation.
 
 
-Manual Instrumentation
-----------------------
 
-If you would like to extend the functionality of the ``oteltrace`` library or gain
-finer control over instrumenting your application, several techniques are
-provided by the library.
-
-Decorator
-^^^^^^^^^
-
-``oteltrace`` provides a decorator that can be used to trace a particular method
-in your application::
-
-  @tracer.wrap()
-  def business_logic():
-    """A method that would be of interest to trace."""
-    # ...
-    # ...
-
-API details of the decorator can be found here :py:meth:`oteltrace.Tracer.wrap`.
-
-Context Manager
-^^^^^^^^^^^^^^^
-
-To trace an arbitrary block of code, you can use the :py:mod:`oteltrace.Span`
-context manager::
-
-  # trace some interesting operation
-  with tracer.trace('interesting.operations'):
-    # do some interesting operation(s)
-    # ...
-    # ...
-
-Further API details can be found here :py:meth:`oteltrace.Tracer`.
-
-Using the API
-^^^^^^^^^^^^^
-
-If the above methods are still not enough to satisfy your tracing needs, a
-manual API is provided which will allow you to start and finish spans however
-you may require::
-
-  span = tracer.trace('operations.of.interest')
-
-  # do some operation(s) of interest in between
-
-  # NOTE: make sure to call span.finish() or the entire trace will not be sent
-  # to OpenTelemetry
-  span.finish()
-
-API details of the decorator can be found here:
-
-- :py:meth:`oteltrace.Tracer.trace`
-- :py:meth:`oteltrace.Span.finish`.
