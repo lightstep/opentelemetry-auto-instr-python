@@ -4,7 +4,7 @@ from molten.testing import TestClient
 from oteltrace import Pin
 from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
 from oteltrace.ext import errors, http
-from oteltrace.propagation.http import HTTP_HEADER_TRACE_ID, HTTP_HEADER_PARENT_ID
+from oteltrace.propagation.datadog import HTTP_HEADER_TRACE_ID, HTTP_HEADER_PARENT_ID
 from oteltrace.contrib.molten import patch, unpatch
 from oteltrace.contrib.molten.patch import MOLTEN_VERSION
 

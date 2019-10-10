@@ -3,7 +3,7 @@ from oteltrace.compat import PY2
 from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
 from oteltrace.contrib.flask.patch import flask_version
 from oteltrace.ext import http
-from oteltrace.propagation.http import HTTP_HEADER_TRACE_ID, HTTP_HEADER_PARENT_ID
+from oteltrace.propagation.datadog import HTTP_HEADER_TRACE_ID, HTTP_HEADER_PARENT_ID
 from flask import abort
 
 from . import BaseFlaskTestCase

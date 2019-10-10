@@ -222,3 +222,15 @@ class OteltraceRunTest(BaseTestCase):
                 ['oteltrace-run', 'python', 'tests/commands/oteltrace_run_otelexporter.py']
             )
             assert out.startswith(b'Test success')
+
+    def test_propagator(self):
+        """ Ensure correct propagator is configured
+        """
+        oteltrace_run_conf = {
+            'OTEL_TRACER_PROPAGATOR': 'b3',
+        }
+        with self.override_env(oteltrace_run_conf):
+            out = subprocess.check_output(
+                ['oteltrace-run', 'python', 'tests/commands/oteltrace_run_propagator.py']
+            )
+            assert out.startswith(b'Test success')

@@ -12,6 +12,7 @@ from .context import Context
 from .sampler import AllSampler, OpenTelemetrySampler, RateSampler, RateByServiceSampler
 from .span import Span
 from .utils.deprecation import deprecated
+from .propagation import http as http_propagator_module
 from . import compat
 
 
@@ -101,7 +102,7 @@ class Tracer(object):
 
     def configure(self, enabled=None, sampler=None, context_provider=None,
                   wrap_executor=None, priority_sampling=None, settings=None, collect_metrics=None,
-                  api=None):
+                  api=None, http_propagator=None):
         """
         Configure an existing Tracer the easy way.
         Allow to configure or reconfigure a Tracer instance.
@@ -166,6 +167,9 @@ class Tracer(object):
 
         if (collect_metrics is None and runtime_metrics_was_running) or collect_metrics:
             self._start_runtime_worker()
+
+        if http_propagator is not None:
+            http_propagator_module.set_http_propagator_factory(http_propagator)
 
     def start_span(self, name, child_of=None, service=None, resource=None, span_type=None):
         """

@@ -9,6 +9,10 @@ import sys
 import logging
 import importlib
 
+from oteltrace.propagation.datadog import DatadogHTTPPropagator
+from oteltrace.propagation.w3c import W3CHTTPPropagator
+from oteltrace.propagation.b3 import B3HTTPPropagator
+
 from oteltrace import api_otel_exporter
 
 from oteltrace.utils.formats import asbool, get_env
@@ -116,6 +120,25 @@ def load_otel_exporter():
         return None
 
 
+OTEL_TRACER_PROPAGATOR = 'OTEL_TRACER_PROPAGATOR'
+OTEL_TRACER_PROPAGATOR_W3C = 'w3c'
+OTEL_TRACER_PROPAGATOR_B3 = 'b3'
+OTEL_TRACER_PROPAGATOR_DATADOG = 'datadog'
+OTEL_TRACER_PROPAGATOR_DEFAULT = OTEL_TRACER_PROPAGATOR_W3C
+
+OTEL_TRACER_PROPAGATOR_MAP = {
+    OTEL_TRACER_PROPAGATOR_W3C: W3CHTTPPropagator,
+    OTEL_TRACER_PROPAGATOR_B3: B3HTTPPropagator,
+    OTEL_TRACER_PROPAGATOR_DATADOG: DatadogHTTPPropagator,
+}
+
+
+def get_http_propagator_factory():
+    """Returns an http propagator factory based on set env variables"""
+    prop = os.getenv(OTEL_TRACER_PROPAGATOR, OTEL_TRACER_PROPAGATOR_DEFAULT)
+    return OTEL_TRACER_PROPAGATOR_MAP[prop.lower()]
+
+
 try:
     from oteltrace import tracer
     patch = True
@@ -136,6 +159,8 @@ try:
     opts['collect_metrics'] = asbool(get_env('runtime_metrics', 'enabled'))
 
     opts['api'] = api_otel_exporter.APIOtel(exporter=load_otel_exporter())
+
+    opts['http_propagator'] = get_http_propagator_factory()
 
     if opts:
         tracer.configure(**opts)

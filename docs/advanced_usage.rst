@@ -26,7 +26,7 @@ To trace requests across hosts, the spans on the secondary hosts must be linked 
 - On the server side, it means to read propagated attributes and set them to the active tracing context.
 - On the client side, it means to propagate the attributes, commonly as a header/metadata.
 
-`oteltrace` already provides default propagators but you can also implement your own.
+`oteltrace` already provides default propagators (``w3c``, ``b3`` and ``datadog``) but you can also implement your own.
 
 Web Frameworks
 ^^^^^^^^^^^^^^
@@ -69,8 +69,8 @@ on the other side, the metadata is retrieved and the trace can continue.
 To propagate the tracing information, HTTP headers are used to transmit the
 required metadata to piece together the trace.
 
-.. autoclass:: oteltrace.propagation.http.HTTPPropagator
-    :members:
+:func:`oteltrace.propagation.http.HTTPPropagator` returns an instance of the configured
+propagator.
 
 Custom
 ^^^^^^
@@ -476,6 +476,13 @@ The specific configuration for each type of exporter is defined by using the
 ``OTEL_EXPORTER_OPTIONS_*`` env variables.
 The text after ``OTEL_EXPORTER_OPTIONS_`` will be passed to
 ``OTEL_EXPORTER_FACTORY`` as kwargs.
+
+Propagator Configuration
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+``oteltrace-run`` supports different formats to distribute the trace context.
+The propagator used is defined by the ``OTEL_TRACER_PROPAGATOR`` env variable.
+Currently ``w3c`` (default), ``b3`` and ``datadog`` are supported.
 
 ``oteltrace-run`` respects a variety of common entrypoints for web applications:
 
