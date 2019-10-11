@@ -1,22 +1,14 @@
 import os
 
-from . import datadog
-from . import w3c
-from . import b3
+from .datadog import DatadogHTTPPropagator
 
-OTEL_TRACER_PROPAGATOR='OTEL_TRACER_PROPAGATOR'
-OTEL_TRACER_PROPAGATOR_W3C='w3c'
-OTEL_TRACER_PROPAGATOR_B3='b3'
-OTEL_TRACER_PROPAGATOR_DATADOG='datadog'
-OTEL_TRACER_PROPAGATOR_DEFAULT=OTEL_TRACER_PROPAGATOR_W3C
+_PROGPAGATOR_FACTORY = DatadogHTTPPropagator
 
-OTEL_TRACER_PROPAGATOR_MAP={
-    OTEL_TRACER_PROPAGATOR_W3C:w3c.W3CHTTPPropagator,
-    OTEL_TRACER_PROPAGATOR_B3:b3.B3HTTPPropagator,
-    OTEL_TRACER_PROPAGATOR_DATADOG:datadog.DatadogHTTPPropagator,
-}
+def set_http_propagator_factory(factory):
+    """Sets the propagator factory to be used globally"""
+    global _PROGPAGATOR_FACTORY
+    _PROGPAGATOR_FACTORY = factory
 
 def HTTPPropagator():
-    """Returns a the http propagator based on the configuration"""
-    prop = os.getenv(OTEL_TRACER_PROPAGATOR, OTEL_TRACER_PROPAGATOR_DEFAULT)
-    return OTEL_TRACER_PROPAGATOR_MAP[prop.lower()]()
+    """Returns and instance of the configured propagator"""
+    return _PROGPAGATOR_FACTORY()

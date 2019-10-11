@@ -9,6 +9,10 @@ import sys
 import logging
 import importlib
 
+from ddtrace.propagation.datadog import DatadogHTTPPropagator
+from ddtrace.propagation.w3c import W3CHTTPPropagator
+from ddtrace.propagation.b3 import B3HTTPPropagator
+
 from ddtrace import api_otel_exporter
 
 from ddtrace.utils.formats import asbool, get_env
@@ -111,6 +115,23 @@ def load_otel_exporter():
         log.exception('Error creating exporter instance.')
         return None
 
+OTEL_TRACER_PROPAGATOR='OTEL_TRACER_PROPAGATOR'
+OTEL_TRACER_PROPAGATOR_W3C='w3c'
+OTEL_TRACER_PROPAGATOR_B3='b3'
+OTEL_TRACER_PROPAGATOR_DATADOG='datadog'
+OTEL_TRACER_PROPAGATOR_DEFAULT=OTEL_TRACER_PROPAGATOR_W3C
+
+OTEL_TRACER_PROPAGATOR_MAP={
+    OTEL_TRACER_PROPAGATOR_W3C:W3CHTTPPropagator,
+    OTEL_TRACER_PROPAGATOR_B3:B3HTTPPropagator,
+    OTEL_TRACER_PROPAGATOR_DATADOG:DatadogHTTPPropagator,
+}
+
+def get_http_propagator_factory():
+    """Returns anhttp propagator factory based on set env variables"""
+    prop = os.getenv(OTEL_TRACER_PROPAGATOR, OTEL_TRACER_PROPAGATOR_DEFAULT)
+    return OTEL_TRACER_PROPAGATOR_MAP[prop.lower()]
+
 try:
     from ddtrace import tracer
     patch = True
@@ -140,6 +161,8 @@ try:
 
     if api_type == 'opentelemetry':
         opts['api'] = api_otel_exporter.APIOtel(exporter=load_otel_exporter())
+
+    opts['http_propagator'] = get_http_propagator_factory()
 
     if opts:
         tracer.configure(**opts)
