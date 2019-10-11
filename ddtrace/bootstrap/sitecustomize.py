@@ -7,6 +7,9 @@ import os
 import imp
 import sys
 import logging
+import importlib
+
+from ddtrace import api_otel_exporter
 
 from ddtrace.utils.formats import asbool, get_env
 from ddtrace.internal.logger import get_logger
@@ -74,6 +77,39 @@ def add_global_tags(tracer):
         tags[tag_name] = tag_value
     tracer.set_tags(tags)
 
+OTEL_MODULE='OTEL_EXPORTER_MODULE'
+OTEL_FACTORY='OTEL_EXPORTER_FACTORY'
+OTEL_OPT_PREFIX='OTEL_EXPORTER_OPTIONS_'
+
+def get_otel_exporter_options():
+    ops = {}
+
+    for var in os.environ:
+        if var.startswith(OTEL_OPT_PREFIX):
+            opt_name = var[len(OTEL_OPT_PREFIX):]
+            ops[opt_name] = os.environ.get(var)
+
+    return ops
+
+def load_otel_exporter():
+    exporter_module = os.environ.get(OTEL_MODULE)
+    if exporter_module is None:
+        log.error('%s is not defined.', OTEL_MODULE)
+        return None
+
+    exporter_type = os.environ.get(OTEL_FACTORY)
+    if exporter_type is None:
+        log.error('%s is not defined.', OTEL_FACTORY)
+        return None
+
+    try:
+        otel_module = importlib.import_module(exporter_module)
+        otel_callback =  getattr(otel_module, exporter_type)
+        opt = get_otel_exporter_options()
+        return otel_callback(**opt)
+    except (ImportError, SyntaxError, AttributeError):
+        log.exception('Error creating exporter instance.')
+        return None
 
 try:
     from ddtrace import tracer
@@ -87,7 +123,7 @@ try:
     port = os.environ.get('DATADOG_TRACE_AGENT_PORT')
     priority_sampling = os.environ.get('DATADOG_PRIORITY_SAMPLING')
     # datadog (default) or opentelemetry.
-    exporter_type = os.environ.get('EXPORTER_TYPE')
+    api_type = os.getenv('API_TYPE', 'datadog').lower()
     opts = {}
 
     if enabled and enabled.lower() == 'false':
@@ -102,7 +138,8 @@ try:
 
     opts['collect_metrics'] = asbool(get_env('runtime_metrics', 'enabled'))
 
-    opts["exporter_type"] = "DATADOG" if exporter_type is None else exporter_type
+    if api_type == 'opentelemetry':
+        opts['api'] = api_otel_exporter.APIOtel(exporter=load_otel_exporter())
 
     if opts:
         tracer.configure(**opts)

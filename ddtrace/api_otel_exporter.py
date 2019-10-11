@@ -29,52 +29,16 @@ class Response(object):
         """Helper to parse the body of this request as JSON"""
         return None
 
-OTEL_MODULE='OTEL_EXPORTER_MODULE'
-OTEL_FACTORY='OTEL_EXPORTER_FACTORY'
-OTEL_OPT_PREFIX='OTEL_EXPORTER_OPTIONS_'
-
-def get_otel_exporter_options():
-    ops = {}
-
-    for var in os.environ:
-        if var.startswith(OTEL_OPT_PREFIX):
-            opt_name = var[len(OTEL_OPT_PREFIX):]
-            ops[opt_name] = os.environ.get(var)
-
-    return ops
-
-def load_exporter():
-    exporter_module = os.environ.get(OTEL_MODULE)
-    if exporter_module is None:
-        log.error('%s is not defined.', OTEL_MODULE)
-        return None
-
-    exporter_type = os.environ.get(OTEL_FACTORY)
-    if exporter_type is None:
-        log.error('%s is not defined.', OTEL_FACTORY)
-        return None
-
-    try:
-        otel_module = importlib.import_module(exporter_module)
-        otel_callback =  getattr(otel_module, exporter_type)
-        opt = get_otel_exporter_options()
-        return otel_callback(**opt)
-    except (ImportError, SyntaxError, AttributeError):
-        log.exception('Error creating exporter instance.')
-        return None
-
-
 class APIOtel(object):
     """
     Export data to OpenTelemetry agents
     """
 
-    def __init__(self):
-        self._exporter = load_exporter()
-        if self._exporter is None:
-            raise ValueError("Exporter is None")
+    def __init__(self, exporter):
+        self._exporter = exporter
 
         # fake hostname and port to avoid crash
+        # TODO: verify why this is needed.
         self.hostname = ''
         self.port = 0
 

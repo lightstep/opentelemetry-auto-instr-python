@@ -4,7 +4,6 @@ import os
 import time
 
 from . import api
-from . import api_otel_exporter
 from . import _worker
 from .internal.logger import get_logger
 from ddtrace.vendor.six.moves.queue import Queue, Full, Empty
@@ -20,19 +19,17 @@ LOG_ERR_INTERVAL = 60
 
 class AgentWriter(object):
 
-    def __init__(self, hostname='localhost', port=8126, uds_path=None, filters=None, priority_sampler=None, exporter_type="DATADOG"):
+    def __init__(self, hostname='localhost', port=8126, uds_path=None, filters=None, priority_sampler=None, api_=None):
         self._pid = None
         self._traces = None
         self._worker = None
         self._filters = filters
         self._priority_sampler = priority_sampler
         priority_sampling = priority_sampler is not None
-        if exporter_type == "DATADOG":
+        if api is None:
             self.api = api.API(hostname, port, uds_path=uds_path, priority_sampling=priority_sampling)
-        elif exporter_type == "OPENTELEMETRY":
-            self.api = api_otel_exporter.APIOtel()
         else:
-            raise AttributeError("bad export type")
+            self.api = api_
 
     def write(self, spans=None, services=None):
         # if the worker needs to be reset, do it.
