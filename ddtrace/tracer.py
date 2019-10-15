@@ -117,6 +117,8 @@ class Tracer(object):
             from the default value
         :param priority_sampling: enable priority sampling, this is required for
             complete distributed tracing support. Enabled by default.
+        :param object api: object to export the traces to a backend.
+        :param class http_propagator: type of propagator to be used to distribute the tracing context.
         """
         if enabled is not None:
             self.enabled = enabled

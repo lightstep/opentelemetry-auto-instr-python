@@ -25,7 +25,7 @@ then to auto-instrument using Datadog, the corresponding command is::
 
 $ ddtrace-run python app.py
 
-For more advanced usage of ``ddtrace-run`` refer to the documentation :ref:`here<ddtracerun>`.
+For more advanced usage of ``ddtrace-run``, like using an OpenTelemetry exporter, refer to the documentation :ref:`here<ddtracerun>`.
 
 ``patch_all``
 ^^^^^^^^^^^^^

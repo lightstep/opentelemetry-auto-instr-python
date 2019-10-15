@@ -20,6 +20,15 @@ You can also use a Unix Domain Socket to connect to the agent::
 
     tracer.configure(uds_path="/path/to/socket")
 
+Sending traces to different backends
+------------------------------------
+
+`ddtrace` can export traces to different backends by using different api implementations, this
+parameter can be controlled by passing and `api` object to :func:`ddtrace.Tracer.configure`.
+By default traces are sent to DataDog.
+
+:class:`ddtrace.api_otel_exporter.APIOtel` allows to use OpenTelemetry exporters.
+
 
 Distributed Tracing
 -------------------
@@ -29,7 +38,7 @@ To trace requests across hosts, the spans on the secondary hosts must be linked 
 - On the server side, it means to read propagated attributes and set them to the active tracing context.
 - On the client side, it means to propagate the attributes, commonly as a header/metadata.
 
-`ddtrace` already provides default propagators but you can also implement your own.
+`ddtrace` already provides default propagators (``w3c``, ``b3`` and ``datadog``) but you can also implement your own.
 
 Web Frameworks
 ^^^^^^^^^^^^^^
@@ -72,8 +81,8 @@ on the other side, the metadata is retrieved and the trace can continue.
 To propagate the tracing information, HTTP headers are used to transmit the
 required metadata to piece together the trace.
 
-.. autoclass:: ddtrace.propagation.http.HTTPPropagator
-    :members:
+:func:`ddtrace.propagation.http.HTTPPropagator` returns an instance of the configured
+propagator.
 
 Custom
 ^^^^^^
@@ -558,6 +567,28 @@ The available environment variables for ``ddtrace-run`` are:
   Sampling`
 * ``DD_LOGS_INJECTION`` (default: false): enables :ref:`Logs Injection`
 
+Exporter Configuration
+^^^^^^^^^^^^^^^^^^^^^^
+
+``oteltrace-run`` uses opentelemetry-python SDK exporters to send the traces to
+different backends.
+The exporter to be used is configured using the following env variables:
+
+* ``OTEL_EXPORTER_MODULE`` specifies the python module where the exporter is implemented.
+* ``OTEL_EXPORTER_FACTORY`` defines a function to be called to get an instance of the exporter.
+
+The specific configuration for each type of exporter is defined by using the
+``OTEL_EXPORTER_OPTIONS_*`` env variables.
+The text after ``OTEL_EXPORTER_OPTIONS_`` will be passed to
+``OTEL_EXPORTER_FACTORY`` as kwargs.
+
+Propagator Configuration
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+``oteltrace-run`` supports different formats to distribute the trace context.
+The propagator used is defined by the ``OTEL_TRACER_PROPAGATOR`` env variable.
+Currently ``w3c`` (default), ``b3`` and ``datadog`` are supported.
+
 ``ddtrace-run`` respects a variety of common entrypoints for web applications:
 
 - ``ddtrace-run python my_app.py``
@@ -601,6 +632,12 @@ API
 ``Pin``
 ^^^^^^^
 .. autoclass:: ddtrace.Pin
+    :members:
+    :special-members: __init__
+
+``APIOtel``
+^^^^^^^^^^^
+.. autoclass:: ddtrace.api_otel_exporter.APIOtel
     :members:
     :special-members: __init__
 
