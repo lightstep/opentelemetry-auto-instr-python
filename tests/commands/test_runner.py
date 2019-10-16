@@ -127,19 +127,6 @@ class DdtraceRunTest(BaseTestCase):
             )
             assert out.startswith(b'Test success')
 
-    def test_runtime_metrics(self):
-        """
-        DD_AGENT_HOST|DD_DOGSTATSD_PORT point to the tracer
-        to the correct host/port for submission
-        """
-        with self.override_env(dict(DD_RUNTIME_METRICS_ENABLED='True',
-                                    DD_AGENT_HOST='172.10.0.1',
-                                    DD_DOGSTATSD_PORT='8120')):
-            out = subprocess.check_output(
-                ['ddtrace-run', 'python', 'tests/commands/ddtrace_run_dogstatsd.py']
-            )
-            assert out.startswith(b'Test success')
-
     def test_priority_sampling_from_env(self):
         """
         DATADOG_PRIORITY_SAMPLING enables Distributed Sampling

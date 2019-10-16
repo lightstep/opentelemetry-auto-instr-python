@@ -2,20 +2,16 @@ import functools
 import logging
 from os import environ, getpid
 
-
 from .constants import FILTERS_KEY, SAMPLE_RATE_METRIC_KEY
 from .ext import system
 from .ext.priority import AUTO_REJECT, AUTO_KEEP
 from .internal.logger import get_logger
-from .internal.runtime import RuntimeTags, RuntimeWorker
 from .internal.writer import AgentWriter
 from .provider import DefaultContextProvider
 from .context import Context
 from .sampler import AllSampler, DatadogSampler, RateSampler, RateByServiceSampler
 from .span import Span
-from .utils.formats import get_env
 from .utils.deprecation import deprecated
-from .vendor.dogstatsd import DogStatsd
 from . import compat
 
 
@@ -37,7 +33,6 @@ class Tracer(object):
 
     DEFAULT_HOSTNAME = environ.get('DD_AGENT_HOST', environ.get('DATADOG_TRACE_AGENT_HOSTNAME', 'localhost'))
     DEFAULT_PORT = int(environ.get('DD_TRACE_AGENT_PORT', 8126))
-    DEFAULT_DOGSTATSD_PORT = int(get_env('dogstatsd', 'port', 8125))
 
     def __init__(self):
         """
@@ -49,8 +44,6 @@ class Tracer(object):
         self.priority_sampler = None
 
         self._runtime_worker = None
-        self._dogstatsd_host = self.DEFAULT_HOSTNAME
-        self._dogstatsd_port = self.DEFAULT_DOGSTATSD_PORT
 
         # Apply the default configuration
         self.configure(
@@ -86,8 +79,7 @@ class Tracer(object):
 
     def global_excepthook(self, type, value, traceback):
         """The global tracer except hook."""
-        self._dogstatsd_client.increment('datadog.tracer.uncaught_exceptions', 1,
-                                         tags=['class:%s' % type.__name__])
+        self.log.warning('global_excepthook not implemented')
 
     def get_call_context(self, *args, **kwargs):
         """
@@ -113,8 +105,8 @@ class Tracer(object):
         return self._context_provider
 
     def configure(self, enabled=None, hostname=None, port=None, uds_path=None, https=None,
-                  dogstatsd_host=None, dogstatsd_port=None, sampler=None, context_provider=None,
-                  wrap_executor=None, priority_sampling=None, settings=None, collect_metrics=None):
+                  sampler=None, context_provider=None, wrap_executor=None, priority_sampling=None,
+                  settings=None, collect_metrics=None):
         """
         Configure an existing Tracer the easy way.
         Allow to configure or reconfigure a Tracer instance.
@@ -125,7 +117,6 @@ class Tracer(object):
         :param int port: Port of the Trace Agent
         :param str uds_path: The Unix Domain Socket path of the agent.
         :param bool https: Whether to use HTTPS or HTTP.
-        :param int metric_port: Port of DogStatsd
         :param object sampler: A custom Sampler instance, locally deciding to totally drop the trace or not.
         :param object context_provider: The ``ContextProvider`` that will be used to retrieve
             automatically the current call context. This is an advanced option that usually
@@ -158,17 +149,6 @@ class Tracer(object):
         if isinstance(self.sampler, DatadogSampler):
             self.sampler._priority_sampler = self.priority_sampler
 
-        self._dogstatsd_host = dogstatsd_host or self._dogstatsd_host
-        self._dogstatsd_port = dogstatsd_port or self._dogstatsd_port
-        self.log.debug('Connecting to DogStatsd on {}:{}'.format(
-            self._dogstatsd_host,
-            self._dogstatsd_port,
-        ))
-        self._dogstatsd_client = DogStatsd(
-            host=self._dogstatsd_host,
-            port=self._dogstatsd_port,
-        )
-
         if hostname is not None or port is not None or uds_path is not None or https is not None or \
                 filters is not None or priority_sampling is not None:
             # Preserve hostname and port when overriding filters or priority sampling
@@ -186,11 +166,7 @@ class Tracer(object):
                 https=https,
                 filters=filters,
                 priority_sampler=self.priority_sampler,
-                dogstatsd=self._dogstatsd_client,
             )
-
-        # HACK: since we recreated our dogstatsd agent, replace the old write one
-        self.writer.dogstatsd = self._dogstatsd_client
 
         if context_provider is not None:
             self._context_provider = context_provider
@@ -198,7 +174,7 @@ class Tracer(object):
         if wrap_executor is not None:
             self._wrap_executor = wrap_executor
 
-        # Since we've recreated our dogstatsd agent, we need to restart metric collection with that new agent
+        # Since we've recreated our metrics_client agent, we need to restart metric collection with that new agent
         if self._runtime_worker:
             runtime_metrics_was_running = True
             self._runtime_worker.stop()
@@ -330,26 +306,20 @@ class Tracer(object):
         if service and service not in self._services:
             self._services.add(service)
 
-            # The constant tags for the dogstatsd client needs to updated with any new
+            # The constant tags for the metrics_client client needs to updated with any new
             # service(s) that may have been added.
-            self._update_dogstatsd_constant_tags()
+            self._update_metrics_client_constant_tags()
 
         return span
 
-    def _update_dogstatsd_constant_tags(self):
+    def _update_metrics_client_constant_tags(self):
         """ Prepare runtime tags for ddstatsd.
         """
+        log.warning('_update_metrics_client_constant_tags() not implemented.')
         # DEV: ddstatsd expects tags in the form ['key1:value1', 'key2:value2', ...]
-        tags = [
-            '{}:{}'.format(k, v)
-            for k, v in RuntimeTags()
-        ]
-        self.log.debug('Updating constant tags {}'.format(tags))
-        self._dogstatsd_client.constant_tags = tags
 
     def _start_runtime_worker(self):
-        self._runtime_worker = RuntimeWorker(self._dogstatsd_client, self._RUNTIME_METRICS_INTERVAL)
-        self._runtime_worker.start()
+        log.warning('RuntimeWorker() not implemented.')
 
     def _check_new_process(self):
         """ Checks if the tracer is in a new process (was forked) and performs
@@ -370,7 +340,7 @@ class Tracer(object):
 
         # force an immediate update constant tags since we have reset services
         # and generated a new runtime id
-        self._update_dogstatsd_constant_tags()
+        self._update_metrics_client_constant_tags()
 
     def trace(self, name, service=None, resource=None, span_type=None):
         """

@@ -7,14 +7,11 @@ import sys
 
 from unittest.case import SkipTest
 
-import mock
-
 import ddtrace
 from ddtrace.ext import system
 from ddtrace.context import Context
 
 from .base import BaseTracerTestCase
-from .util import override_global_tracer
 from .utils.tracer import DummyTracer
 from .utils.tracer import DummyWriter  # noqa
 
@@ -437,7 +434,7 @@ class TracerTestCase(BaseTracerTestCase):
         self.start_span('child', service='two', child_of=context)
         self.assertSetEqual(self.tracer._services, set(['one', 'two']))
 
-    def test_configure_runtime_worker(self):
+    def _test_configure_runtime_worker(self):
         # by default runtime worker not started though runtime id is set
         self.assertIsNone(self.tracer._runtime_worker)
 
@@ -456,7 +453,7 @@ class TracerTestCase(BaseTracerTestCase):
 
         self.assertIsNone(child.get_tag('language'))
 
-    def test_only_root_span_runtime(self):
+    def _test_only_root_span_runtime(self):
         self.tracer.configure(collect_metrics=True)
 
         root = self.start_span('root')
@@ -475,30 +472,3 @@ def test_installed_excepthook():
     assert sys.excepthook is not ddtrace._excepthook
     ddtrace.install_excepthook()
     assert sys.excepthook is ddtrace._excepthook
-
-
-def test_excepthook():
-    ddtrace.install_excepthook()
-
-    class Foobar(Exception):
-        pass
-
-    called = {}
-
-    def original(type, value, traceback):
-        called['yes'] = True
-
-    sys.excepthook = original
-    ddtrace.install_excepthook()
-
-    e = Foobar()
-
-    tracer = ddtrace.Tracer()
-    tracer._dogstatsd_client = mock.Mock()
-    with override_global_tracer(tracer):
-        sys.excepthook(e.__class__, e, None)
-
-    tracer._dogstatsd_client.increment.assert_has_calls((
-        mock.call('datadog.tracer.uncaught_exceptions', 1, tags=['class:Foobar']),
-    ))
-    assert called

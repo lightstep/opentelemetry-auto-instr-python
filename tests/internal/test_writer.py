@@ -64,8 +64,8 @@ class AgentWriterTests(TestCase):
     N_TRACES = 11
 
     def create_worker(self, filters=None, api_class=DummyAPI, enable_stats=False):
-        self.dogstatsd = mock.Mock()
-        worker = AgentWriter(dogstatsd=self.dogstatsd, filters=filters)
+        self.metrics_client = mock.Mock()
+        worker = AgentWriter(metrics_client=self.metrics_client, filters=filters)
         worker._ENABLE_STATS = enable_stats
         worker._STATS_EVERY_INTERVAL = 1
         self.api = api_class()
@@ -112,16 +112,16 @@ class AgentWriterTests(TestCase):
         worker = self.create_worker()
         assert worker._ENABLE_STATS is False
         assert [
-        ] == self.dogstatsd.gauge.mock_calls
+        ] == self.metrics_client.gauge.mock_calls
 
-    def test_dogstatsd(self):
+    def test_metrics_client(self):
         self.create_worker(enable_stats=True)
         assert [
             mock.call('datadog.tracer.queue.max_length', 1000),
             mock.call('datadog.tracer.queue.length', 11),
             mock.call('datadog.tracer.queue.size', mock.ANY),
             mock.call('datadog.tracer.queue.spans', 77),
-        ] == self.dogstatsd.gauge.mock_calls
+        ] == self.metrics_client.gauge.mock_calls
         increment_calls = [
             mock.call('datadog.tracer.queue.dropped', 0),
             mock.call('datadog.tracer.queue.accepted', 11),
@@ -134,16 +134,16 @@ class AgentWriterTests(TestCase):
         ]
         if hasattr(time, 'thread_time_ns'):
             increment_calls.append(mock.call('datadog.tracer.writer.cpu_time', mock.ANY))
-        assert increment_calls == self.dogstatsd.increment.mock_calls
+        assert increment_calls == self.metrics_client.increment.mock_calls
 
-    def test_dogstatsd_failing_api(self):
+    def test_metrics_client_failing_api(self):
         self.create_worker(api_class=FailingAPI, enable_stats=True)
         assert [
             mock.call('datadog.tracer.queue.max_length', 1000),
             mock.call('datadog.tracer.queue.length', 11),
             mock.call('datadog.tracer.queue.size', mock.ANY),
             mock.call('datadog.tracer.queue.spans', 77),
-        ] == self.dogstatsd.gauge.mock_calls
+        ] == self.metrics_client.gauge.mock_calls
         increment_calls = [
             mock.call('datadog.tracer.queue.dropped', 0),
             mock.call('datadog.tracer.queue.accepted', 11),
@@ -155,7 +155,7 @@ class AgentWriterTests(TestCase):
         ]
         if hasattr(time, 'thread_time_ns'):
             increment_calls.append(mock.call('datadog.tracer.writer.cpu_time', mock.ANY))
-        assert increment_calls == self.dogstatsd.increment.mock_calls
+        assert increment_calls == self.metrics_client.increment.mock_calls
 
 
 def test_queue_full():
