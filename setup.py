@@ -69,11 +69,6 @@ setup_kwargs = dict(
     install_requires=[
         'psutil>=5.0.0',
     ],
-    extras_require={
-        # users can include opentracing by having:
-        # install_requires=['ddtrace[opentracing]', ...]
-        'opentracing': ['opentracing>=2.0.0'],
-    },
     # plugin tox
     tests_require=['tox', 'flake8'],
     cmdclass={'test': Tox},
