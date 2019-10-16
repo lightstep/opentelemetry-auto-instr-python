@@ -6,7 +6,7 @@ Datastore Libraries
 Algoliasearch
 -------------
 
-.. automodule:: ddtrace.contrib.algoliasearch
+.. automodule:: oteltrace.contrib.algoliasearch
 
 
 .. _cassandra:
@@ -14,7 +14,7 @@ Algoliasearch
 Cassandra
 ---------
 
-.. automodule:: ddtrace.contrib.cassandra
+.. automodule:: oteltrace.contrib.cassandra
 
 
 .. _consul:
@@ -22,7 +22,7 @@ Cassandra
 Consul
 ------
 
-.. automodule:: ddtrace.contrib.consul
+.. automodule:: oteltrace.contrib.consul
 
 
 .. _elasticsearch:
@@ -30,7 +30,7 @@ Consul
 Elasticsearch
 -------------
 
-.. automodule:: ddtrace.contrib.elasticsearch
+.. automodule:: oteltrace.contrib.elasticsearch
 
 
 .. _flask_cache:
@@ -38,7 +38,7 @@ Elasticsearch
 Flask Cache
 -----------
 
-.. automodule:: ddtrace.contrib.flask_cache
+.. automodule:: oteltrace.contrib.flask_cache
 
 
 .. _mongodb:
@@ -51,7 +51,7 @@ MongoDB
 Mongoengine
 ^^^^^^^^^^^
 
-.. automodule:: ddtrace.contrib.mongoengine
+.. automodule:: oteltrace.contrib.mongoengine
 
 
 .. _pymongo:
@@ -59,7 +59,7 @@ Mongoengine
 Pymongo
 ^^^^^^^
 
-.. automodule:: ddtrace.contrib.pymongo
+.. automodule:: oteltrace.contrib.pymongo
 
 
 Memcached
@@ -70,14 +70,14 @@ Memcached
 pylibmc
 ^^^^^^^
 
-.. automodule:: ddtrace.contrib.pylibmc
+.. automodule:: oteltrace.contrib.pylibmc
 
 .. _pymemcache:
 
 pymemcache
 ^^^^^^^^^^
 
-.. automodule:: ddtrace.contrib.pymemcache
+.. automodule:: oteltrace.contrib.pymemcache
 
 MySQL
 -----
@@ -87,7 +87,7 @@ MySQL
 mysql-connector
 ^^^^^^^^^^^^^^^
 
-.. automodule:: ddtrace.contrib.mysql
+.. automodule:: oteltrace.contrib.mysql
 
 
 .. _mysqlclient:
@@ -97,14 +97,14 @@ mysql-connector
 mysqlclient/MySQL-python
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. automodule:: ddtrace.contrib.mysqldb
+.. automodule:: oteltrace.contrib.mysqldb
 
 .. _pymysql:
 
 pymysql
 ^^^^^^^
 
-.. automodule:: ddtrace.contrib.pymysql
+.. automodule:: oteltrace.contrib.pymysql
 
 
 Postgres
@@ -115,7 +115,7 @@ Postgres
 aiopg
 ^^^^^
 
-.. automodule:: ddtrace.contrib.aiopg
+.. automodule:: oteltrace.contrib.aiopg
 
 
 .. _psycopg2:
@@ -123,7 +123,7 @@ aiopg
 psycopg
 ^^^^^^^
 
-.. automodule:: ddtrace.contrib.psycopg
+.. automodule:: oteltrace.contrib.psycopg
 
 
 
@@ -135,7 +135,7 @@ Redis
 redis
 ^^^^^
 
-.. automodule:: ddtrace.contrib.redis
+.. automodule:: oteltrace.contrib.redis
 
 
 .. _rediscluster:
@@ -143,7 +143,7 @@ redis
 redis-py-cluster
 ^^^^^^^^^^^^^^^^
 
-.. automodule:: ddtrace.contrib.rediscluster
+.. automodule:: oteltrace.contrib.rediscluster
 
 
 .. _sqlalchemy:
@@ -151,7 +151,7 @@ redis-py-cluster
 SQLAlchemy
 ----------
 
-.. automodule:: ddtrace.contrib.sqlalchemy
+.. automodule:: oteltrace.contrib.sqlalchemy
 
 
 .. _sqllite:
@@ -159,11 +159,11 @@ SQLAlchemy
 SQLite
 ------
 
-.. automodule:: ddtrace.contrib.sqlite3
+.. automodule:: oteltrace.contrib.sqlite3
 
 .. _vertica:
 
 Vertica
 -------
 
-.. automodule:: ddtrace.contrib.vertica
+.. automodule:: oteltrace.contrib.vertica

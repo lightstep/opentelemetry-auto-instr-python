@@ -1,8 +1,8 @@
 import threading
 
-from ddtrace.context import Context
-from ddtrace.internal.context_manager import DefaultContextManager
-from ddtrace.span import Span
+from oteltrace.context import Context
+from oteltrace.internal.context_manager import DefaultContextManager
+from oteltrace.span import Span
 
 from ..base import BaseTestCase
 

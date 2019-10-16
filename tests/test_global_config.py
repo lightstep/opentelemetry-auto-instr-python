@@ -3,8 +3,8 @@ from unittest import TestCase
 
 import pytest
 
-from ddtrace import config as global_config
-from ddtrace.settings import Config
+from oteltrace import config as global_config
+from oteltrace.settings import Config
 
 from .test_tracer import get_dummy_tracer
 
@@ -50,7 +50,7 @@ class GlobalConfigTestCase(TestCase):
         assert isinstance(e.value, KeyError)
 
     def test_global_configuration(self):
-        # ensure a global configuration is available in the `ddtrace` module
+        # ensure a global configuration is available in the `oteltrace` module
         assert isinstance(global_config, Config)
 
     def test_settings_merge(self):

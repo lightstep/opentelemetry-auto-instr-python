@@ -1,8 +1,8 @@
-from ddtrace.internal.runtime.runtime_metrics import (
+from oteltrace.internal.runtime.runtime_metrics import (
     RuntimeTags,
     RuntimeMetrics,
 )
-from ddtrace.internal.runtime.constants import (
+from oteltrace.internal.runtime.constants import (
     DEFAULT_RUNTIME_METRICS,
     GC_COUNT_GEN0,
     SERVICE,

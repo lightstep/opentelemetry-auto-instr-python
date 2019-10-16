@@ -3,7 +3,7 @@
 ==============
 
 When contributing to this repository, we advise you to discuss the change you
-wish to make via an `issue <https://github.com/DataDog/dd-trace-py/issues>`_.
+wish to make via an `issue <https://github.com/opentelemetry/otel-trace-py/issues>`_.
 
 Branches
 ========
@@ -48,8 +48,8 @@ That ensures that:
 Internal API
 ============
 
-The `ddtrace.internal` module contains code that must only be used inside
-`ddtrace` itself. Relying on the API of this module is dangerous and can break
+The `oteltrace.internal` module contains code that must only be used inside
+`oteltrace` itself. Relying on the API of this module is dangerous and can break
 at anytime. Don't do it.
 
 Python Versions and Implementations Support

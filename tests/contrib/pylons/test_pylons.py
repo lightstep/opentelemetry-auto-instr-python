@@ -5,10 +5,10 @@ from paste import fixture
 from paste.deploy import loadapp
 import pytest
 
-from ddtrace import config
-from ddtrace.ext import http, errors
-from ddtrace.constants import SAMPLING_PRIORITY_KEY, ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.pylons import PylonsTraceMiddleware
+from oteltrace import config
+from oteltrace.ext import http, errors
+from oteltrace.constants import SAMPLING_PRIORITY_KEY, ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.pylons import PylonsTraceMiddleware
 
 from ...base import BaseTracerTestCase
 

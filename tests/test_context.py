@@ -8,10 +8,10 @@ from tests.test_tracer import get_dummy_tracer
 
 import pytest
 
-from ddtrace.span import Span
-from ddtrace.context import Context
-from ddtrace.constants import HOSTNAME_KEY
-from ddtrace.ext.priority import USER_REJECT, AUTO_REJECT, AUTO_KEEP, USER_KEEP
+from oteltrace.span import Span
+from oteltrace.context import Context
+from oteltrace.constants import HOSTNAME_KEY
+from oteltrace.ext.priority import USER_REJECT, AUTO_REJECT, AUTO_KEEP, USER_KEEP
 
 
 @pytest.fixture
@@ -157,7 +157,7 @@ class TestTracingContext(BaseTestCase):
         assert trace is None
         assert sampled is None
 
-    @mock.patch('ddtrace.internal.hostname.get_hostname')
+    @mock.patch('oteltrace.internal.hostname.get_hostname')
     def test_get_report_hostname_enabled(self, get_hostname):
         get_hostname.return_value = 'test-hostname'
 
@@ -176,7 +176,7 @@ class TestTracingContext(BaseTestCase):
             assert trace[0].get_tag(HOSTNAME_KEY) == 'test-hostname'
             assert span.get_tag(HOSTNAME_KEY) == 'test-hostname'
 
-    @mock.patch('ddtrace.internal.hostname.get_hostname')
+    @mock.patch('oteltrace.internal.hostname.get_hostname')
     def test_get_report_hostname_disabled(self, get_hostname):
         get_hostname.return_value = 'test-hostname'
 
@@ -195,7 +195,7 @@ class TestTracingContext(BaseTestCase):
             assert trace[0].get_tag(HOSTNAME_KEY) is None
             assert span.get_tag(HOSTNAME_KEY) is None
 
-    @mock.patch('ddtrace.internal.hostname.get_hostname')
+    @mock.patch('oteltrace.internal.hostname.get_hostname')
     def test_get_report_hostname_default(self, get_hostname):
         get_hostname.return_value = 'test-hostname'
 
@@ -444,6 +444,6 @@ class TestTracingContext(BaseTestCase):
         assert cloned_ctx._parent_trace_id == ctx._parent_trace_id
         assert cloned_ctx._parent_span_id == ctx._parent_span_id
         assert cloned_ctx._sampling_priority == ctx._sampling_priority
-        assert cloned_ctx._dd_origin == ctx._dd_origin
+        assert cloned_ctx._otel_origin == ctx._otel_origin
         assert cloned_ctx._current_span == ctx._current_span
         assert cloned_ctx._trace == []

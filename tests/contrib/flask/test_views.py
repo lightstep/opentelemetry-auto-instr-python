@@ -1,7 +1,7 @@
 from flask.views import MethodView, View
 
-from ddtrace.compat import PY2
-from ddtrace.ext import http
+from oteltrace.compat import PY2
+from oteltrace.ext import http
 
 from . import BaseFlaskTestCase
 

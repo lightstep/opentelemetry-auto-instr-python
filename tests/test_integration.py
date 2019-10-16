@@ -3,19 +3,19 @@ import json
 import time
 import logging
 import mock
-import ddtrace
+import oteltrace
 
 from unittest import TestCase, skip, skipUnless
 
-from ddtrace.api import API, Response
-from ddtrace.ext import http
-from ddtrace.filters import FilterRequestsOnUrl
-from ddtrace.constants import FILTERS_KEY
-from ddtrace.tracer import Tracer
-from ddtrace.encoding import JSONEncoder, MsgpackEncoder, get_encoder
-from ddtrace.compat import httplib, PYTHON_INTERPRETER, PYTHON_VERSION
-from ddtrace.internal.runtime.container import CGroupInfo
-from ddtrace.vendor import msgpack
+from oteltrace.api import API, Response
+from oteltrace.ext import http
+from oteltrace.filters import FilterRequestsOnUrl
+from oteltrace.constants import FILTERS_KEY
+from oteltrace.tracer import Tracer
+from oteltrace.encoding import JSONEncoder, MsgpackEncoder, get_encoder
+from oteltrace.compat import httplib, PYTHON_INTERPRETER, PYTHON_VERSION
+from oteltrace.internal.runtime.container import CGroupInfo
+from oteltrace.vendor import msgpack
 from tests.test_tracer import get_dummy_tracer
 
 
@@ -45,8 +45,8 @@ class FlawedAPI(API):
 
 
 @skipUnless(
-    os.environ.get('TEST_DATADOG_INTEGRATION', False),
-    'You should have a running trace agent and set TEST_DATADOG_INTEGRATION=1 env variable'
+    os.environ.get('TEST_OPENTELEMETRY_INTEGRATION', False),
+    'You should have a running trace agent and set TEST_OPENTELEMETRY_INTEGRATION=1 env variable'
 )
 class TestWorkers(TestCase):
     """
@@ -98,8 +98,8 @@ class TestWorkers(TestCase):
         return None, None
 
     @skipUnless(
-        os.environ.get('TEST_DATADOG_INTEGRATION_UDS', False),
-        'You should have a running trace agent on a socket and set TEST_DATADOG_INTEGRATION_UDS=1 env variable'
+        os.environ.get('TEST_OPENTELEMETRY_INTEGRATION_UDS', False),
+        'You should have a running trace agent on a socket and set TEST_OPENTELEMETRY_INTEGRATION_UDS=1 env variable'
     )
     def test_worker_single_trace_uds(self):
         self.tracer.configure(uds_path='/tmp/ddagent/trace.sock')
@@ -190,7 +190,7 @@ class TestWorkers(TestCase):
         self.tracer.writer.api = FlawedAPI(Tracer.DEFAULT_HOSTNAME, Tracer.DEFAULT_PORT)
         tracer.trace('client.testing').finish()
 
-        log = logging.getLogger('ddtrace.internal.writer')
+        log = logging.getLogger('oteltrace.internal.writer')
         log_handler = MockedLogHandler(level='DEBUG')
         log.addHandler(log_handler)
 
@@ -199,7 +199,7 @@ class TestWorkers(TestCase):
 
         logged_errors = log_handler.messages['error']
         assert len(logged_errors) == 1
-        assert 'Failed to send traces to Datadog Agent at http://localhost:8126: ' \
+        assert 'Failed to send traces to OpenTelemetry Agent at http://localhost:8126: ' \
             'HTTP error status 400, reason Bad Request, message Content-Type:' \
             in logged_errors[0]
 
@@ -227,8 +227,8 @@ class TestWorkers(TestCase):
 
 
 @skipUnless(
-    os.environ.get('TEST_DATADOG_INTEGRATION', False),
-    'You should have a running trace agent and set TEST_DATADOG_INTEGRATION=1 env variable'
+    os.environ.get('TEST_OPENTELEMETRY_INTEGRATION', False),
+    'You should have a running trace agent and set TEST_OPENTELEMETRY_INTEGRATION=1 env variable'
 )
 class TestAPITransport(TestCase):
     """
@@ -236,7 +236,7 @@ class TestAPITransport(TestCase):
     of integration tests so real calls are triggered and you have to execute
     a real trace-agent to let them pass.
     """
-    @mock.patch('ddtrace.internal.runtime.container.get_container_info')
+    @mock.patch('oteltrace.internal.runtime.container.get_container_info')
     def setUp(self, get_container_info):
         """
         Create a tracer without workers, while spying the ``send()`` method
@@ -249,7 +249,7 @@ class TestAPITransport(TestCase):
         self.api_json = API('localhost', 8126, encoder=JSONEncoder())
         self.api_msgpack = API('localhost', 8126, encoder=MsgpackEncoder())
 
-    @mock.patch('ddtrace.api.httplib.HTTPConnection')
+    @mock.patch('oteltrace.api.httplib.HTTPConnection')
     def test_send_presampler_headers(self, mocked_http):
         # register a single trace with a span and send them to the trace agent
         self.tracer.trace('client.testing').finish()
@@ -263,12 +263,12 @@ class TestAPITransport(TestCase):
 
         # retrieve the headers from the mocked request call
         expected_headers = {
-            'Datadog-Container-Id': 'test-container-id',  # mocked in setUp()
-            'Datadog-Meta-Lang': 'python',
-            'Datadog-Meta-Lang-Interpreter': PYTHON_INTERPRETER,
-            'Datadog-Meta-Lang-Version': PYTHON_VERSION,
-            'Datadog-Meta-Tracer-Version': ddtrace.__version__,
-            'X-Datadog-Trace-Count': '1',
+            'OpenTelemetry-Container-Id': 'test-container-id',  # mocked in setUp()
+            'OpenTelemetry-Meta-Lang': 'python',
+            'OpenTelemetry-Meta-Lang-Interpreter': PYTHON_INTERPRETER,
+            'OpenTelemetry-Meta-Lang-Version': PYTHON_VERSION,
+            'OpenTelemetry-Meta-Tracer-Version': oteltrace.__version__,
+            'X-OpenTelemetry-Trace-Count': '1',
             'Content-Type': 'application/msgpack',
         }
         params, _ = request_call.call_args_list[0]
@@ -277,7 +277,7 @@ class TestAPITransport(TestCase):
         for k, v in expected_headers.items():
             assert v == headers[k]
 
-    @mock.patch('ddtrace.api.httplib.HTTPConnection')
+    @mock.patch('oteltrace.api.httplib.HTTPConnection')
     def test_send_presampler_headers_not_in_services(self, mocked_http):
         # register some services and send them to the trace agent
         services = [{
@@ -407,8 +407,8 @@ class TestAPITransport(TestCase):
 
 
 @skipUnless(
-    os.environ.get('TEST_DATADOG_INTEGRATION', False),
-    'You should have a running trace agent and set TEST_DATADOG_INTEGRATION=1 env variable'
+    os.environ.get('TEST_OPENTELEMETRY_INTEGRATION', False),
+    'You should have a running trace agent and set TEST_OPENTELEMETRY_INTEGRATION=1 env variable'
 )
 class TestAPIDowngrade(TestCase):
     """
@@ -422,7 +422,7 @@ class TestAPIDowngrade(TestCase):
         encoder = get_encoder()
         assert isinstance(encoder, MsgpackEncoder)
 
-    @mock.patch('ddtrace.encoding.MSGPACK_ENCODING', False)
+    @mock.patch('oteltrace.encoding.MSGPACK_ENCODING', False)
     def test_get_encoder_fallback(self):
         # get_encoder should return JSONEncoder instance if
         # msgpack or the CPP implementaiton, are not available
@@ -451,8 +451,8 @@ class TestAPIDowngrade(TestCase):
 
 
 @skipUnless(
-    os.environ.get('TEST_DATADOG_INTEGRATION', False),
-    'You should have a running trace agent and set TEST_DATADOG_INTEGRATION=1 env variable'
+    os.environ.get('TEST_OPENTELEMETRY_INTEGRATION', False),
+    'You should have a running trace agent and set TEST_OPENTELEMETRY_INTEGRATION=1 env variable'
 )
 class TestRateByService(TestCase):
     """
@@ -492,8 +492,8 @@ class TestRateByService(TestCase):
 
 
 @skipUnless(
-    os.environ.get('TEST_DATADOG_INTEGRATION', False),
-    'You should have a running trace agent and set TEST_DATADOG_INTEGRATION=1 env variable'
+    os.environ.get('TEST_OPENTELEMETRY_INTEGRATION', False),
+    'You should have a running trace agent and set TEST_OPENTELEMETRY_INTEGRATION=1 env variable'
 )
 class TestConfigure(TestCase):
     """

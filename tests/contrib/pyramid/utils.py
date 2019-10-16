@@ -4,11 +4,11 @@ from pyramid.httpexceptions import HTTPException
 import pytest
 import webtest
 
-from ddtrace import compat
-from ddtrace import config
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.pyramid.patch import insert_tween_if_needed
-from ddtrace.ext import http
+from oteltrace import compat
+from oteltrace import config
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.pyramid.patch import insert_tween_if_needed
+from oteltrace.ext import http
 
 from .app import create_app
 
@@ -25,7 +25,7 @@ class PyramidBase(BaseTracerTestCase):
         # get default settings or use what is provided
         settings = settings or self.get_settings()
         # always set the dummy tracer as a default tracer
-        settings.update({'datadog_tracer': self.tracer})
+        settings.update({'opentelemetry_tracer': self.tracer})
 
         app, renderer = create_app(settings, self.instrument)
         self.app = webtest.TestApp(app)
@@ -44,7 +44,7 @@ class PyramidTestCase(PyramidBase):
 
     def get_settings(self):
         return {
-            'datadog_trace_service': 'foobar',
+            'opentelemetry_trace_service': 'foobar',
         }
 
     def test_200(self, query_string=''):
@@ -105,7 +105,7 @@ class PyramidTestCase(PyramidBase):
                 We expect the root span to have the appropriate tag
         """
         with self.override_global_config(dict(analytics_enabled=True)):
-            self.override_settings(dict(datadog_analytics_enabled=True, datadog_analytics_sample_rate=0.5))
+            self.override_settings(dict(opentelemetry_analytics_enabled=True, opentelemetry_analytics_sample_rate=0.5))
             res = self.app.get('/', status=200)
             assert b'idx' in res.body
 
@@ -133,7 +133,7 @@ class PyramidTestCase(PyramidBase):
                 We expect the root span to have the appropriate tag
         """
         with self.override_global_config(dict(analytics_enabled=False)):
-            self.override_settings(dict(datadog_analytics_enabled=True, datadog_analytics_sample_rate=0.5))
+            self.override_settings(dict(opentelemetry_analytics_enabled=True, opentelemetry_analytics_sample_rate=0.5))
             res = self.app.get('/', status=200)
             assert b'idx' in res.body
 
@@ -287,9 +287,9 @@ class PyramidTestCase(PyramidBase):
         assert s.meta.get(http.URL) == 'http://localhost/404/raise_exception'
 
     def test_insert_tween_if_needed_already_set(self):
-        settings = {'pyramid.tweens': 'ddtrace.contrib.pyramid:trace_tween_factory'}
+        settings = {'pyramid.tweens': 'oteltrace.contrib.pyramid:trace_tween_factory'}
         insert_tween_if_needed(settings)
-        assert settings['pyramid.tweens'] == 'ddtrace.contrib.pyramid:trace_tween_factory'
+        assert settings['pyramid.tweens'] == 'oteltrace.contrib.pyramid:trace_tween_factory'
 
     def test_insert_tween_if_needed_none(self):
         settings = {'pyramid.tweens': ''}
@@ -301,7 +301,7 @@ class PyramidTestCase(PyramidBase):
         insert_tween_if_needed(settings)
         assert (
             settings['pyramid.tweens'] ==
-            'ddtrace.contrib.pyramid:trace_tween_factory\npyramid.tweens.excview_tween_factory'
+            'oteltrace.contrib.pyramid:trace_tween_factory\npyramid.tweens.excview_tween_factory'
         )
 
     def test_insert_tween_if_needed_excview_and_other(self):
@@ -310,7 +310,7 @@ class PyramidTestCase(PyramidBase):
         assert (
             settings['pyramid.tweens'] ==
             'a.first.tween\n'
-            'ddtrace.contrib.pyramid:trace_tween_factory\n'
+            'oteltrace.contrib.pyramid:trace_tween_factory\n'
             'pyramid.tweens.excview_tween_factory\n'
             'a.last.tween\n')
 
@@ -319,7 +319,7 @@ class PyramidTestCase(PyramidBase):
         insert_tween_if_needed(settings)
         assert (
             settings['pyramid.tweens'] ==
-            'a.random.tween\nand.another.one\nddtrace.contrib.pyramid:trace_tween_factory'
+            'a.random.tween\nand.another.one\noteltrace.contrib.pyramid:trace_tween_factory'
         )
 
     def test_include_conflicts(self):

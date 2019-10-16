@@ -3,8 +3,8 @@ from django.apps import apps
 from django.test import TestCase
 
 # project
-from ddtrace.tracer import Tracer
-from ddtrace.contrib.django.conf import settings
+from oteltrace.tracer import Tracer
+from oteltrace.contrib.django.conf import settings
 
 # testing
 from ...test_tracer import DummyWriter
@@ -23,7 +23,7 @@ class DjangoTracingDisabledTest(TestCase):
 
         # Restart app with tracing disabled
         settings.ENABLED = False
-        self.app = apps.get_app_config('datadog_django')
+        self.app = apps.get_app_config('opentelemetry_django')
         self.app.ready()
 
     def tearDown(self):

@@ -1,8 +1,8 @@
 import sqlalchemy
 
-from ddtrace import Pin
-from ddtrace.contrib.sqlalchemy import patch, unpatch
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace import Pin
+from oteltrace.contrib.sqlalchemy import patch, unpatch
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
 
 from ..config import POSTGRES_CONFIG
 from ...base import BaseTracerTestCase

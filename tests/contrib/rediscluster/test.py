@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import rediscluster
 
-from ddtrace import Pin
-from ddtrace.contrib.rediscluster.patch import patch, unpatch
+from oteltrace import Pin
+from oteltrace.contrib.rediscluster.patch import patch, unpatch
 from ..config import REDISCLUSTER_CONFIG
 from ...test_tracer import get_dummy_tracer
 from ...base import BaseTracerTestCase

@@ -1,8 +1,8 @@
 Web Frameworks
 --------------
 
-``ddtrace`` provides tracing support for many Python web frameworks. For each
-framework ``ddtrace`` supports:
+``oteltrace`` provides tracing support for many Python web frameworks. For each
+framework ``oteltrace`` supports:
 
 - tracing of requests [*]_: trace requests through middleware and back
 - distributed tracing [*]_: trace requests across application boundaries
@@ -17,7 +17,7 @@ framework ``ddtrace`` supports:
 aiohttp
 ^^^^^^^
 
-.. automodule:: ddtrace.contrib.aiohttp
+.. automodule:: oteltrace.contrib.aiohttp
 
 
 .. _bottle:
@@ -25,7 +25,7 @@ aiohttp
 Bottle
 ^^^^^^
 
-.. automodule:: ddtrace.contrib.bottle
+.. automodule:: oteltrace.contrib.bottle
 
 .. _djangorestframework:
 .. _django:
@@ -33,7 +33,7 @@ Bottle
 Django
 ^^^^^^
 
-.. automodule:: ddtrace.contrib.django
+.. automodule:: oteltrace.contrib.django
 
 
 .. _falcon:
@@ -41,7 +41,7 @@ Django
 Falcon
 ^^^^^^
 
-.. automodule:: ddtrace.contrib.falcon
+.. automodule:: oteltrace.contrib.falcon
 
 
 .. _flask:
@@ -50,21 +50,21 @@ Flask
 ^^^^^
 
 
-.. automodule:: ddtrace.contrib.flask
+.. automodule:: oteltrace.contrib.flask
 
 .. _molten:
 
 Molten
 ^^^^^^
 
-.. automodule:: ddtrace.contrib.molten
+.. automodule:: oteltrace.contrib.molten
 
 .. _pylons:
 
 Pylons
 ^^^^^^
 
-.. automodule:: ddtrace.contrib.pylons
+.. automodule:: oteltrace.contrib.pylons
 
 
 .. _pyramid:
@@ -72,7 +72,7 @@ Pylons
 Pyramid
 ^^^^^^^
 
-.. automodule:: ddtrace.contrib.pyramid
+.. automodule:: oteltrace.contrib.pyramid
 
 
 .. _tornado:
@@ -80,5 +80,5 @@ Pyramid
 Tornado
 ^^^^^^^
 
-.. automodule:: ddtrace.contrib.tornado
+.. automodule:: oteltrace.contrib.tornado
 

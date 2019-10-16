@@ -6,9 +6,9 @@ from mako.template import Template
 from mako.lookup import TemplateLookup
 from mako.runtime import Context
 
-from ddtrace import Pin
-from ddtrace.contrib.mako import patch, unpatch
-from ddtrace.compat import StringIO, to_unicode
+from oteltrace import Pin
+from oteltrace.contrib.mako import patch, unpatch
+from oteltrace.compat import StringIO, to_unicode
 from tests.test_tracer import get_dummy_tracer
 
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))

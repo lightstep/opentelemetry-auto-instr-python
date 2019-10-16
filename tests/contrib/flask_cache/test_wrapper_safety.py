@@ -2,10 +2,10 @@
 import unittest
 
 # project
-from ddtrace.ext import net
-from ddtrace.tracer import Tracer
-from ddtrace.contrib.flask_cache import get_traced_cache
-from ddtrace.contrib.flask_cache.tracers import CACHE_BACKEND
+from oteltrace.ext import net
+from oteltrace.tracer import Tracer
+from oteltrace.contrib.flask_cache import get_traced_cache
+from oteltrace.contrib.flask_cache.tracers import CACHE_BACKEND
 
 # 3rd party
 from flask import Flask

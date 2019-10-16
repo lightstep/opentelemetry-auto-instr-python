@@ -6,14 +6,14 @@ import unittest
 
 import pytest
 
-from ddtrace.compat import iteritems
-from ddtrace.constants import SAMPLING_PRIORITY_KEY, SAMPLE_RATE_METRIC_KEY
-from ddtrace.constants import SAMPLING_AGENT_DECISION, SAMPLING_RULE_DECISION, SAMPLING_LIMIT_DECISION
-from ddtrace.ext.priority import AUTO_KEEP, AUTO_REJECT
-from ddtrace.internal.rate_limiter import RateLimiter
-from ddtrace.sampler import DatadogSampler, SamplingRule
-from ddtrace.sampler import RateSampler, AllSampler, RateByServiceSampler
-from ddtrace.span import Span
+from oteltrace.compat import iteritems
+from oteltrace.constants import SAMPLING_PRIORITY_KEY, SAMPLE_RATE_METRIC_KEY
+from oteltrace.constants import SAMPLING_AGENT_DECISION, SAMPLING_RULE_DECISION, SAMPLING_LIMIT_DECISION
+from oteltrace.ext.priority import AUTO_KEEP, AUTO_REJECT
+from oteltrace.internal.rate_limiter import RateLimiter
+from oteltrace.sampler import OpenTelemetrySampler, SamplingRule
+from oteltrace.sampler import RateSampler, AllSampler, RateByServiceSampler
+from oteltrace.span import Span
 
 from .test_tracer import get_dummy_tracer
 
@@ -381,7 +381,7 @@ def test_sampling_rule_matches_exception():
     rule = SamplingRule(sample_rate=1.0, name=pattern)
     span = create_span(name='test.span')
 
-    with mock.patch('ddtrace.sampler.log') as mock_log:
+    with mock.patch('oteltrace.sampler.log') as mock_log:
         assert rule.matches(span) is False
         mock_log.warning.assert_called_once_with(
             '%r pattern %r failed with %r: %s',
@@ -432,39 +432,39 @@ def test_sampling_rule_sample_rate_0():
     ) == 0
 
 
-def test_datadog_sampler_init():
+def test_opentelemetry_sampler_init():
     # No args
-    sampler = DatadogSampler()
+    sampler = OpenTelemetrySampler()
     assert sampler.rules == []
     assert isinstance(sampler.limiter, RateLimiter)
-    assert sampler.limiter.rate_limit == DatadogSampler.DEFAULT_RATE_LIMIT
+    assert sampler.limiter.rate_limit == OpenTelemetrySampler.DEFAULT_RATE_LIMIT
 
     # With rules
     rule = SamplingRule(sample_rate=1)
-    sampler = DatadogSampler(rules=[rule])
+    sampler = OpenTelemetrySampler(rules=[rule])
     assert sampler.rules == [rule]
-    assert sampler.limiter.rate_limit == DatadogSampler.DEFAULT_RATE_LIMIT
+    assert sampler.limiter.rate_limit == OpenTelemetrySampler.DEFAULT_RATE_LIMIT
 
     # With rate limit
-    sampler = DatadogSampler(rate_limit=10)
+    sampler = OpenTelemetrySampler(rate_limit=10)
     assert sampler.limiter.rate_limit == 10
 
     # Invalid rules
     for val in (None, True, False, object(), 1, Exception()):
         with pytest.raises(TypeError):
-            DatadogSampler(rules=[val])
+            OpenTelemetrySampler(rules=[val])
 
     # Ensure rule order
     rule_1 = SamplingRule(sample_rate=1)
     rule_2 = SamplingRule(sample_rate=0.5, service='test')
     rule_3 = SamplingRule(sample_rate=0.25, name='flask.request')
-    sampler = DatadogSampler(rules=[rule_1, rule_2, rule_3])
+    sampler = OpenTelemetrySampler(rules=[rule_1, rule_2, rule_3])
     assert sampler.rules == [rule_1, rule_2, rule_3]
 
 
-@mock.patch('ddtrace.internal.rate_limiter.RateLimiter.is_allowed')
-def test_datadog_sampler_sample_no_rules(mock_is_allowed, dummy_tracer):
-    sampler = DatadogSampler()
+@mock.patch('oteltrace.internal.rate_limiter.RateLimiter.is_allowed')
+def test_opentelemetry_sampler_sample_no_rules(mock_is_allowed, dummy_tracer):
+    sampler = OpenTelemetrySampler()
     span = create_span(tracer=dummy_tracer)
 
     # Default SamplingRule(sample_rate=1.0) is applied
@@ -494,8 +494,8 @@ def test_datadog_sampler_sample_no_rules(mock_is_allowed, dummy_tracer):
     mock_is_allowed.assert_called_once_with()
 
 
-@mock.patch('ddtrace.internal.rate_limiter.RateLimiter.is_allowed')
-def test_datadog_sampler_sample_rules(mock_is_allowed, dummy_tracer):
+@mock.patch('oteltrace.internal.rate_limiter.RateLimiter.is_allowed')
+def test_opentelemetry_sampler_sample_rules(mock_is_allowed, dummy_tracer):
     # Do not let the limiter get in the way of our test
     mock_is_allowed.return_value = True
 
@@ -504,7 +504,7 @@ def test_datadog_sampler_sample_rules(mock_is_allowed, dummy_tracer):
         mock.Mock(spec=SamplingRule),
         mock.Mock(spec=SamplingRule),
     ]
-    sampler = DatadogSampler(rules=rules)
+    sampler = OpenTelemetrySampler(rules=rules)
     sampler.default_sampler = mock.Mock(spec=SamplingRule)
     sampler.default_sampler.return_value = True
 
@@ -696,12 +696,12 @@ def test_datadog_sampler_sample_rules(mock_is_allowed, dummy_tracer):
         sampler._priority_sampler = None
 
 
-def test_datadog_sampler_tracer(dummy_tracer):
+def test_opentelemetry_sampler_tracer(dummy_tracer):
     rule = SamplingRule(sample_rate=1.0, name='test.span')
     rule_spy = mock.Mock(spec=rule, wraps=rule)
     rule_spy.sample_rate = rule.sample_rate
 
-    sampler = DatadogSampler(rules=[rule_spy])
+    sampler = OpenTelemetrySampler(rules=[rule_spy])
     limiter_spy = mock.Mock(spec=sampler.limiter, wraps=sampler.limiter)
     sampler.limiter = limiter_spy
     sampler_spy = mock.Mock(spec=sampler, wraps=sampler)
@@ -724,12 +724,12 @@ def test_datadog_sampler_tracer(dummy_tracer):
         assert_sampling_decision_tags(span, rule=1.0)
 
 
-def test_datadog_sampler_tracer_rate_limited(dummy_tracer):
+def test_opentelemetry_sampler_tracer_rate_limited(dummy_tracer):
     rule = SamplingRule(sample_rate=1.0, name='test.span')
     rule_spy = mock.Mock(spec=rule, wraps=rule)
     rule_spy.sample_rate = rule.sample_rate
 
-    sampler = DatadogSampler(rules=[rule_spy])
+    sampler = OpenTelemetrySampler(rules=[rule_spy])
     limiter_spy = mock.Mock(spec=sampler.limiter, wraps=sampler.limiter)
     limiter_spy.is_allowed.return_value = False  # Have the limiter deny the span
     sampler.limiter = limiter_spy
@@ -753,12 +753,12 @@ def test_datadog_sampler_tracer_rate_limited(dummy_tracer):
         assert_sampling_decision_tags(span, rule=1.0, limit=None)
 
 
-def test_datadog_sampler_tracer_rate_0(dummy_tracer):
+def test_opentelemetry_sampler_tracer_rate_0(dummy_tracer):
     rule = SamplingRule(sample_rate=0, name='test.span')  # Sample rate of 0 means never sample
     rule_spy = mock.Mock(spec=rule, wraps=rule)
     rule_spy.sample_rate = rule.sample_rate
 
-    sampler = DatadogSampler(rules=[rule_spy])
+    sampler = OpenTelemetrySampler(rules=[rule_spy])
     limiter_spy = mock.Mock(spec=sampler.limiter, wraps=sampler.limiter)
     sampler.limiter = limiter_spy
     sampler_spy = mock.Mock(spec=sampler, wraps=sampler)
@@ -781,12 +781,12 @@ def test_datadog_sampler_tracer_rate_0(dummy_tracer):
         assert_sampling_decision_tags(span, rule=0)
 
 
-def test_datadog_sampler_tracer_child(dummy_tracer):
+def test_opentelemetry_sampler_tracer_child(dummy_tracer):
     rule = SamplingRule(sample_rate=1.0)  # No rules means it gets applied to every span
     rule_spy = mock.Mock(spec=rule, wraps=rule)
     rule_spy.sample_rate = rule.sample_rate
 
-    sampler = DatadogSampler(rules=[rule_spy])
+    sampler = OpenTelemetrySampler(rules=[rule_spy])
     limiter_spy = mock.Mock(spec=sampler.limiter, wraps=sampler.limiter)
     sampler.limiter = limiter_spy
     sampler_spy = mock.Mock(spec=sampler, wraps=sampler)
@@ -815,12 +815,12 @@ def test_datadog_sampler_tracer_child(dummy_tracer):
             assert child._context.sampling_priority is AUTO_KEEP
 
 
-def test_datadog_sampler_tracer_start_span(dummy_tracer):
+def test_opentelemetry_sampler_tracer_start_span(dummy_tracer):
     rule = SamplingRule(sample_rate=1.0)  # No rules means it gets applied to every span
     rule_spy = mock.Mock(spec=rule, wraps=rule)
     rule_spy.sample_rate = rule.sample_rate
 
-    sampler = DatadogSampler(rules=[rule_spy])
+    sampler = OpenTelemetrySampler(rules=[rule_spy])
     limiter_spy = mock.Mock(spec=sampler.limiter, wraps=sampler.limiter)
     sampler.limiter = limiter_spy
     sampler_spy = mock.Mock(spec=sampler, wraps=sampler)

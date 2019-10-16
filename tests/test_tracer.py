@@ -7,9 +7,9 @@ import sys
 
 from unittest.case import SkipTest
 
-import ddtrace
-from ddtrace.ext import system
-from ddtrace.context import Context
+import oteltrace
+from oteltrace.ext import system
+from oteltrace.context import Context
 
 from .base import BaseTracerTestCase
 from .utils.tracer import DummyTracer
@@ -466,9 +466,9 @@ class TracerTestCase(BaseTracerTestCase):
 
 
 def test_installed_excepthook():
-    ddtrace.install_excepthook()
-    assert sys.excepthook is ddtrace._excepthook
-    ddtrace.uninstall_excepthook()
-    assert sys.excepthook is not ddtrace._excepthook
-    ddtrace.install_excepthook()
-    assert sys.excepthook is ddtrace._excepthook
+    oteltrace.install_excepthook()
+    assert sys.excepthook is oteltrace._excepthook
+    oteltrace.uninstall_excepthook()
+    assert sys.excepthook is not oteltrace._excepthook
+    oteltrace.install_excepthook()
+    assert sys.excepthook is oteltrace._excepthook

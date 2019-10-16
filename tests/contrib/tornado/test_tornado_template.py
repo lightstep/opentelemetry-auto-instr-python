@@ -4,7 +4,7 @@ import pytest
 
 from .utils import TornadoTestCase
 
-from ddtrace.ext import http
+from oteltrace.ext import http
 
 
 class TestTornadoTemplate(TornadoTestCase):

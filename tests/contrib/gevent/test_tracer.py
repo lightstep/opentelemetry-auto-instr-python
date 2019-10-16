@@ -1,11 +1,11 @@
 import gevent
 import gevent.pool
-import ddtrace
+import oteltrace
 
-from ddtrace.constants import SAMPLING_PRIORITY_KEY
-from ddtrace.context import Context
-from ddtrace.contrib.gevent import patch, unpatch
-from ddtrace.ext.priority import USER_KEEP
+from oteltrace.constants import SAMPLING_PRIORITY_KEY
+from oteltrace.context import Context
+from oteltrace.contrib.gevent import patch, unpatch
+from oteltrace.ext.priority import USER_KEEP
 
 from unittest import TestCase
 from tests.test_tracer import get_dummy_tracer
@@ -21,8 +21,8 @@ class TestGeventTracer(TestCase):
     def setUp(self):
         # use a dummy tracer
         self.tracer = get_dummy_tracer()
-        self._original_tracer = ddtrace.tracer
-        ddtrace.tracer = self.tracer
+        self._original_tracer = oteltrace.tracer
+        oteltrace.tracer = self.tracer
         # trace gevent
         patch()
 
@@ -30,21 +30,21 @@ class TestGeventTracer(TestCase):
         # clean the active Context
         self.tracer.context_provider.activate(None)
         # restore the original tracer
-        ddtrace.tracer = self._original_tracer
+        oteltrace.tracer = self._original_tracer
         # untrace gevent
         unpatch()
 
     def test_main_greenlet(self):
         # the main greenlet must not be affected by the tracer
         main_greenlet = gevent.getcurrent()
-        ctx = getattr(main_greenlet, '__datadog_context', None)
+        ctx = getattr(main_greenlet, '__opentelemetry_context', None)
         assert ctx is None
 
     def test_main_greenlet_context(self):
         # the main greenlet must have a ``Context`` if called
         ctx_tracer = self.tracer.get_call_context()
         main_greenlet = gevent.getcurrent()
-        ctx_greenlet = getattr(main_greenlet, '__datadog_context', None)
+        ctx_greenlet = getattr(main_greenlet, '__opentelemetry_context', None)
         assert ctx_tracer is ctx_greenlet
         assert len(ctx_tracer._trace) == 0
 
@@ -56,7 +56,7 @@ class TestGeventTracer(TestCase):
         g = gevent.spawn(greenlet)
         g.join()
         ctx = g.value
-        stored_ctx = getattr(g, '__datadog_context', None)
+        stored_ctx = getattr(g, '__opentelemetry_context', None)
         assert stored_ctx is not None
         assert ctx == stored_ctx
 
@@ -77,7 +77,7 @@ class TestGeventTracer(TestCase):
 
         g = gevent.spawn(greenlet)
         g.join()
-        ctx = getattr(g, '__datadog_context', None)
+        ctx = getattr(g, '__opentelemetry_context', None)
         assert ctx is None
 
     def test_spawn_greenlet(self):
@@ -87,7 +87,7 @@ class TestGeventTracer(TestCase):
 
         g = gevent.spawn(greenlet)
         g.join()
-        ctx = getattr(g, '__datadog_context', None)
+        ctx = getattr(g, '__opentelemetry_context', None)
         assert ctx is not None
         assert 0 == len(ctx._trace)
 
@@ -99,7 +99,7 @@ class TestGeventTracer(TestCase):
 
         g = gevent.spawn_later(0.01, greenlet)
         g.join()
-        ctx = getattr(g, '__datadog_context', None)
+        ctx = getattr(g, '__opentelemetry_context', None)
         assert ctx is not None
         assert 0 == len(ctx._trace)
 
@@ -346,7 +346,7 @@ class TestGeventTracer(TestCase):
         """A helper to assert the parenting of a trace when greenlets are
         spawned within another greenlet.
 
-        This is meant to help maintain compatibility between the Datadog and
+        This is meant to help maintain compatibility between the OpenTelemetry and
         OpenTracing tracer implementations.
 
         Note that for gevent there is differing behaviour between the context
@@ -383,8 +383,8 @@ class TestGeventTracer(TestCase):
         assert worker_2.name == 'greenlet.worker2'
         assert worker_2.resource == 'greenlet.worker2'
 
-    def test_trace_spawn_multiple_greenlets_multiple_traces_dd(self):
-        """Datadog version of the same test."""
+    def test_trace_spawn_multiple_greenlets_multiple_traces_otel(self):
+        """OpenTelemetry version of the same test."""
         def entrypoint():
             with self.tracer.trace('greenlet.main') as span:
                 span.resource = 'base'

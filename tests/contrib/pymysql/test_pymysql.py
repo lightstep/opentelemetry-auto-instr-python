@@ -2,11 +2,11 @@
 import pymysql
 
 # project
-from ddtrace import Pin
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.compat import PY2
-from ddtrace.compat import stringify
-from ddtrace.contrib.pymysql.patch import patch, unpatch
+from oteltrace import Pin
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.compat import PY2
+from oteltrace.compat import stringify
+from oteltrace.contrib.pymysql.patch import patch, unpatch
 
 # testing
 from ...base import BaseTracerTestCase

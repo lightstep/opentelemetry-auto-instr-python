@@ -103,12 +103,12 @@ jobs:
     docker:
       - <<: *test_runner
         env:
-          TEST_DATADOG_INTEGRATION: 1
+          TEST_OPENTELEMETRY_INTEGRATION: 1
       - image: datadog/docker-dd-agent
         env:
-            - DD_APM_ENABLED=true
-            - DD_BIND_HOST=0.0.0.0
-            - DD_API_KEY=invalid_key_but_this_is_fine
+            - OTEL_APM_ENABLED=true
+            - OTEL_BIND_HOST=0.0.0.0
+            - OTEL_API_KEY=invalid_key_but_this_is_fine
     resource_class: *resource_class
     steps:
       - checkout
@@ -139,14 +139,14 @@ jobs:
       - *persist_to_workspace_step
       - *save_cache_step
 
-  ddtracerun:
+  oteltracerun:
     docker:
       - *test_runner
       - image: redis:4.0-alpine
     resource_class: *resource_class
     steps:
       - checkout
-      - run: scripts/run-tox-scenario '^py..-ddtracerun$'
+      - run: scripts/run-tox-scenario '^py..-oteltracerun$'
       - *persist_to_workspace_step
 
   test_utils:
@@ -298,9 +298,9 @@ jobs:
       - image: memcached:1.5-alpine
       - image: datadog/docker-dd-agent
         env:
-            - DD_APM_ENABLED=true
-            - DD_BIND_HOST=0.0.0.0
-            - DD_API_KEY=invalid_key_but_this_is_fine
+            - OTEL_APM_ENABLED=true
+            - OTEL_BIND_HOST=0.0.0.0
+            - OTEL_API_KEY=invalid_key_but_this_is_fine
     resource_class: *resource_class
     steps:
       - checkout
@@ -849,7 +849,7 @@ workflows:
       - dbapi:
           requires:
             - flake8
-      - ddtracerun:
+      - oteltracerun:
           requires:
             - flake8
       - django:
@@ -983,7 +983,7 @@ workflows:
             - celery
             - consul
             - dbapi
-            - ddtracerun
+            - oteltracerun
             - django
             - elasticsearch
             - falcon

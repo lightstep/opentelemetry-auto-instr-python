@@ -1,5 +1,5 @@
-from ddtrace.internal.runtime import constants
-from ddtrace.internal.runtime import tag_collectors
+from oteltrace.internal.runtime import constants
+from oteltrace.internal.runtime import tag_collectors
 
 
 def test_values():

@@ -1,16 +1,16 @@
 import logging
 import mock
 
-from ddtrace.internal.logger import DDLogger, get_logger
+from oteltrace.internal.logger import OtelLogger, get_logger
 
 from ..base import BaseTestCase
 
 ALL_LEVEL_NAMES = ('debug', 'info', 'warn', 'warning', 'error', 'exception', 'critical', 'fatal')
 
 
-class DDLoggerTestCase(BaseTestCase):
+class OtelLoggerTestCase(BaseTestCase):
     def setUp(self):
-        super(DDLoggerTestCase, self).setUp()
+        super(OtelLoggerTestCase, self).setUp()
 
         self.root = logging.root
         self.manager = self.root.manager
@@ -23,7 +23,7 @@ class DDLoggerTestCase(BaseTestCase):
         self.root = None
         self.manager = None
 
-        super(DDLoggerTestCase, self).tearDown()
+        super(OtelLoggerTestCase, self).tearDown()
 
     def _make_record(
             self, logger, msg='test', args=(), level=logging.INFO,
@@ -31,7 +31,7 @@ class DDLoggerTestCase(BaseTestCase):
     ):
         return logger.makeRecord(logger.name, level, fn, lno, msg, args, exc_info, func, extra)
 
-    @mock.patch('ddtrace.internal.logger.DDLogger.handle')
+    @mock.patch('oteltrace.internal.logger.OtelLogger.handle')
     def assert_log_records(self, log, expected_levels, handle):
         for name in ALL_LEVEL_NAMES:
             method = getattr(log, name)
@@ -50,11 +50,11 @@ class DDLoggerTestCase(BaseTestCase):
         """
         When using `get_logger` to get a logger
             When the logger does not exist
-                We create a new DDLogger
+                We create a new OtelLogger
             When the logger exists
                 We return the expected logger
             When a different logger is requested
-                We return a new DDLogger
+                We return a new OtelLogger
         """
         # Assert the logger doesn't already exist
         self.assertNotIn('test.logger', self.manager.loggerDict)
@@ -64,8 +64,8 @@ class DDLoggerTestCase(BaseTestCase):
         self.assertEqual(log.name, 'test.logger')
         self.assertEqual(log.level, logging.NOTSET)
 
-        # Ensure it is a DDLogger
-        self.assertIsInstance(log, DDLogger)
+        # Ensure it is a OtelLogger
+        self.assertIsInstance(log, OtelLogger)
         # Make sure it is stored in all the places we expect
         self.assertEqual(self.manager.getLogger('test.logger'), log)
         self.assertEqual(self.manager.loggerDict['test.logger'], log)
@@ -102,19 +102,19 @@ class DDLoggerTestCase(BaseTestCase):
 
     def test_logger_init(self):
         """
-        When creating a new DDLogger
+        When creating a new OtelLogger
             Has the same interface as logging.Logger
             Configures a defaultdict for buckets
             Properly configures the rate limit
         """
         # Create a logger
-        log = DDLogger('test.logger')
+        log = OtelLogger('test.logger')
 
         # Ensure we set the name and use default log level
         self.assertEqual(log.name, 'test.logger')
         self.assertEqual(log.level, logging.NOTSET)
 
-        # Assert DDLogger default properties
+        # Assert OtelLogger default properties
         self.assertIsInstance(log.buckets, dict)
         self.assertEqual(log.rate_limit, 60)
 
@@ -125,18 +125,18 @@ class DDLoggerTestCase(BaseTestCase):
         self.assertIsNone(log.parent)
 
         # Override rate limit from environment variable
-        with self.override_env(dict(DD_LOGGING_RATE_LIMIT='10')):
-            log = DDLogger('test.logger')
+        with self.override_env(dict(OTEL_LOGGING_RATE_LIMIT='10')):
+            log = OtelLogger('test.logger')
             self.assertEqual(log.rate_limit, 10)
 
         # Set specific log level
-        log = DDLogger('test.logger', level=logging.DEBUG)
+        log = OtelLogger('test.logger', level=logging.DEBUG)
         self.assertEqual(log.level, logging.DEBUG)
 
     def test_logger_log(self):
         """
-        When calling `DDLogger` log methods
-            We call `DDLogger.handle` with the expected log record
+        When calling `OtelLogger` log methods
+            We call `OtelLogger.handle` with the expected log record
         """
         log = get_logger('test.logger')
 
@@ -174,7 +174,7 @@ class DDLoggerTestCase(BaseTestCase):
     @mock.patch('logging.Logger.handle')
     def test_logger_handle_no_limit(self, base_handle):
         """
-        Calling `DDLogger.handle`
+        Calling `OtelLogger.handle`
             When no rate limit is set
                 Always calls the base `Logger.handle`
         """
@@ -196,7 +196,7 @@ class DDLoggerTestCase(BaseTestCase):
     @mock.patch('logging.Logger.handle')
     def test_logger_handle_bucket(self, base_handle):
         """
-        When calling `DDLogger.handle`
+        When calling `OtelLogger.handle`
             With a record
                 We pass it to the base `Logger.handle`
                 We create a bucket for tracking
@@ -213,7 +213,7 @@ class DDLoggerTestCase(BaseTestCase):
         # We added an bucket entry for this record
         key = (record.name, record.levelno, record.pathname, record.lineno)
         logging_bucket = log.buckets.get(key)
-        self.assertIsInstance(logging_bucket, DDLogger.LoggingBucket)
+        self.assertIsInstance(logging_bucket, OtelLogger.LoggingBucket)
 
         # The bucket entry is correct
         expected_bucket = int(record.created / log.rate_limit)
@@ -223,7 +223,7 @@ class DDLoggerTestCase(BaseTestCase):
     @mock.patch('logging.Logger.handle')
     def test_logger_handle_bucket_limited(self, base_handle):
         """
-        When calling `DDLogger.handle`
+        When calling `OtelLogger.handle`
             With multiple records in a single time frame
                 We pass only the first to the base `Logger.handle`
                 We keep track of the number skipped
@@ -255,7 +255,7 @@ class DDLoggerTestCase(BaseTestCase):
     @mock.patch('logging.Logger.handle')
     def test_logger_handle_bucket_skipped_msg(self, base_handle):
         """
-        When calling `DDLogger.handle`
+        When calling `OtelLogger.handle`
             When a bucket exists for a previous time frame
                 We pass only the record to the base `Logger.handle`
                 We update the record message to include the number of skipped messages
@@ -269,7 +269,7 @@ class DDLoggerTestCase(BaseTestCase):
         key = (record.name, record.levelno, record.pathname, record.lineno)
         bucket = int(record.created / log.rate_limit)
         # We want the time bucket to be for an older bucket
-        log.buckets[key] = DDLogger.LoggingBucket(bucket=bucket - 1, skipped=20)
+        log.buckets[key] = OtelLogger.LoggingBucket(bucket=bucket - 1, skipped=20)
 
         # Handle our record
         log.handle(record)
@@ -281,7 +281,7 @@ class DDLoggerTestCase(BaseTestCase):
 
     def test_logger_handle_bucket_key(self):
         """
-        When calling `DDLogger.handle`
+        When calling `OtelLogger.handle`
             With different log messages
                 We use different buckets to limit them
         """

@@ -1,6 +1,6 @@
 import pytest
 
-from ddtrace import _worker
+from oteltrace import _worker
 
 
 def test_start():

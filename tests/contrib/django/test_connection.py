@@ -4,11 +4,11 @@ import time
 # 3rd party
 from django.contrib.auth.models import User
 
-from ddtrace.contrib.django.conf import settings
-from ddtrace.contrib.django.patch import apply_django_patches, connections
+from oteltrace.contrib.django.conf import settings
+from oteltrace.contrib.django.patch import apply_django_patches, connections
 
 # testing
-from .utils import DjangoTraceTestCase, override_ddtrace_settings
+from .utils import DjangoTraceTestCase, override_oteltrace_settings
 
 
 class DjangoConnectionTest(DjangoTraceTestCase):
@@ -42,7 +42,7 @@ class DjangoConnectionTest(DjangoTraceTestCase):
         assert spans[0].resource == 'SELECT COUNT(*) AS "__count" FROM "auth_user"'
         assert spans[0].get_tag('sql.query') is None
 
-    @override_ddtrace_settings(INSTRUMENT_DATABASE=False)
+    @override_oteltrace_settings(INSTRUMENT_DATABASE=False)
     def test_connection_disabled(self):
         # trace a simple query
         users = User.objects.count()

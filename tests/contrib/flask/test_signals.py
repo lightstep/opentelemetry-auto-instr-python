@@ -2,9 +2,9 @@ import mock
 
 import flask
 
-from ddtrace import Pin
-from ddtrace.contrib.flask import unpatch
-from ddtrace.contrib.flask.patch import flask_version
+from oteltrace import Pin
+from oteltrace.contrib.flask import unpatch
+from oteltrace.contrib.flask.patch import flask_version
 
 from . import BaseFlaskTestCase
 

@@ -1,6 +1,6 @@
 from flask import Blueprint
 
-from ddtrace.ext import http
+from oteltrace.ext import http
 from . import BaseFlaskTestCase
 
 

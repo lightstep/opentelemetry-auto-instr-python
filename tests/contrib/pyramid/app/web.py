@@ -1,4 +1,4 @@
-from ddtrace.contrib.pyramid import trace_pyramid
+from oteltrace.contrib.pyramid import trace_pyramid
 
 from pyramid.response import Response
 from pyramid.config import Configurator

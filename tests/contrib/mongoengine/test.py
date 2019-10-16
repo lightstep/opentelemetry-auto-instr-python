@@ -7,10 +7,10 @@ import mongoengine
 import pymongo
 
 # project
-from ddtrace import Pin
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.mongoengine.patch import patch, unpatch
-from ddtrace.ext import mongo as mongox
+from oteltrace import Pin
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.mongoengine.patch import patch, unpatch
+from oteltrace.ext import mongo as mongox
 
 # testing
 from ..config import MONGO_CONFIG

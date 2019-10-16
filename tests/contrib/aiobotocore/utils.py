@@ -1,6 +1,6 @@
 import aiobotocore.session
 
-from ddtrace import Pin
+from oteltrace import Pin
 from contextlib import contextmanager
 
 

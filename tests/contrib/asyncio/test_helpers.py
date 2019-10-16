@@ -1,9 +1,9 @@
 import asyncio
 import pytest
 
-from ddtrace.context import Context
-from ddtrace.internal.context_manager import CONTEXTVARS_IS_AVAILABLE
-from ddtrace.contrib.asyncio import helpers
+from oteltrace.context import Context
+from oteltrace.internal.context_manager import CONTEXTVARS_IS_AVAILABLE
+from oteltrace.contrib.asyncio import helpers
 from .utils import AsyncioTestCase, mark_asyncio
 
 

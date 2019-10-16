@@ -1,7 +1,7 @@
 import time
 import concurrent
 
-from ddtrace.contrib.futures import patch, unpatch
+from oteltrace.contrib.futures import patch, unpatch
 
 from ...base import BaseTracerTestCase
 

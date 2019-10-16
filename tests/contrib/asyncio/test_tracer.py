@@ -3,11 +3,11 @@ import pytest
 import time
 
 
-from ddtrace.context import Context
-from ddtrace.internal.context_manager import CONTEXTVARS_IS_AVAILABLE
-from ddtrace.provider import DefaultContextProvider
-from ddtrace.contrib.asyncio.patch import patch, unpatch
-from ddtrace.contrib.asyncio.helpers import set_call_context
+from oteltrace.context import Context
+from oteltrace.internal.context_manager import CONTEXTVARS_IS_AVAILABLE
+from oteltrace.provider import DefaultContextProvider
+from oteltrace.contrib.asyncio.patch import patch, unpatch
+from oteltrace.contrib.asyncio.helpers import set_call_context
 
 from .utils import AsyncioTestCase, mark_asyncio
 
@@ -28,12 +28,12 @@ class TestAsyncioTracer(AsyncioTestCase):
         # it should return the context attached to the current Task
         # or create a new one
         task = asyncio.Task.current_task()
-        ctx = getattr(task, '__datadog_context', None)
+        ctx = getattr(task, '__opentelemetry_context', None)
         assert ctx is None
         # get the context from the loop creates a new one that
         # is attached to the Task object
         ctx = self.tracer.get_call_context()
-        assert ctx == getattr(task, '__datadog_context', None)
+        assert ctx == getattr(task, '__opentelemetry_context', None)
 
     @mark_asyncio
     def test_get_call_context_twice(self):

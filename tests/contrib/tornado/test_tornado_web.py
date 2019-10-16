@@ -313,7 +313,7 @@ class TestTornadoWebAnalyticsOn(TornadoTestCase):
     def get_settings(self):
         # distributed_tracing needs to be disabled manually
         return {
-            'datadog_trace': {
+            'opentelemetry_trace': {
                 'analytics_enabled': True,
                 'analytics_sample_rate': 0.5,
             },
@@ -357,7 +357,7 @@ class TestTornadoWebAnalyticsNoRate(TornadoTestCase):
     def get_settings(self):
         # distributed_tracing needs to be disabled manually
         return {
-            'datadog_trace': {
+            'opentelemetry_trace': {
                 'analytics_enabled': True,
             },
         }
@@ -385,7 +385,7 @@ class TestNoPropagationTornadoWeb(TornadoTestCase):
     def get_settings(self):
         # distributed_tracing needs to be disabled manually
         return {
-            'datadog_trace': {
+            'opentelemetry_trace': {
                 'distributed_tracing': False,
             },
         }

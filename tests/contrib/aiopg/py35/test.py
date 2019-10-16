@@ -5,8 +5,8 @@ import asyncio
 import aiopg
 
 # project
-from ddtrace.contrib.aiopg.patch import patch, unpatch
-from ddtrace import Pin
+from oteltrace.contrib.aiopg.patch import patch, unpatch
+from oteltrace import Pin
 
 # testing
 from tests.contrib.config import POSTGRES_CONFIG
@@ -59,5 +59,5 @@ class TestPsycopgPatch(AsyncioTestCase):
     @mark_asyncio
     def test_cursor_ctx_manager(self):
         # ensure cursors work with context managers
-        # https://github.com/DataDog/dd-trace-py/issues/228
+        # https://github.com/opentelemetry/otel-trace-py/issues/228
         yield from self._test_cursor_ctx_manager()

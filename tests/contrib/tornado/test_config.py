@@ -1,4 +1,4 @@
-from ddtrace.filters import FilterRequestsOnUrl
+from oteltrace.filters import FilterRequestsOnUrl
 
 from .utils import TornadoTestCase
 
@@ -11,7 +11,7 @@ class TestTornadoSettings(TornadoTestCase):
     def get_settings(self):
         # update tracer settings
         return {
-            'datadog_trace': {
+            'opentelemetry_trace': {
                 'default_service': 'custom-tornado',
                 'tags': {'env': 'production', 'debug': 'false'},
                 'enabled': False,

@@ -1,8 +1,8 @@
 import pytest
 
-from ddtrace import tracer, Span
-from ddtrace.http import store_request_headers, store_response_headers
-from ddtrace.settings import Config, IntegrationConfig
+from oteltrace import tracer, Span
+from oteltrace.http import store_request_headers, store_response_headers
+from oteltrace.settings import Config, IntegrationConfig
 
 
 class TestHeaders(object):

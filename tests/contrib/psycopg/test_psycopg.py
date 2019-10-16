@@ -9,10 +9,10 @@ from psycopg2 import extras
 from unittest import skipIf
 
 # project
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.psycopg import connection_factory
-from ddtrace.contrib.psycopg.patch import patch, unpatch, PSYCOPG2_VERSION
-from ddtrace import Pin
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.psycopg import connection_factory
+from oteltrace.contrib.psycopg.patch import patch, unpatch, PSYCOPG2_VERSION
+from oteltrace import Pin
 
 # testing
 from tests.contrib.config import POSTGRES_CONFIG
@@ -136,7 +136,7 @@ class PsycopgCore(BaseTracerTestCase):
     @skipIf(PSYCOPG2_VERSION < (2, 5), 'context manager not available in psycopg2==2.4')
     def test_cursor_ctx_manager(self):
         # ensure cursors work with context managers
-        # https://github.com/DataDog/dd-trace-py/issues/228
+        # https://github.com/opentelemetry/otel-trace-py/issues/228
         conn = self._get_conn()
         t = type(conn.cursor())
         with conn.cursor() as cur:
@@ -189,7 +189,7 @@ class PsycopgCore(BaseTracerTestCase):
 
     @skipIf(PSYCOPG2_VERSION < (2, 7), 'quote_ident not available in psycopg2<2.7')
     def test_manual_wrap_extension_quote_ident(self):
-        from ddtrace import patch_all
+        from oteltrace import patch_all
         patch_all()
         from psycopg2.extensions import quote_ident
 
@@ -289,7 +289,7 @@ def test_backwards_compatibilty_v3():
 
 @skipIf(PSYCOPG2_VERSION < (2, 7), 'quote_ident not available in psycopg2<2.7')
 def test_manual_wrap_extension_quote_ident_standalone():
-    from ddtrace import patch_all
+    from oteltrace import patch_all
     patch_all()
     from psycopg2.extensions import quote_ident
 

@@ -3,11 +3,11 @@ import requests
 from requests import Session
 from requests.exceptions import MissingSchema
 
-from ddtrace import config
-from ddtrace import Pin
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.requests import patch, unpatch
-from ddtrace.ext import errors, http
+from oteltrace import config
+from oteltrace import Pin
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.requests import patch, unpatch
+from oteltrace.ext import errors, http
 
 from ...base import BaseTracerTestCase
 from ...util import override_global_tracer
@@ -27,7 +27,7 @@ class BaseRequestTestCase(object):
 
         patch()
         self.session = Session()
-        setattr(self.session, 'datadog_tracer', self.tracer)
+        setattr(self.session, 'opentelemetry_tracer', self.tracer)
 
     def tearDown(self):
         unpatch()
@@ -88,7 +88,7 @@ class TestRequests(BaseRequestTestCase, BaseTracerTestCase):
         # ensure that double patch doesn't duplicate instrumentation
         patch()
         session = Session()
-        setattr(session, 'datadog_tracer', self.tracer)
+        setattr(session, 'opentelemetry_tracer', self.tracer)
 
         out = session.get(URL_200)
         assert out.status_code == 200

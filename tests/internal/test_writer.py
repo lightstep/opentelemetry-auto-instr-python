@@ -5,8 +5,8 @@ import pytest
 
 import mock
 
-from ddtrace.span import Span
-from ddtrace.internal.writer import AgentWriter, Q, Empty
+from oteltrace.span import Span
+from oteltrace.internal.writer import AgentWriter, Q, Empty
 
 
 class RemoveAllFilter():
@@ -117,44 +117,44 @@ class AgentWriterTests(TestCase):
     def test_metrics_client(self):
         self.create_worker(enable_stats=True)
         assert [
-            mock.call('datadog.tracer.queue.max_length', 1000),
-            mock.call('datadog.tracer.queue.length', 11),
-            mock.call('datadog.tracer.queue.size', mock.ANY),
-            mock.call('datadog.tracer.queue.spans', 77),
+            mock.call('opentelemetry.tracer.queue.max_length', 1000),
+            mock.call('opentelemetry.tracer.queue.length', 11),
+            mock.call('opentelemetry.tracer.queue.size', mock.ANY),
+            mock.call('opentelemetry.tracer.queue.spans', 77),
         ] == self.metrics_client.gauge.mock_calls
         increment_calls = [
-            mock.call('datadog.tracer.queue.dropped', 0),
-            mock.call('datadog.tracer.queue.accepted', 11),
-            mock.call('datadog.tracer.queue.accepted_lengths', 77),
-            mock.call('datadog.tracer.queue.accepted_size', mock.ANY),
-            mock.call('datadog.tracer.traces.filtered', 0),
-            mock.call('datadog.tracer.api.requests', 11),
-            mock.call('datadog.tracer.api.errors', 0),
-            mock.call('datadog.tracer.api.responses', 11, tags=['status:200']),
+            mock.call('opentelemetry.tracer.queue.dropped', 0),
+            mock.call('opentelemetry.tracer.queue.accepted', 11),
+            mock.call('opentelemetry.tracer.queue.accepted_lengths', 77),
+            mock.call('opentelemetry.tracer.queue.accepted_size', mock.ANY),
+            mock.call('opentelemetry.tracer.traces.filtered', 0),
+            mock.call('opentelemetry.tracer.api.requests', 11),
+            mock.call('opentelemetry.tracer.api.errors', 0),
+            mock.call('opentelemetry.tracer.api.responses', 11, tags=['status:200']),
         ]
         if hasattr(time, 'thread_time_ns'):
-            increment_calls.append(mock.call('datadog.tracer.writer.cpu_time', mock.ANY))
+            increment_calls.append(mock.call('opentelemetry.tracer.writer.cpu_time', mock.ANY))
         assert increment_calls == self.metrics_client.increment.mock_calls
 
     def test_metrics_client_failing_api(self):
         self.create_worker(api_class=FailingAPI, enable_stats=True)
         assert [
-            mock.call('datadog.tracer.queue.max_length', 1000),
-            mock.call('datadog.tracer.queue.length', 11),
-            mock.call('datadog.tracer.queue.size', mock.ANY),
-            mock.call('datadog.tracer.queue.spans', 77),
+            mock.call('opentelemetry.tracer.queue.max_length', 1000),
+            mock.call('opentelemetry.tracer.queue.length', 11),
+            mock.call('opentelemetry.tracer.queue.size', mock.ANY),
+            mock.call('opentelemetry.tracer.queue.spans', 77),
         ] == self.metrics_client.gauge.mock_calls
         increment_calls = [
-            mock.call('datadog.tracer.queue.dropped', 0),
-            mock.call('datadog.tracer.queue.accepted', 11),
-            mock.call('datadog.tracer.queue.accepted_lengths', 77),
-            mock.call('datadog.tracer.queue.accepted_size', mock.ANY),
-            mock.call('datadog.tracer.traces.filtered', 0),
-            mock.call('datadog.tracer.api.requests', 1),
-            mock.call('datadog.tracer.api.errors', 1),
+            mock.call('opentelemetry.tracer.queue.dropped', 0),
+            mock.call('opentelemetry.tracer.queue.accepted', 11),
+            mock.call('opentelemetry.tracer.queue.accepted_lengths', 77),
+            mock.call('opentelemetry.tracer.queue.accepted_size', mock.ANY),
+            mock.call('opentelemetry.tracer.traces.filtered', 0),
+            mock.call('opentelemetry.tracer.api.requests', 1),
+            mock.call('opentelemetry.tracer.api.errors', 1),
         ]
         if hasattr(time, 'thread_time_ns'):
-            increment_calls.append(mock.call('datadog.tracer.writer.cpu_time', mock.ANY))
+            increment_calls.append(mock.call('opentelemetry.tracer.writer.cpu_time', mock.ANY))
         assert increment_calls == self.metrics_client.increment.mock_calls
 
 

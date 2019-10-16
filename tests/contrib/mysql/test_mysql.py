@@ -2,9 +2,9 @@
 import mysql
 
 # project
-from ddtrace import Pin
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.mysql.patch import patch, unpatch
+from oteltrace import Pin
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.mysql.patch import patch, unpatch
 
 # tests
 from tests.contrib.config import MYSQL_CONFIG

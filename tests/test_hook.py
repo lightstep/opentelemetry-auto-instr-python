@@ -1,7 +1,7 @@
 import mock
 
-from ddtrace.compat import reload_module
-from ddtrace.utils.hook import (
+from oteltrace.compat import reload_module
+from oteltrace.utils.hook import (
     register_post_import_hook,
     deregister_post_import_hook,
 )
@@ -26,7 +26,7 @@ class TestHook(SubprocessTestCase):
         appropriate log debug message.
         """
         test_hook = mock.MagicMock()
-        with mock.patch('ddtrace.utils.hook.log') as log_mock:
+        with mock.patch('oteltrace.utils.hook.log') as log_mock:
             import tests.utils.test_module  # noqa
             register_post_import_hook('tests.utils.test_module', test_hook)
             test_hook.assert_called_once()
@@ -64,9 +64,9 @@ class TestHook(SubprocessTestCase):
         test_hook = mock.MagicMock()
         test_hook_redis = mock.MagicMock()
         register_post_import_hook('tests.utils.test_module', test_hook)
-        register_post_import_hook('ddtrace.contrib.redis', test_hook_redis)
+        register_post_import_hook('oteltrace.contrib.redis', test_hook_redis)
         import tests.utils.test_module  # noqa
-        import ddtrace.contrib.redis  # noqa
+        import oteltrace.contrib.redis  # noqa
         test_hook.assert_called_once()
         test_hook_redis.assert_called_once()
 
@@ -75,7 +75,7 @@ class TestHook(SubprocessTestCase):
         Test that a function can be registered as a hook twice.
         """
         test_hook = mock.MagicMock()
-        with mock.patch('ddtrace.utils.hook.log') as log_mock:
+        with mock.patch('oteltrace.utils.hook.log') as log_mock:
             register_post_import_hook('tests.utils.test_module', test_hook)
             register_post_import_hook('tests.utils.test_module', test_hook)
             import tests.utils.test_module  # noqa
@@ -171,7 +171,7 @@ class TestHook(SubprocessTestCase):
             raise Exception('test_hook_failed')
         register_post_import_hook('tests.utils.test_module', test_hook)
 
-        with mock.patch('ddtrace.utils.hook.log') as log_mock:
+        with mock.patch('oteltrace.utils.hook.log') as log_mock:
             import tests.utils.test_module  # noqa
             calls = [
                 mock.call('hook "{}" for module "tests.utils.test_module" failed: test_hook_failed'.format(test_hook))

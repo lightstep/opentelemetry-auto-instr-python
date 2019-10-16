@@ -1,6 +1,6 @@
 import gc
 
-from ddtrace.contrib.celery.utils import (
+from oteltrace.contrib.celery.utils import (
     tags_from_context,
     retrieve_task_id,
     attach_span,
@@ -85,7 +85,7 @@ class CeleryTagsTest(CeleryBaseTestCase):
         span = self.tracer.trace('celery.run')
         attach_span(fn_task, task_id, span)
         # delete the Span
-        weak_dict = getattr(fn_task, '__dd_task_span')
+        weak_dict = getattr(fn_task, '__otel_task_span')
         detach_span(fn_task, task_id)
         assert weak_dict.get((task_id, False)) is None
 
@@ -116,7 +116,7 @@ class CeleryTagsTest(CeleryBaseTestCase):
         # propagate and finish a Span for `fn_task`
         task_id = '7c6731af-9533-40c3-83a9-25b58f0d837f'
         attach_span(fn_task, task_id, self.tracer.trace('celery.run'))
-        weak_dict = getattr(fn_task, '__dd_task_span')
+        weak_dict = getattr(fn_task, '__otel_task_span')
         key = (task_id, False)
         assert weak_dict.get(key)
         # flush data and force the GC

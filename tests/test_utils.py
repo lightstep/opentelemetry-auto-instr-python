@@ -2,9 +2,9 @@ import os
 import unittest
 import warnings
 
-from ddtrace.utils.deprecation import deprecation, deprecated, format_message
-from ddtrace.utils.formats import asbool, get_env, flatten_dict
-from ddtrace.utils import sizeof
+from oteltrace.utils.deprecation import deprecation, deprecated, format_message
+from oteltrace.utils.formats import asbool, get_env, flatten_dict
+from oteltrace.utils import sizeof
 
 
 class TestUtils(unittest.TestCase):
@@ -30,7 +30,7 @@ class TestUtils(unittest.TestCase):
 
     def test_get_env_found(self):
         # ensure `get_env` returns a value if the environment variable is set
-        os.environ['DD_REQUESTS_DISTRIBUTED_TRACING'] = '1'
+        os.environ['OTEL_REQUESTS_DISTRIBUTED_TRACING'] = '1'
         value = get_env('requests', 'distributed_tracing')
         self.assertEqual(value, '1')
 
@@ -39,17 +39,17 @@ class TestUtils(unittest.TestCase):
         # are used, raising a Deprecation warning
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter('always')
-            os.environ['DATADOG_REQUESTS_DISTRIBUTED_TRACING'] = '1'
+            os.environ['OPENTELEMETRY_REQUESTS_DISTRIBUTED_TRACING'] = '1'
             value = get_env('requests', 'distributed_tracing')
             self.assertEqual(value, '1')
             self.assertEqual(len(w), 1)
             self.assertTrue(issubclass(w[-1].category, DeprecationWarning))
-            self.assertTrue('Use `DD_` prefix instead' in str(w[-1].message))
+            self.assertTrue('Use `OTEL_` prefix instead' in str(w[-1].message))
 
     def test_get_env_key_priority(self):
-        # ensure `get_env` use `DD_` with highest priority
-        os.environ['DD_REQUESTS_DISTRIBUTED_TRACING'] = 'highest'
-        os.environ['DATADOG_REQUESTS_DISTRIBUTED_TRACING'] = 'lowest'
+        # ensure `get_env` use `OTEL_` with highest priority
+        os.environ['OTEL_REQUESTS_DISTRIBUTED_TRACING'] = 'highest'
+        os.environ['OPENTELEMETRY_REQUESTS_DISTRIBUTED_TRACING'] = 'lowest'
         value = get_env('requests', 'distributed_tracing')
         self.assertEqual(value, 'highest')
 
@@ -126,7 +126,7 @@ class BrokenSlots(object):
 
 
 def test_sizeof_broken_slots():
-    """https://github.com/DataDog/dd-trace-py/issues/1079"""
+    """https://github.com/opentelemetry/otel-trace-py/issues/1079"""
     assert sizeof.sizeof(BrokenSlots()) >= 1
 
 

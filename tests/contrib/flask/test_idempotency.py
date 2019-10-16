@@ -2,10 +2,10 @@ import mock
 import unittest
 
 import flask
-from ddtrace.vendor import wrapt
+from oteltrace.vendor import wrapt
 
-from ddtrace.contrib.flask import patch, unpatch
-from ddtrace.contrib.flask.patch import _w, _u
+from oteltrace.contrib.flask import patch, unpatch
+from oteltrace.contrib.flask.patch import _w, _u
 
 
 class FlaskIdempotencyTestCase(unittest.TestCase):
@@ -14,29 +14,29 @@ class FlaskIdempotencyTestCase(unittest.TestCase):
         unpatch()
 
     def assert_is_patched(self):
-        self.assertTrue(flask._datadog_patch)
+        self.assertTrue(flask._opentelemetry_patch)
         self.assertTrue(isinstance(flask.render_template, wrapt.ObjectProxy))
 
     def assert_is_not_patched(self):
-        self.assertFalse(flask._datadog_patch)
+        self.assertFalse(flask._opentelemetry_patch)
         self.assertFalse(isinstance(flask.render_template, wrapt.ObjectProxy))
 
-    def test_datadog_patch(self):
+    def test_opentelemetry_patch(self):
         # If we have been patching/testing in other files,
         #   at least make sure this is where we want it
-        if hasattr(flask, '_datadog_patch'):
-            self.assertFalse(flask._datadog_patch)
+        if hasattr(flask, '_opentelemetry_patch'):
+            self.assertFalse(flask._opentelemetry_patch)
 
-        # Patching sets `_datadog_patch` to `True`
+        # Patching sets `_opentelemetry_patch` to `True`
         patch()
         self.assert_is_patched()
 
-        # Unpatching sets `_datadog_patch` to `False`
+        # Unpatching sets `_opentelemetry_patch` to `False`
         unpatch()
         self.assert_is_not_patched()
 
     # DEV: Use `side_effect` so the original function still gets called
-    @mock.patch('ddtrace.contrib.flask._patch._w', side_effect=_w)
+    @mock.patch('oteltrace.contrib.flask._patch._w', side_effect=_w)
     def test_patch_idempotency(self, _w):
         # Ensure we didn't do any patching automatically
         _w.assert_not_called()
@@ -56,8 +56,8 @@ class FlaskIdempotencyTestCase(unittest.TestCase):
         self.assert_is_patched()
 
     # DEV: Use `side_effect` so the original function still gets called
-    @mock.patch('ddtrace.contrib.flask._patch._w', side_effect=_w)
-    @mock.patch('ddtrace.contrib.flask._patch._u', side_effect=_u)
+    @mock.patch('oteltrace.contrib.flask._patch._w', side_effect=_w)
+    @mock.patch('oteltrace.contrib.flask._patch._u', side_effect=_u)
     def test_unpatch_idempotency(self, _u, _w):
         # We need to patch in order to unpatch
         patch()

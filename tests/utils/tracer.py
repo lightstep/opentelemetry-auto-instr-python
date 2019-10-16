@@ -1,5 +1,5 @@
-from ddtrace.internal.writer import AgentWriter
-from ddtrace.tracer import Tracer
+from oteltrace.internal.writer import AgentWriter
+from oteltrace.tracer import Tracer
 
 
 class DummyWriter(AgentWriter):
