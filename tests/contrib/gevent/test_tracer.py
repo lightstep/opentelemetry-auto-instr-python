@@ -8,8 +8,6 @@ from ddtrace.contrib.gevent import patch, unpatch
 from ddtrace.ext.priority import USER_KEEP
 
 from unittest import TestCase
-from opentracing.scope_managers.gevent import GeventScopeManager
-from tests.opentracer.utils import init_tracer
 from tests.test_tracer import get_dummy_tracer
 
 from .utils import silence_errors
@@ -406,33 +404,5 @@ class TestGeventTracer(TestCase):
                 gevent.sleep(0.01)
 
         gevent.spawn(entrypoint).join()
-        spans = self.tracer.writer.pop()
-        self._assert_spawn_multiple_greenlets(spans)
-
-    def test_trace_spawn_multiple_greenlets_multiple_traces_ot(self):
-        """OpenTracing version of the same test."""
-
-        ot_tracer = init_tracer('my_svc', self.tracer, scope_manager=GeventScopeManager())
-
-        def entrypoint():
-            with ot_tracer.start_active_span('greenlet.main') as span:
-                span.resource = 'base'
-                jobs = [gevent.spawn(green_1), gevent.spawn(green_2)]
-                gevent.joinall(jobs)
-
-        def green_1():
-            with self.tracer.trace('greenlet.worker1') as span:
-                span.set_tag('worker_id', '1')
-                gevent.sleep(0.01)
-
-        # note that replacing the `tracer.trace` call here with the
-        # OpenTracing equivalent will cause the checks to fail
-        def green_2():
-            with ot_tracer.start_active_span('greenlet.worker2') as scope:
-                scope.span.set_tag('worker_id', '2')
-                gevent.sleep(0.01)
-
-        gevent.spawn(entrypoint).join()
-
         spans = self.tracer.writer.pop()
         self._assert_spawn_multiple_greenlets(spans)

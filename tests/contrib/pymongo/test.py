@@ -13,7 +13,6 @@ from ddtrace.contrib.pymongo.client import trace_mongo_client, normalize_filter
 from ddtrace.contrib.pymongo.patch import patch, unpatch
 
 # testing
-from tests.opentracer.utils import init_tracer
 from ..config import MONGO_CONFIG
 from ...base import override_config
 from ...test_tracer import get_dummy_tracer
@@ -248,59 +247,6 @@ class PymongoCore(object):
 
         # confirm query tag find with query criteria on name
         assert spans[-1].get_tag('mongodb.query') == '{\'name\': \'?\'}'
-
-    def test_update_ot(self):
-        """OpenTracing version of test_update."""
-        tracer, client = self.get_tracer_and_client()
-        ot_tracer = init_tracer('mongo_svc', tracer)
-
-        writer = tracer.writer
-        with ot_tracer.start_active_span('mongo_op'):
-            db = client['testdb']
-            db.drop_collection('songs')
-            input_songs = [
-                {'name': 'Powderfinger', 'artist': 'Neil'},
-                {'name': 'Harvest', 'artist': 'Neil'},
-                {'name': 'Suzanne', 'artist': 'Leonard'},
-                {'name': 'Partisan', 'artist': 'Leonard'},
-            ]
-            db.songs.insert_many(input_songs)
-            result = db.songs.update_many(
-                {'artist': 'Neil'},
-                {'$set': {'artist': 'Shakey'}},
-            )
-
-            assert result.matched_count == 2
-            assert result.modified_count == 2
-
-        # ensure all is traced.
-        spans = writer.pop()
-        assert spans, spans
-        assert len(spans) == 4
-
-        ot_span = spans[0]
-        assert ot_span.parent_id is None
-        assert ot_span.name == 'mongo_op'
-        assert ot_span.service == 'mongo_svc'
-
-        for span in spans[1:]:
-            # ensure the parenting
-            assert span.parent_id == ot_span.span_id
-            # ensure all the of the common metadata is set
-            assert span.service == self.TEST_SERVICE
-            assert span.span_type == 'mongodb'
-            assert span.meta.get('mongodb.collection') == 'songs'
-            assert span.meta.get('mongodb.db') == 'testdb'
-            assert span.meta.get('out.host')
-            assert span.meta.get('out.port')
-
-        expected_resources = set([
-            'drop songs',
-            'update songs {"artist": "?"}',
-            'insert songs',
-        ])
-
-        assert expected_resources == {s.resource for s in spans[1:]}
 
     def test_analytics_default(self):
         tracer, client = self.get_tracer_and_client()

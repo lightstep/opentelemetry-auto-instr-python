@@ -17,7 +17,6 @@ from ddtrace import config, Pin
 
 # testing
 from tests.contrib.config import CASSANDRA_CONFIG
-from tests.opentracer.utils import init_tracer
 from tests.test_tracer import get_dummy_tracer
 
 # Oftentimes our tests fails because Cassandra connection timeouts during keyspace drop. Slowness in keyspace drop
@@ -171,44 +170,6 @@ class CassandraBase(object):
             query = spans[0]
             # confirm no analytics sample rate set by default
             assert query.get_metric(ANALYTICS_SAMPLE_RATE_KEY) == 1.0
-
-    def test_query_ot(self):
-        """Ensure that cassandra works with the opentracer."""
-        def execute_fn(session, query):
-            return session.execute(query)
-
-        session, tracer = self._traced_session()
-        ot_tracer = init_tracer('cass_svc', tracer)
-        writer = tracer.writer
-
-        with ot_tracer.start_active_span('cass_op'):
-            result = execute_fn(session, self.TEST_QUERY)
-            self._assert_result_correct(result)
-
-        spans = writer.pop()
-        assert spans, spans
-
-        # another for the actual query
-        assert len(spans) == 2
-        ot_span, dd_span = spans
-
-        # confirm parenting
-        assert ot_span.parent_id is None
-        assert dd_span.parent_id == ot_span.span_id
-
-        assert ot_span.name == 'cass_op'
-        assert ot_span.service == 'cass_svc'
-
-        assert dd_span.service == self.TEST_SERVICE
-        assert dd_span.resource == self.TEST_QUERY
-        assert dd_span.span_type == cassx.TYPE
-
-        assert dd_span.get_tag(cassx.KEYSPACE) == self.TEST_KEYSPACE
-        assert dd_span.get_tag(net.TARGET_PORT) == self.TEST_PORT
-        assert dd_span.get_tag(cassx.ROW_COUNT) == '1'
-        assert dd_span.get_tag(cassx.PAGE_NUMBER) is None
-        assert dd_span.get_tag(cassx.PAGINATED) == 'False'
-        assert dd_span.get_tag(net.TARGET_HOST) == '127.0.0.1'
 
     def test_query_async(self):
         def execute_fn(session, query):

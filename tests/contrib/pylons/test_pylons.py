@@ -10,7 +10,6 @@ from ddtrace.ext import http, errors
 from ddtrace.constants import SAMPLING_PRIORITY_KEY, ANALYTICS_SAMPLE_RATE_KEY
 from ddtrace.contrib.pylons import PylonsTraceMiddleware
 
-from tests.opentracer.utils import init_tracer
 from ...base import BaseTracerTestCase
 
 
@@ -400,29 +399,3 @@ class PylonsTestCase(BaseTracerTestCase):
         assert span.trace_id != 100
         assert span.parent_id != 42
         assert span.get_metric(SAMPLING_PRIORITY_KEY) != 2
-
-    def test_success_200_ot(self):
-        """OpenTracing version of test_success_200."""
-        ot_tracer = init_tracer('pylons_svc', self.tracer)
-
-        with ot_tracer.start_active_span('pylons_get'):
-            res = self.app.get(url_for(controller='root', action='index'))
-            assert res.status == 200
-
-        spans = self.tracer.writer.pop()
-        assert spans, spans
-        assert len(spans) == 2
-        ot_span, dd_span = spans
-
-        # confirm the parenting
-        assert ot_span.parent_id is None
-        assert dd_span.parent_id == ot_span.span_id
-
-        assert ot_span.name == 'pylons_get'
-        assert ot_span.service == 'pylons_svc'
-
-        assert dd_span.service == 'web'
-        assert dd_span.resource == 'root.index'
-        assert dd_span.meta.get(http.STATUS_CODE) == '200'
-        assert dd_span.meta.get(http.URL) == 'http://localhost:80/'
-        assert dd_span.error == 0

@@ -10,7 +10,6 @@ from ddtrace.contrib.elasticsearch.elasticsearch import elasticsearch
 from ddtrace.contrib.elasticsearch.patch import patch, unpatch
 
 # testing
-from tests.opentracer.utils import init_tracer
 from ..config import ELASTICSEARCH_CONFIG
 from ...test_tracer import get_dummy_tracer
 from ...base import BaseTracerTestCase
@@ -146,44 +145,6 @@ class ElasticsearchTest(unittest.TestCase):
         # Drop the index, checking it won't raise exception on success or failure
         es.indices.delete(index=self.ES_INDEX, ignore=[400, 404])
         es.indices.delete(index=self.ES_INDEX, ignore=[400, 404])
-
-    def test_elasticsearch_ot(self):
-        """Shortened OpenTracing version of test_elasticsearch."""
-        tracer = get_dummy_tracer()
-        writer = tracer.writer
-        ot_tracer = init_tracer('my_svc', tracer)
-
-        transport_class = get_traced_transport(
-                datadog_tracer=tracer,
-                datadog_service=self.TEST_SERVICE)
-
-        es = elasticsearch.Elasticsearch(transport_class=transport_class, port=ELASTICSEARCH_CONFIG['port'])
-
-        # Test index creation
-        mapping = {'mapping': {'properties': {'created': {'type': 'date', 'format': 'yyyy-MM-dd'}}}}
-
-        with ot_tracer.start_active_span('ot_span'):
-            es.indices.create(index=self.ES_INDEX, ignore=400, body=mapping)
-
-        spans = writer.pop()
-        assert spans
-        assert len(spans) == 2
-        ot_span, dd_span = spans
-
-        # confirm the parenting
-        assert ot_span.parent_id is None
-        assert dd_span.parent_id == ot_span.span_id
-
-        assert ot_span.service == 'my_svc'
-        assert ot_span.resource == 'ot_span'
-
-        assert dd_span.service == self.TEST_SERVICE
-        assert dd_span.name == 'elasticsearch.query'
-        assert dd_span.span_type == 'elasticsearch'
-        assert dd_span.error == 0
-        assert dd_span.get_tag('elasticsearch.method') == 'PUT'
-        assert dd_span.get_tag('elasticsearch.url') == '/%s' % self.ES_INDEX
-        assert dd_span.resource == 'PUT /%s' % self.ES_INDEX
 
 
 class ElasticsearchPatchTest(BaseTracerTestCase):

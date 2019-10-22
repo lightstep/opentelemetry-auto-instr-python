@@ -15,7 +15,6 @@ from ddtrace.contrib.psycopg.patch import patch, unpatch, PSYCOPG2_VERSION
 from ddtrace import Pin
 
 # testing
-from tests.opentracer.utils import init_tracer
 from tests.contrib.config import POSTGRES_CONFIG
 from ...base import BaseTracerTestCase
 from ...utils.tracer import DummyTracer
@@ -133,47 +132,6 @@ class PsycopgCore(BaseTracerTestCase):
         root = self.get_root_span()
         self.assertIsNone(root.get_tag('sql.query'))
         self.reset()
-
-    def test_opentracing_propagation(self):
-        # ensure OpenTracing plays well with our integration
-        query = """SELECT 'tracing'"""
-
-        db = self._get_conn()
-        ot_tracer = init_tracer('psycopg-svc', self.tracer)
-
-        with ot_tracer.start_active_span('db.access'):
-            cursor = db.cursor()
-            cursor.execute(query)
-            rows = cursor.fetchall()
-
-        self.assertEquals(rows, [('tracing',)])
-
-        self.assert_structure(
-            dict(name='db.access', service='psycopg-svc'),
-            (
-                dict(name='postgres.query', resource=query, service='postgres', error=0, span_type='sql'),
-            ),
-        )
-        self.reset()
-
-        with self.override_config('dbapi2', dict(trace_fetch_methods=True)):
-            db = self._get_conn()
-            ot_tracer = init_tracer('psycopg-svc', self.tracer)
-
-            with ot_tracer.start_active_span('db.access'):
-                cursor = db.cursor()
-                cursor.execute(query)
-                rows = cursor.fetchall()
-
-            self.assertEquals(rows, [('tracing',)])
-
-            self.assert_structure(
-                dict(name='db.access', service='psycopg-svc'),
-                (
-                    dict(name='postgres.query', resource=query, service='postgres', error=0, span_type='sql'),
-                    dict(name='postgres.query.fetchall', resource=query, service='postgres', error=0, span_type='sql'),
-                ),
-            )
 
     @skipIf(PSYCOPG2_VERSION < (2, 5), 'context manager not available in psycopg2==2.4')
     def test_cursor_ctx_manager(self):

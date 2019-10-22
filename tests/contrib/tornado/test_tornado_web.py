@@ -1,13 +1,9 @@
 from .web.app import CustomDefaultHandler
 from .utils import TornadoTestCase
 
-from ddtrace import config
-from ddtrace.constants import SAMPLING_PRIORITY_KEY, ORIGIN_KEY, ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.ext import http
-import pytest
-import tornado
-
-from tests.opentracer.utils import init_tracer
+from oteltrace import config
+from oteltrace.constants import SAMPLING_PRIORITY_KEY, ORIGIN_KEY, ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.ext import http
 
 
 class TestTornadoWeb(TornadoTestCase):
@@ -274,41 +270,6 @@ class TestTornadoWeb(TornadoTestCase):
         assert 1234 == request_span.trace_id
         assert 4567 == request_span.parent_id
         assert 2 == request_span.get_metric(SAMPLING_PRIORITY_KEY)
-
-    # Opentracing support depends on new AsyncioScopeManager
-    # See: https://github.com/opentracing/opentracing-python/pull/118
-    @pytest.mark.skipif(tornado.version_info >= (5, 0),
-                        reason='Opentracing ScopeManager not available for Tornado >= 5')
-    def test_success_handler_ot(self):
-        """OpenTracing version of test_success_handler."""
-        from opentracing.scope_managers.tornado import TornadoScopeManager
-        ot_tracer = init_tracer('tornado_svc', self.tracer, scope_manager=TornadoScopeManager())
-
-        with ot_tracer.start_active_span('tornado_op'):
-            response = self.fetch('/success/')
-            assert 200 == response.code
-
-        traces = self.tracer.writer.pop_traces()
-        assert 1 == len(traces)
-        assert 2 == len(traces[0])
-        # dd_span will start and stop before the ot_span finishes
-        ot_span, dd_span = traces[0]
-
-        # confirm the parenting
-        assert ot_span.parent_id is None
-        assert dd_span.parent_id == ot_span.span_id
-
-        assert ot_span.name == 'tornado_op'
-        assert ot_span.service == 'tornado_svc'
-
-        assert 'tornado-web' == dd_span.service
-        assert 'tornado.request' == dd_span.name
-        assert 'http' == dd_span.span_type
-        assert 'tests.contrib.tornado.web.app.SuccessHandler' == dd_span.resource
-        assert 'GET' == dd_span.get_tag('http.method')
-        assert '200' == dd_span.get_tag('http.status_code')
-        assert self.get_url('/success/') == dd_span.get_tag(http.URL)
-        assert 0 == dd_span.error
 
 
 class TestTornadoWebAnalyticsDefault(TornadoTestCase):

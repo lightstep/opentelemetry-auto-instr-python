@@ -99,17 +99,6 @@ jobs:
       - *persist_to_workspace_step
       - *save_cache_step
 
-  opentracer:
-    docker:
-      - *test_runner
-    resource_class: *resource_class
-    steps:
-      - checkout
-      - *restore_cache_step
-      - run: scripts/run-tox-scenario '^py..-opentracer'
-      - *persist_to_workspace_step
-      - *save_cache_step
-
   integration:
     docker:
       - <<: *test_runner
@@ -917,9 +906,6 @@ workflows:
       - mysqlpython:
           requires:
             - flake8
-      - opentracer:
-          requires:
-            - flake8
       - psycopg:
           requires:
             - flake8
@@ -1016,7 +1002,6 @@ workflows:
             - mysqlconnector
             - mysqldb
             - mysqlpython
-            - opentracer
             - psycopg
             - pylibmc
             - pylons

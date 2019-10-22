@@ -10,7 +10,6 @@ from ddtrace.ext import http
 from ddtrace.compat import stringify
 
 # testing
-from tests.opentracer.utils import init_tracer
 from ...base import BaseTracerTestCase
 
 
@@ -215,35 +214,3 @@ class BotocoreTest(BaseTracerTestCase):
 
         # checking for protection on sts against security leak
         self.assertIsNone(span.get_tag('params'))
-
-    @mock_ec2
-    def test_traced_client_ot(self):
-        """OpenTracing version of test_traced_client."""
-        ot_tracer = init_tracer('ec2_svc', self.tracer)
-
-        with ot_tracer.start_active_span('ec2_op'):
-            ec2 = self.session.create_client('ec2', region_name='us-west-2')
-            Pin(service=self.TEST_SERVICE, tracer=self.tracer).onto(ec2)
-            ec2.describe_instances()
-
-        spans = self.get_spans()
-        assert spans
-        self.assertEqual(len(spans), 2)
-
-        ot_span, dd_span = spans
-
-        # confirm the parenting
-        self.assertIsNone(ot_span.parent_id)
-        self.assertEqual(dd_span.parent_id, ot_span.span_id)
-
-        self.assertEqual(ot_span.name, 'ec2_op')
-        self.assertEqual(ot_span.service, 'ec2_svc')
-
-        self.assertEqual(dd_span.get_tag('aws.agent'), 'botocore')
-        self.assertEqual(dd_span.get_tag('aws.region'), 'us-west-2')
-        self.assertEqual(dd_span.get_tag('aws.operation'), 'DescribeInstances')
-        self.assertEqual(dd_span.get_tag(http.STATUS_CODE), '200')
-        self.assertEqual(dd_span.get_tag('retry_attempts'), '0')
-        self.assertEqual(dd_span.service, 'test-botocore-tracing.ec2')
-        self.assertEqual(dd_span.resource, 'ec2.describeinstances')
-        self.assertEqual(dd_span.name, 'ec2.command')

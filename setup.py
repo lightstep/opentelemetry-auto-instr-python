@@ -90,11 +90,6 @@ setup_kwargs = dict(
 )
 
 
-# The following from here to the end of the file is borrowed from wrapt's and msgpack's `setup.py`:
-#   https://github.com/GrahamDumpleton/wrapt/blob/4ee35415a4b0d570ee6a9b3a14a6931441aeab4b/setup.py
-#   https://github.com/msgpack/msgpack-python/blob/381c2eff5f8ee0b8669fd6daf1fd1ecaffe7c931/setup.py
-# These helpers are useful for attempting build a C-extension and then retrying without it if it fails
-
 libraries = []
 if sys.platform == 'win32':
     libraries.append('ws2_32')

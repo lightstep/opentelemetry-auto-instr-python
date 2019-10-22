@@ -12,7 +12,6 @@ from ddtrace.ext import http
 
 from .app import create_app
 
-from ...opentracer.utils import init_tracer
 from ...base import BaseTracerTestCase
 
 
@@ -329,33 +328,3 @@ class PyramidTestCase(PyramidBase):
         self.app.get('/404', status=404)
         spans = self.tracer.writer.pop()
         assert len(spans) == 1
-
-    def test_200_ot(self):
-        """OpenTracing version of test_200."""
-        ot_tracer = init_tracer('pyramid_svc', self.tracer)
-
-        with ot_tracer.start_active_span('pyramid_get'):
-            res = self.app.get('/', status=200)
-            assert b'idx' in res.body
-
-        writer = self.tracer.writer
-        spans = writer.pop()
-        assert len(spans) == 2
-
-        ot_span, dd_span = spans
-
-        # confirm the parenting
-        assert ot_span.parent_id is None
-        assert dd_span.parent_id == ot_span.span_id
-
-        assert ot_span.name == 'pyramid_get'
-        assert ot_span.service == 'pyramid_svc'
-
-        assert dd_span.service == 'foobar'
-        assert dd_span.resource == 'GET index'
-        assert dd_span.error == 0
-        assert dd_span.span_type == 'http'
-        assert dd_span.meta.get('http.method') == 'GET'
-        assert dd_span.meta.get('http.status_code') == '200'
-        assert dd_span.meta.get(http.URL) == 'http://localhost/'
-        assert dd_span.meta.get('pyramid.route.name') == 'index'

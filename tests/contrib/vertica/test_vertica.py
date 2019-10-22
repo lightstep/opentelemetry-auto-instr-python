@@ -13,7 +13,6 @@ from ddtrace.utils.merge import deepmerge
 # testing
 from tests.base import BaseTracerTestCase
 from tests.contrib.config import VERTICA_CONFIG
-from tests.opentracer.utils import init_tracer
 from tests.test_tracer import get_dummy_tracer
 
 TEST_TABLE = 'test_table'
@@ -354,33 +353,6 @@ class TestVertica(BaseTracerTestCase):
         assert spans[0].resource == query
         assert spans[1].name == 'vertica.query'
         assert spans[1].resource == 'COMMIT;'
-
-    def test_opentracing(self):
-        """Ensure OpenTracing works with vertica."""
-        conn, cur = self.test_conn
-
-        ot_tracer = init_tracer('vertica_svc', self.test_tracer)
-
-        with ot_tracer.start_active_span('vertica_execute'):
-            cur.execute("INSERT INTO {} (a, b) VALUES (1, 'aa');".format(TEST_TABLE))
-            conn.close()
-
-        spans = self.test_tracer.writer.pop()
-        assert len(spans) == 2
-        ot_span, dd_span = spans
-
-        # confirm the parenting
-        assert ot_span.parent_id is None
-        assert dd_span.parent_id == ot_span.span_id
-
-        assert dd_span.service == 'vertica'
-        assert dd_span.span_type == 'sql'
-        assert dd_span.name == 'vertica.query'
-        assert dd_span.get_metric('db.rowcount') == -1
-        query = "INSERT INTO test_table (a, b) VALUES (1, 'aa');"
-        assert dd_span.resource == query
-        assert dd_span.get_tag('out.host') == '127.0.0.1'
-        assert dd_span.get_tag('out.port') == '5433'
 
     def test_analytics_default(self):
         conn, cur = self.test_conn
