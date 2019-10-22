@@ -182,17 +182,6 @@ jobs:
       - *persist_to_workspace_step
       - *save_cache_step
 
-  pylons:
-    docker:
-      - *test_runner
-    resource_class: *resource_class
-    steps:
-      - checkout
-      - *restore_cache_step
-      - run: scripts/run-tox-scenario '^pylons_contrib-'
-      - *persist_to_workspace_step
-      - *save_cache_step
-
   aiohttp:
     docker:
       - *test_runner
@@ -287,7 +276,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'falcon_contrib{,_autopatch}-{py27,py34,py35,py36}-falcon{10,11,12,13,14}' --result-json /tmp/falcon.results
+      - run: tox -e 'falcon_contrib{,_autopatch}-{py34,py35,py36}-falcon{10,11,12,13,14}' --result-json /tmp/falcon.results
       - *persist_to_workspace_step
       - *save_cache_step
 
@@ -399,24 +388,6 @@ jobs:
       - *restore_cache_step
       - run: tox -e 'wait' mysql
       - run: scripts/run-tox-scenario '^mysqldb_contrib-.*-mysqlclient'
-      - *persist_to_workspace_step
-      - *save_cache_step
-
-  mysqldb:
-    docker:
-      - *test_runner
-      - image: mysql:5.7
-        env:
-            - MYSQL_ROOT_PASSWORD=admin
-            - MYSQL_PASSWORD=test
-            - MYSQL_USER=test
-            - MYSQL_DATABASE=test
-    resource_class: *resource_class
-    steps:
-      - checkout
-      - *restore_cache_step
-      - run: tox -e 'wait' mysql
-      - run: scripts/run-tox-scenario '^mysqldb_contrib-.*-mysqldb'
       - *persist_to_workspace_step
       - *save_cache_step
 
@@ -689,7 +660,7 @@ jobs:
       - run:
           command: |
             mkdir -p /tmp/test-reports
-            tox -e 'benchmarks-{py27,py34,py35,py36,py37}' --result-json /tmp/benchmarks.results -- --benchmark-storage=file:///tmp/test-reports/ --benchmark-autosave
+            tox -e 'benchmarks-{py34,py35,py36,py37}' --result-json /tmp/benchmarks.results -- --benchmark-storage=file:///tmp/test-reports/ --benchmark-autosave
       - store_test_results:
           path: /tmp/test-reports
       - store_artifacts:
@@ -900,9 +871,6 @@ workflows:
       - mysqlconnector:
           requires:
             - flake8
-      - mysqldb:
-          requires:
-            - flake8
       - mysqlpython:
           requires:
             - flake8
@@ -910,9 +878,6 @@ workflows:
           requires:
             - flake8
       - pylibmc:
-          requires:
-            - flake8
-      - pylons:
           requires:
             - flake8
       - pymemcache:
@@ -1000,11 +965,9 @@ workflows:
             - molten
             - mongoengine
             - mysqlconnector
-            - mysqldb
             - mysqlpython
             - psycopg
             - pylibmc
-            - pylons
             - pymemcache
             - pymongo
             - pymysql
