@@ -99,24 +99,6 @@ jobs:
       - *persist_to_workspace_step
       - *save_cache_step
 
-  integration:
-    docker:
-      - <<: *test_runner
-        env:
-          TEST_OPENTELEMETRY_INTEGRATION: 1
-      - image: datadog/docker-dd-agent
-        env:
-            - OTEL_APM_ENABLED=true
-            - OTEL_BIND_HOST=0.0.0.0
-            - OTEL_API_KEY=invalid_key_but_this_is_fine
-    resource_class: *resource_class
-    steps:
-      - checkout
-      - *restore_cache_step
-      - run: scripts/run-tox-scenario '^py..-integration$'
-      - *persist_to_workspace_step
-      - *save_cache_step
-
   futures:
     docker:
       - *test_runner
@@ -847,9 +829,6 @@ workflows:
       - httplib:
           requires:
             - flake8
-      - integration:
-          requires:
-            - flake8
       - internal:
           requires:
             - flake8
@@ -957,7 +936,6 @@ workflows:
             - gevent
             - grpc
             - httplib
-            - integration
             - internal
             - jinja2
             - kombu
