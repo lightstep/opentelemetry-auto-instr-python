@@ -36,20 +36,20 @@ namespace :pypi do
   end
 
   task :confirm do
-    ddtrace_version = get_version
+    oteltrace_version = get_version
 
-    if get_branch.downcase != 'tags/v#{ddtrace_version}'
-      print "WARNING: Expected current commit to be tagged as 'tags/v#{ddtrace_version}, instead we are on '#{get_branch}', proceed anyways [y|N]? "
+    if get_branch.downcase != 'tags/v#{oteltrace_version}'
+      print "WARNING: Expected current commit to be tagged as 'tags/v#{oteltrace_version}, instead we are on '#{get_branch}', proceed anyways [y|N]? "
       $stdout.flush
 
       abort if $stdin.gets.to_s.strip.downcase != 'y'
     end
 
-    puts "WARNING: This task will build and release new wheels to https://pypi.org/project/ddtrace/, this action cannot be undone"
-    print "         To proceed please type the version '#{ddtrace_version}': "
+    puts "WARNING: This task will build and release new wheels to https://pypi.org/project/oteltrace/, this action cannot be undone"
+    print "         To proceed please type the version '#{oteltrace_version}': "
     $stdout.flush
 
-    abort if $stdin.gets.to_s.strip.downcase != ddtrace_version
+    abort if $stdin.gets.to_s.strip.downcase != oteltrace_version
   end
 
   task :clean do

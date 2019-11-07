@@ -1,7 +1,7 @@
-from ddtrace import Pin
-from ddtrace.contrib.flask import patch, unpatch
+from oteltrace import Pin
+from oteltrace.contrib.flask import patch, unpatch
 import flask
-from ddtrace.vendor import wrapt
+from oteltrace.vendor import wrapt
 
 from ...base import BaseTracerTestCase
 

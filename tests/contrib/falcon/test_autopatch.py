@@ -1,6 +1,6 @@
 from falcon import testing
 
-import ddtrace
+import oteltrace
 
 from ...base import BaseTracerTestCase
 from .app import get_app
@@ -20,10 +20,10 @@ class AutoPatchTestCase(BaseTracerTestCase, testing.TestCase, FalconTestCase):
 
         self._service = 'my-falcon'
 
-        # Since most integrations do `from ddtrace import tracer` we cannot update do `ddtrace.tracer = self.tracer`
-        self.original_writer = ddtrace.tracer.writer
-        ddtrace.tracer.writer = self.tracer.writer
-        self.tracer = ddtrace.tracer
+        # Since most integrations do `from oteltrace import tracer` we cannot update do `oteltrace.tracer = self.tracer`
+        self.original_writer = oteltrace.tracer.writer
+        oteltrace.tracer.writer = self.tracer.writer
+        self.tracer = oteltrace.tracer
 
         # build a test app without adding a tracer middleware;
         # reconfigure the global tracer since the autopatch mode
@@ -33,4 +33,4 @@ class AutoPatchTestCase(BaseTracerTestCase, testing.TestCase, FalconTestCase):
     def tearDown(self):
         super(AutoPatchTestCase, self).tearDown()
 
-        ddtrace.tracer.writer = self.original_writer
+        oteltrace.tracer.writer = self.original_writer

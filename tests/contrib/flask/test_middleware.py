@@ -4,11 +4,10 @@ import re
 
 from unittest import TestCase
 
-from ddtrace.contrib.flask import TraceMiddleware
-from ddtrace.constants import SAMPLING_PRIORITY_KEY
-from ddtrace.ext import http, errors
+from oteltrace.contrib.flask import TraceMiddleware
+from oteltrace.constants import SAMPLING_PRIORITY_KEY
+from oteltrace.ext import http, errors
 
-from tests.opentracer.utils import init_tracer
 from .web import create_app
 from ...test_tracer import get_dummy_tracer
 
@@ -31,7 +30,7 @@ class TestFlask(TestCase):
         self.app = self.flask_app.test_client()
 
     def test_double_instrumentation(self):
-        # ensure Flask is never instrumented twice when `ddtrace-run`
+        # ensure Flask is never instrumented twice when `oteltrace-run`
         # and `TraceMiddleware` are used together. `traced_app` MUST
         # be assigned otherwise it's not possible to reproduce the
         # problem (the test scope must keep a strong reference)
@@ -43,7 +42,7 @@ class TestFlask(TestCase):
 
     def test_double_instrumentation_config(self):
         # ensure Flask uses the last set configuration to be sure
-        # there are no breaking changes for who uses `ddtrace-run`
+        # there are no breaking changes for who uses `oteltrace-run`
         # with the `TraceMiddleware`
         TraceMiddleware(
             self.flask_app,
@@ -350,37 +349,3 @@ class TestFlask(TestCase):
         assert s.error == 0
         assert s.meta.get(http.STATUS_CODE) == '200'
         assert s.meta.get(http.METHOD) == 'GET'
-
-    def test_success_200_ot(self):
-        """OpenTracing version of test_success_200."""
-        ot_tracer = init_tracer('my_svc', self.tracer)
-        writer = self.tracer.writer
-
-        with ot_tracer.start_active_span('ot_span'):
-            start = time.time()
-            rv = self.app.get('/')
-            end = time.time()
-
-        # ensure request worked
-        assert rv.status_code == 200
-        assert rv.data == b'hello'
-
-        # ensure trace worked
-        assert not self.tracer.current_span(), self.tracer.current_span().pprint()
-        spans = writer.pop()
-        assert len(spans) == 2
-        ot_span, dd_span = spans
-
-        # confirm the parenting
-        assert ot_span.parent_id is None
-        assert dd_span.parent_id == ot_span.span_id
-
-        assert ot_span.resource == 'ot_span'
-        assert ot_span.service == 'my_svc'
-
-        assert dd_span.resource == 'index'
-        assert dd_span.start >= start
-        assert dd_span.duration <= end - start
-        assert dd_span.error == 0
-        assert dd_span.meta.get(http.STATUS_CODE) == '200'
-        assert dd_span.meta.get(http.METHOD) == 'GET'

@@ -1,9 +1,9 @@
 .. include:: ./shared.rst
 
-Datadog Python Trace Client
+OpenTelemetry Python Trace Client
 ===========================
 
-``ddtrace`` is Datadog's Python tracing client. It is used to trace requests as
+``oteltrace`` is OpenTelemetry's Python tracing client. It is used to trace requests as
 they flow across web servers, databases and microservices. This enables
 developers to have greater visibility into bottlenecks and troublesome requests
 in their application.
@@ -16,7 +16,7 @@ For a basic product overview: check out the `setup documentation`_.
 For details about developing and contributing: refer to the `development
 guide`_.
 
-For descriptions of the terminology of Datadog APM: take a look at the `official
+For descriptions of the terminology of OpenTelemetry APM: take a look at the `official
 documentation`_.
 
 
@@ -27,7 +27,7 @@ Supported Libraries
 
 We officially support Python 2.7, 3.4 and above.
 
-The versions listed are the versions that we have tested, but ``ddtrace`` can
+The versions listed are the versions that we have tested, but ``oteltrace`` can
 still be compatible with other versions of these libraries. If a version of a
 library you use is unsupported, feel free to contribute or request it by
 contacting support.
@@ -119,7 +119,7 @@ contacting support.
 
 
 .. [1] Libraries that are automatically instrumented when the
-  :ref:`ddtrace-run<ddtracerun>` command is used or the ``patch_all()`` method
+  :ref:`oteltrace-run<oteltracerun>` command is used or the ``patch_all()`` method
   is called. Always use ``patch()`` and ``patch_all()`` as soon as possible in
   your Python entrypoint.
 

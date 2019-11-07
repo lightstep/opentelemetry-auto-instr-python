@@ -99,35 +99,6 @@ jobs:
       - *persist_to_workspace_step
       - *save_cache_step
 
-  opentracer:
-    docker:
-      - *test_runner
-    resource_class: *resource_class
-    steps:
-      - checkout
-      - *restore_cache_step
-      - run: scripts/run-tox-scenario '^py..-opentracer'
-      - *persist_to_workspace_step
-      - *save_cache_step
-
-  integration:
-    docker:
-      - <<: *test_runner
-        env:
-          TEST_DATADOG_INTEGRATION: 1
-      - image: datadog/docker-dd-agent
-        env:
-            - DD_APM_ENABLED=true
-            - DD_BIND_HOST=0.0.0.0
-            - DD_API_KEY=invalid_key_but_this_is_fine
-    resource_class: *resource_class
-    steps:
-      - checkout
-      - *restore_cache_step
-      - run: scripts/run-tox-scenario '^py..-integration$'
-      - *persist_to_workspace_step
-      - *save_cache_step
-
   futures:
     docker:
       - *test_runner
@@ -150,14 +121,14 @@ jobs:
       - *persist_to_workspace_step
       - *save_cache_step
 
-  ddtracerun:
+  oteltracerun:
     docker:
       - *test_runner
       - image: redis:4.0-alpine
     resource_class: *resource_class
     steps:
       - checkout
-      - run: scripts/run-tox-scenario '^py..-ddtracerun$'
+      - run: scripts/run-tox-scenario '^py..-oteltracerun$'
       - *persist_to_workspace_step
 
   test_utils:
@@ -190,17 +161,6 @@ jobs:
       - checkout
       - *restore_cache_step
       - run: scripts/run-tox-scenario '^asyncio_contrib-'
-      - *persist_to_workspace_step
-      - *save_cache_step
-
-  pylons:
-    docker:
-      - *test_runner
-    resource_class: *resource_class
-    steps:
-      - checkout
-      - *restore_cache_step
-      - run: scripts/run-tox-scenario '^pylons_contrib-'
       - *persist_to_workspace_step
       - *save_cache_step
 
@@ -298,7 +258,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache_step
-      - run: tox -e 'falcon_contrib{,_autopatch}-{py27,py34,py35,py36}-falcon{10,11,12,13,14}' --result-json /tmp/falcon.results
+      - run: tox -e 'falcon_contrib{,_autopatch}-{py34,py35,py36}-falcon{10,11,12,13,14}' --result-json /tmp/falcon.results
       - *persist_to_workspace_step
       - *save_cache_step
 
@@ -309,9 +269,9 @@ jobs:
       - image: memcached:1.5-alpine
       - image: datadog/docker-dd-agent
         env:
-            - DD_APM_ENABLED=true
-            - DD_BIND_HOST=0.0.0.0
-            - DD_API_KEY=invalid_key_but_this_is_fine
+            - OTEL_APM_ENABLED=true
+            - OTEL_BIND_HOST=0.0.0.0
+            - OTEL_API_KEY=invalid_key_but_this_is_fine
     resource_class: *resource_class
     steps:
       - checkout
@@ -410,24 +370,6 @@ jobs:
       - *restore_cache_step
       - run: tox -e 'wait' mysql
       - run: scripts/run-tox-scenario '^mysqldb_contrib-.*-mysqlclient'
-      - *persist_to_workspace_step
-      - *save_cache_step
-
-  mysqldb:
-    docker:
-      - *test_runner
-      - image: mysql:5.7
-        env:
-            - MYSQL_ROOT_PASSWORD=admin
-            - MYSQL_PASSWORD=test
-            - MYSQL_USER=test
-            - MYSQL_DATABASE=test
-    resource_class: *resource_class
-    steps:
-      - checkout
-      - *restore_cache_step
-      - run: tox -e 'wait' mysql
-      - run: scripts/run-tox-scenario '^mysqldb_contrib-.*-mysqldb'
       - *persist_to_workspace_step
       - *save_cache_step
 
@@ -700,7 +642,7 @@ jobs:
       - run:
           command: |
             mkdir -p /tmp/test-reports
-            tox -e 'benchmarks-{py27,py34,py35,py36,py37}' --result-json /tmp/benchmarks.results -- --benchmark-storage=file:///tmp/test-reports/ --benchmark-autosave
+            tox -e 'benchmarks-{py34,py35,py36,py37}' --result-json /tmp/benchmarks.results -- --benchmark-storage=file:///tmp/test-reports/ --benchmark-autosave
       - store_test_results:
           path: /tmp/test-reports
       - store_artifacts:
@@ -860,7 +802,7 @@ workflows:
       - dbapi:
           requires:
             - flake8
-      - ddtracerun:
+      - oteltracerun:
           requires:
             - flake8
       - django:
@@ -887,9 +829,6 @@ workflows:
       - httplib:
           requires:
             - flake8
-      - integration:
-          requires:
-            - flake8
       - internal:
           requires:
             - flake8
@@ -911,22 +850,13 @@ workflows:
       - mysqlconnector:
           requires:
             - flake8
-      - mysqldb:
-          requires:
-            - flake8
       - mysqlpython:
-          requires:
-            - flake8
-      - opentracer:
           requires:
             - flake8
       - psycopg:
           requires:
             - flake8
       - pylibmc:
-          requires:
-            - flake8
-      - pylons:
           requires:
             - flake8
       - pymemcache:
@@ -997,7 +927,7 @@ workflows:
             - celery
             - consul
             - dbapi
-            - ddtracerun
+            - oteltracerun
             - django
             - elasticsearch
             - falcon
@@ -1006,7 +936,6 @@ workflows:
             - gevent
             - grpc
             - httplib
-            - integration
             - internal
             - jinja2
             - kombu
@@ -1014,12 +943,9 @@ workflows:
             - molten
             - mongoengine
             - mysqlconnector
-            - mysqldb
             - mysqlpython
-            - opentracer
             - psycopg
             - pylibmc
-            - pylons
             - pymemcache
             - pymongo
             - pymysql

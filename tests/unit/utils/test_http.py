@@ -1,4 +1,4 @@
-from ddtrace.utils.http import normalize_header_name
+from oteltrace.utils.http import normalize_header_name
 
 
 class TestHeaderNameNormalization(object):

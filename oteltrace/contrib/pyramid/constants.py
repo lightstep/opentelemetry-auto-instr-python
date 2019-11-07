@@ -1,0 +1,6 @@
+SETTINGS_SERVICE = 'opentelemetry_trace_service'
+SETTINGS_TRACER = 'opentelemetry_tracer'
+SETTINGS_TRACE_ENABLED = 'opentelemetry_trace_enabled'
+SETTINGS_DISTRIBUTED_TRACING = 'opentelemetry_distributed_tracing'
+SETTINGS_ANALYTICS_ENABLED = 'opentelemetry_analytics_enabled'
+SETTINGS_ANALYTICS_SAMPLE_RATE = 'opentelemetry_analytics_sample_rate'

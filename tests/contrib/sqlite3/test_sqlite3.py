@@ -3,15 +3,14 @@ import sqlite3
 import time
 
 # project
-import ddtrace
-from ddtrace import Pin
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.sqlite3 import connection_factory
-from ddtrace.contrib.sqlite3.patch import patch, unpatch, TracedSQLiteCursor
-from ddtrace.ext import errors
+import oteltrace
+from oteltrace import Pin
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.sqlite3 import connection_factory
+from oteltrace.contrib.sqlite3.patch import patch, unpatch, TracedSQLiteCursor
+from oteltrace.ext import errors
 
 # testing
-from tests.opentracer.utils import init_tracer
 from ...base import BaseTracerTestCase
 
 
@@ -36,15 +35,15 @@ class TestSQLite(BaseTracerTestCase):
         assert not self.spans
 
     def test_service_info(self):
-        backup_tracer = ddtrace.tracer
-        ddtrace.tracer = self.tracer
+        backup_tracer = oteltrace.tracer
+        oteltrace.tracer = self.tracer
 
         sqlite3.connect(':memory:')
 
         services = self.tracer.writer.pop_services()
         self.assertEqual(services, {})
 
-        ddtrace.tracer = backup_tracer
+        oteltrace.tracer = backup_tracer
 
     def test_sqlite(self):
         # ensure we can trace multiple services without stomping
@@ -183,49 +182,6 @@ class TestSQLite(BaseTracerTestCase):
                 ),
             )
             self.assertIsNone(fetchmany_span.get_tag('sql.query'))
-
-    def test_sqlite_ot(self):
-        """Ensure sqlite works with the opentracer."""
-        ot_tracer = init_tracer('sqlite_svc', self.tracer)
-
-        # Ensure we can run a query and it's correctly traced
-        q = 'select * from sqlite_master'
-        with ot_tracer.start_active_span('sqlite_op'):
-            db = sqlite3.connect(':memory:')
-            pin = Pin.get_from(db)
-            assert pin
-            self.assertEqual('db', pin.app_type)
-            pin.clone(tracer=self.tracer).onto(db)
-            cursor = db.execute(q)
-            rows = cursor.fetchall()
-        assert not rows
-
-        self.assert_structure(
-            dict(name='sqlite_op', service='sqlite_svc'),
-            (
-                dict(name='sqlite.query', span_type='sql', resource=q, error=0),
-            )
-        )
-        self.reset()
-
-        with self.override_config('dbapi2', dict(trace_fetch_methods=True)):
-            with ot_tracer.start_active_span('sqlite_op'):
-                db = sqlite3.connect(':memory:')
-                pin = Pin.get_from(db)
-                assert pin
-                self.assertEqual('db', pin.app_type)
-                pin.clone(tracer=self.tracer).onto(db)
-                cursor = db.execute(q)
-                rows = cursor.fetchall()
-                assert not rows
-
-            self.assert_structure(
-                dict(name='sqlite_op', service='sqlite_svc'),
-                (
-                    dict(name='sqlite.query', span_type='sql', resource=q, error=0),
-                    dict(name='sqlite.query.fetchall', span_type='sql', resource=q, error=0),
-                ),
-            )
 
     def test_commit(self):
         connection = self._given_a_traced_connection(self.tracer)

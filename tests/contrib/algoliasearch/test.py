@@ -1,7 +1,7 @@
-from ddtrace import config, patch_all
-from ddtrace.contrib.algoliasearch.patch import (SEARCH_SPAN_TYPE, patch,
-                                                 unpatch, algoliasearch_version)
-from ddtrace.pin import Pin
+from oteltrace import config, patch_all
+from oteltrace.contrib.algoliasearch.patch import (SEARCH_SPAN_TYPE, patch,
+                                                   unpatch, algoliasearch_version)
+from oteltrace.pin import Pin
 from tests.base import BaseTracerTestCase
 
 

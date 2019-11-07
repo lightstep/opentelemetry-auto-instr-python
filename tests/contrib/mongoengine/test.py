@@ -7,13 +7,12 @@ import mongoengine
 import pymongo
 
 # project
-from ddtrace import Pin
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.mongoengine.patch import patch, unpatch
-from ddtrace.ext import mongo as mongox
+from oteltrace import Pin
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.mongoengine.patch import patch, unpatch
+from oteltrace.ext import mongo as mongox
 
 # testing
-from tests.opentracer.utils import init_tracer
 from ..config import MONGO_CONFIG
 from ...base import override_config
 from ...test_tracer import get_dummy_tracer
@@ -128,33 +127,6 @@ class MongoEngineCore(object):
         assert span.span_type == 'mongodb'
         assert span.service == self.TEST_SERVICE
         _assert_timing(span, start, end)
-
-    def test_opentracing(self):
-        """Ensure the opentracer works with mongoengine."""
-        tracer = self.get_tracer_and_connect()
-        ot_tracer = init_tracer('my_svc', tracer)
-
-        with ot_tracer.start_active_span('ot_span'):
-            start = time.time()
-            Artist.drop_collection()
-            end = time.time()
-
-        # ensure we get a drop collection span
-        spans = tracer.writer.pop()
-        assert len(spans) == 2
-        ot_span, dd_span = spans
-
-        # confirm the parenting
-        assert ot_span.parent_id is None
-        assert dd_span.parent_id == ot_span.span_id
-
-        assert ot_span.name == 'ot_span'
-        assert ot_span.service == 'my_svc'
-
-        assert dd_span.resource == 'drop artist'
-        assert dd_span.span_type == 'mongodb'
-        assert dd_span.service == self.TEST_SERVICE
-        _assert_timing(dd_span, start, end)
 
     def test_analytics_default(self):
         tracer = self.get_tracer_and_connect()

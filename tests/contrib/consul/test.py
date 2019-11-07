@@ -1,9 +1,9 @@
 import consul
-from ddtrace import Pin
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.ext import consul as consulx
-from ddtrace.vendor.wrapt import BoundFunctionWrapper
-from ddtrace.contrib.consul.patch import patch, unpatch
+from oteltrace import Pin
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.ext import consul as consulx
+from oteltrace.vendor.wrapt import BoundFunctionWrapper
+from oteltrace.contrib.consul.patch import patch, unpatch
 
 from ..config import CONSUL_CONFIG
 from ...base import BaseTracerTestCase

@@ -1,7 +1,7 @@
 import unittest
 
-from ddtrace.contrib.tornado.compat import futures_available
-from ddtrace.ext import http
+from oteltrace.contrib.tornado.compat import futures_available
+from oteltrace.ext import http
 
 from tornado import version_info
 
@@ -171,10 +171,10 @@ class TestTornadoExecutor(TornadoTestCase):
     def test_futures_double_instrumentation(self):
         # it should not double wrap `ThreadpPoolExecutor.submit` method if
         # `futures` is already instrumented
-        from ddtrace import patch
+        from oteltrace import patch
         patch(futures=True)
         from concurrent.futures import ThreadPoolExecutor
-        from ddtrace.vendor.wrapt import BoundFunctionWrapper
+        from oteltrace.vendor.wrapt import BoundFunctionWrapper
 
         fn_wrapper = getattr(ThreadPoolExecutor.submit, '__wrapped__', None)
         assert not isinstance(fn_wrapper, BoundFunctionWrapper)

@@ -1,4 +1,4 @@
-from ddtrace.ext import http
+from oteltrace.ext import http
 
 from .utils import TornadoTestCase
 

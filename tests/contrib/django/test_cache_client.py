@@ -4,7 +4,7 @@ import time
 from django.core.cache import caches
 
 # testing
-from .utils import DjangoTraceTestCase, override_ddtrace_settings
+from .utils import DjangoTraceTestCase, override_oteltrace_settings
 from ...util import assert_dict_issuperset
 
 
@@ -41,7 +41,7 @@ class DjangoCacheWrapperTest(DjangoTraceTestCase):
         assert_dict_issuperset(span.meta, expected_meta)
         assert start < span.start < span.start + span.duration < end
 
-    @override_ddtrace_settings(DEFAULT_CACHE_SERVICE='foo')
+    @override_oteltrace_settings(DEFAULT_CACHE_SERVICE='foo')
     def test_cache_service_can_be_overriden(self):
         # get the default cache
         cache = caches['default']
@@ -56,7 +56,7 @@ class DjangoCacheWrapperTest(DjangoTraceTestCase):
         span = spans[0]
         assert span.service == 'foo'
 
-    @override_ddtrace_settings(INSTRUMENT_CACHE=False)
+    @override_oteltrace_settings(INSTRUMENT_CACHE=False)
     def test_cache_disabled(self):
         # get the default cache
         cache = caches['default']

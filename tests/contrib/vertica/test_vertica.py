@@ -1,19 +1,18 @@
 # 3p
 import pytest
-from ddtrace.vendor import wrapt
+from oteltrace.vendor import wrapt
 
 # project
-import ddtrace
-from ddtrace import Pin, config
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.vertica.patch import patch, unpatch
-from ddtrace.ext import errors
-from ddtrace.utils.merge import deepmerge
+import oteltrace
+from oteltrace import Pin, config
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.vertica.patch import patch, unpatch
+from oteltrace.ext import errors
+from oteltrace.utils.merge import deepmerge
 
 # testing
 from tests.base import BaseTracerTestCase
 from tests.contrib.config import VERTICA_CONFIG
-from tests.opentracer.utils import init_tracer
 from tests.test_tracer import get_dummy_tracer
 
 TEST_TABLE = 'test_table'
@@ -27,7 +26,7 @@ def test_tracer(request):
 
 @pytest.fixture(scope='function')
 def test_conn(request, test_tracer):
-    ddtrace.tracer = test_tracer
+    oteltrace.tracer = test_tracer
     patch()
 
     import vertica_python  # must happen AFTER installing with patch()
@@ -354,33 +353,6 @@ class TestVertica(BaseTracerTestCase):
         assert spans[0].resource == query
         assert spans[1].name == 'vertica.query'
         assert spans[1].resource == 'COMMIT;'
-
-    def test_opentracing(self):
-        """Ensure OpenTracing works with vertica."""
-        conn, cur = self.test_conn
-
-        ot_tracer = init_tracer('vertica_svc', self.test_tracer)
-
-        with ot_tracer.start_active_span('vertica_execute'):
-            cur.execute("INSERT INTO {} (a, b) VALUES (1, 'aa');".format(TEST_TABLE))
-            conn.close()
-
-        spans = self.test_tracer.writer.pop()
-        assert len(spans) == 2
-        ot_span, dd_span = spans
-
-        # confirm the parenting
-        assert ot_span.parent_id is None
-        assert dd_span.parent_id == ot_span.span_id
-
-        assert dd_span.service == 'vertica'
-        assert dd_span.span_type == 'sql'
-        assert dd_span.name == 'vertica.query'
-        assert dd_span.get_metric('db.rowcount') == -1
-        query = "INSERT INTO test_table (a, b) VALUES (1, 'aa');"
-        assert dd_span.resource == query
-        assert dd_span.get_tag('out.host') == '127.0.0.1'
-        assert dd_span.get_tag('out.port') == '5433'
 
     def test_analytics_default(self):
         conn, cur = self.test_conn

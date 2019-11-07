@@ -1,4 +1,4 @@
-from ddtrace import Tracer
+from oteltrace import Tracer
 import pytest
 
 from .test_tracer import DummyWriter

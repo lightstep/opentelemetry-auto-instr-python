@@ -3,13 +3,12 @@ import pytest
 import time
 
 
-from ddtrace.context import Context
-from ddtrace.internal.context_manager import CONTEXTVARS_IS_AVAILABLE
-from ddtrace.provider import DefaultContextProvider
-from ddtrace.contrib.asyncio.patch import patch, unpatch
-from ddtrace.contrib.asyncio.helpers import set_call_context
+from oteltrace.context import Context
+from oteltrace.internal.context_manager import CONTEXTVARS_IS_AVAILABLE
+from oteltrace.provider import DefaultContextProvider
+from oteltrace.contrib.asyncio.patch import patch, unpatch
+from oteltrace.contrib.asyncio.helpers import set_call_context
 
-from tests.opentracer.utils import init_tracer
 from .utils import AsyncioTestCase, mark_asyncio
 
 
@@ -29,12 +28,12 @@ class TestAsyncioTracer(AsyncioTestCase):
         # it should return the context attached to the current Task
         # or create a new one
         task = asyncio.Task.current_task()
-        ctx = getattr(task, '__datadog_context', None)
+        ctx = getattr(task, '__opentelemetry_context', None)
         assert ctx is None
         # get the context from the loop creates a new one that
         # is attached to the Task object
         ctx = self.tracer.get_call_context()
-        assert ctx == getattr(task, '__datadog_context', None)
+        assert ctx == getattr(task, '__opentelemetry_context', None)
 
     @mark_asyncio
     def test_get_call_context_twice(self):
@@ -336,57 +335,3 @@ class TestAsyncioPropagation(AsyncioTestCase):
         # the event loop
         patch()
         self.test_tasks_chaining()
-
-    @mark_asyncio
-    def test_trace_multiple_coroutines_ot_outer(self):
-        """OpenTracing version of test_trace_multiple_coroutines."""
-        # if multiple coroutines have nested tracing, they must belong
-        # to the same trace
-        @asyncio.coroutine
-        def coro():
-            # another traced coroutine
-            with self.tracer.trace('coroutine_2'):
-                return 42
-
-        ot_tracer = init_tracer('asyncio_svc', self.tracer)
-        with ot_tracer.start_active_span('coroutine_1'):
-            value = yield from coro()
-
-        # the coroutine has been called correctly
-        assert 42 == value
-        # a single trace has been properly reported
-        traces = self.tracer.writer.pop_traces()
-        assert 1 == len(traces)
-        assert 2 == len(traces[0])
-        assert 'coroutine_1' == traces[0][0].name
-        assert 'coroutine_2' == traces[0][1].name
-        # the parenting is correct
-        assert traces[0][0] == traces[0][1]._parent
-        assert traces[0][0].trace_id == traces[0][1].trace_id
-
-    @mark_asyncio
-    def test_trace_multiple_coroutines_ot_inner(self):
-        """OpenTracing version of test_trace_multiple_coroutines."""
-        # if multiple coroutines have nested tracing, they must belong
-        # to the same trace
-        ot_tracer = init_tracer('asyncio_svc', self.tracer)
-        @asyncio.coroutine
-        def coro():
-            # another traced coroutine
-            with ot_tracer.start_active_span('coroutine_2'):
-                return 42
-
-        with self.tracer.trace('coroutine_1'):
-            value = yield from coro()
-
-        # the coroutine has been called correctly
-        assert 42 == value
-        # a single trace has been properly reported
-        traces = self.tracer.writer.pop_traces()
-        assert 1 == len(traces)
-        assert 2 == len(traces[0])
-        assert 'coroutine_1' == traces[0][0].name
-        assert 'coroutine_2' == traces[0][1].name
-        # the parenting is correct
-        assert traces[0][0] == traces[0][1]._parent
-        assert traces[0][0].trace_id == traces[0][1].trace_id

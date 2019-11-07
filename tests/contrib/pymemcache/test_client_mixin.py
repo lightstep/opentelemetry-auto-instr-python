@@ -3,11 +3,11 @@ import unittest
 import pymemcache
 
 # project
-from ddtrace import Pin
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.pymemcache.patch import patch, unpatch
-from ddtrace.ext import memcached as memcachedx
-from ddtrace.ext import net
+from oteltrace import Pin
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.pymemcache.patch import patch, unpatch
+from oteltrace.ext import memcached as memcachedx
+from oteltrace.ext import net
 from .utils import MockSocket
 
 from tests.test_tracer import get_dummy_tracer

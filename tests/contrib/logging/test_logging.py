@@ -1,9 +1,9 @@
 import logging
 
-from ddtrace.helpers import get_correlation_ids
-from ddtrace.compat import StringIO
-from ddtrace.contrib.logging import patch, unpatch
-from ddtrace.vendor import wrapt
+from oteltrace.helpers import get_correlation_ids
+from oteltrace.compat import StringIO
+from oteltrace.contrib.logging import patch, unpatch
+from oteltrace.vendor import wrapt
 
 from ...base import BaseTracerTestCase
 
@@ -58,11 +58,11 @@ class LoggingTestCase(BaseTracerTestCase):
             # with format string for trace info
             output, result = capture_function_log(
                 func,
-                fmt='%(message)s - dd.trace_id=%(dd.trace_id)s dd.span_id=%(dd.span_id)s',
+                fmt='%(message)s - otel.trace_id=%(otel.trace_id)s otel.span_id=%(otel.span_id)s',
             )
             self.assertEqual(
                 output,
-                'Hello! - dd.trace_id={} dd.span_id={}'.format(*result),
+                'Hello! - otel.trace_id={} otel.span_id={}'.format(*result),
             )
 
             # without format string
@@ -87,9 +87,9 @@ class LoggingTestCase(BaseTracerTestCase):
             # with format string for trace info
             output, _ = capture_function_log(
                 func,
-                fmt='%(message)s - dd.trace_id=%(dd.trace_id)s dd.span_id=%(dd.span_id)s',
+                fmt='%(message)s - otel.trace_id=%(otel.trace_id)s otel.span_id=%(otel.span_id)s',
             )
             self.assertEqual(
                 output,
-                'Hello! - dd.trace_id=0 dd.span_id=0',
+                'Hello! - otel.trace_id=0 otel.span_id=0',
             )

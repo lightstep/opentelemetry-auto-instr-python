@@ -3,18 +3,16 @@ import contextlib
 import sys
 
 # Third party
-from ddtrace.vendor import wrapt
+from oteltrace.vendor import wrapt
 
 # Project
-from ddtrace import config
-from ddtrace.compat import httplib, PY2
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.httplib import patch, unpatch
-from ddtrace.contrib.httplib.patch import should_skip_request
-from ddtrace.ext import http
-from ddtrace.pin import Pin
-
-from tests.opentracer.utils import init_tracer
+from oteltrace import config
+from oteltrace.compat import httplib, PY2
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.httplib import patch, unpatch
+from oteltrace.contrib.httplib.patch import should_skip_request
+from oteltrace.ext import http
+from oteltrace.pin import Pin
 
 from ...base import BaseTracerTestCase
 from ...util import assert_dict_issuperset, override_global_tracer
@@ -113,18 +111,6 @@ class HTTPLibTestCase(HTTPLibBaseMixin, BaseTracerTestCase):
         # Disabled Pin and non-internal request
         self.tracer.enabled = False
         request = self.get_http_connection(SOCKET)
-        pin = Pin.get_from(request)
-        self.assertTrue(should_skip_request(pin, request))
-
-        # Enabled Pin and internal request
-        self.tracer.enabled = True
-        request = self.get_http_connection(self.tracer.writer.api.hostname, self.tracer.writer.api.port)
-        pin = Pin.get_from(request)
-        self.assertTrue(should_skip_request(pin, request))
-
-        # Disabled Pin and internal request
-        self.tracer.enabled = False
-        request = self.get_http_connection(self.tracer.writer.api.hostname, self.tracer.writer.api.port)
         pin = Pin.get_from(request)
         self.assertTrue(should_skip_request(pin, request))
 
@@ -368,7 +354,7 @@ class HTTPLibTestCase(HTTPLibBaseMixin, BaseTracerTestCase):
 
         # Enabled when configured
         with self.override_config('hhtplib', {}):
-            from ddtrace.settings import IntegrationConfig
+            from oteltrace.settings import IntegrationConfig
             integration_config = config.httplib  # type: IntegrationConfig
             integration_config.http.trace_headers(['my-header', 'access-control-allow-origin'])
             conn = self.get_http_connection(SOCKET)
@@ -475,41 +461,6 @@ class HTTPLibTestCase(HTTPLibBaseMixin, BaseTracerTestCase):
         self.assertEqual(span.get_tag('http.method'), 'GET')
         self.assertEqual(span.get_tag('http.status_code'), '200')
         self.assertEqual(span.get_tag('http.url'), URL_200)
-
-    def test_httplib_request_get_request_ot(self):
-        """ OpenTracing version of test with same name. """
-        ot_tracer = init_tracer('my_svc', self.tracer)
-
-        with ot_tracer.start_active_span('ot_span'):
-            conn = self.get_http_connection(SOCKET)
-            with contextlib.closing(conn):
-                conn.request('GET', '/status/200')
-                resp = conn.getresponse()
-                self.assertEqual(self.to_str(resp.read()), '')
-                self.assertEqual(resp.status, 200)
-
-        spans = self.tracer.writer.pop()
-        self.assertEqual(len(spans), 2)
-        ot_span, dd_span = spans
-
-        # confirm the parenting
-        self.assertEqual(ot_span.parent_id, None)
-        self.assertEqual(dd_span.parent_id, ot_span.span_id)
-
-        self.assertEqual(ot_span.service, 'my_svc')
-        self.assertEqual(ot_span.name, 'ot_span')
-
-        self.assertEqual(dd_span.span_type, 'http')
-        self.assertEqual(dd_span.name, self.SPAN_NAME)
-        self.assertEqual(dd_span.error, 0)
-        assert_dict_issuperset(
-            dd_span.meta,
-            {
-                'http.method': 'GET',
-                'http.status_code': '200',
-                'http.url': URL_200,
-            }
-        )
 
     def test_analytics_default(self):
         conn = self.get_http_connection(SOCKET)

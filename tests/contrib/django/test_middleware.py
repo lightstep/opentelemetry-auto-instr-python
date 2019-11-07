@@ -3,15 +3,14 @@ from django.test import modify_settings
 from django.db import connections
 
 # project
-from ddtrace import config
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY, SAMPLING_PRIORITY_KEY
-from ddtrace.contrib.django.db import unpatch_conn
-from ddtrace.ext import errors, http
+from oteltrace import config
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY, SAMPLING_PRIORITY_KEY
+from oteltrace.contrib.django.db import unpatch_conn
+from oteltrace.ext import errors, http
 
 # testing
-from tests.opentracer.utils import init_tracer
 from .compat import reverse
-from .utils import DjangoTraceTestCase, override_ddtrace_settings
+from .utils import DjangoTraceTestCase, override_oteltrace_settings
 
 
 class DjangoMiddlewareTest(DjangoTraceTestCase):
@@ -86,7 +85,7 @@ class DjangoMiddlewareTest(DjangoTraceTestCase):
         self.assertIsNone(sp_template.get_metric(ANALYTICS_SAMPLE_RATE_KEY))
         self.assertIsNone(sp_database.get_metric(ANALYTICS_SAMPLE_RATE_KEY))
 
-    @override_ddtrace_settings(ANALYTICS_ENABLED=True, ANALYTICS_SAMPLE_RATE=0.5)
+    @override_oteltrace_settings(ANALYTICS_ENABLED=True, ANALYTICS_SAMPLE_RATE=0.5)
     def test_analytics_global_on_integration_on(self):
         """
         When making a request
@@ -129,7 +128,7 @@ class DjangoMiddlewareTest(DjangoTraceTestCase):
         self.assertIsNone(sp_template.get_metric(ANALYTICS_SAMPLE_RATE_KEY))
         self.assertIsNone(sp_database.get_metric(ANALYTICS_SAMPLE_RATE_KEY))
 
-    @override_ddtrace_settings(ANALYTICS_ENABLED=True, ANALYTICS_SAMPLE_RATE=0.5)
+    @override_oteltrace_settings(ANALYTICS_ENABLED=True, ANALYTICS_SAMPLE_RATE=0.5)
     def test_analytics_global_off_integration_on(self):
         """
         When making a request
@@ -151,7 +150,7 @@ class DjangoMiddlewareTest(DjangoTraceTestCase):
         self.assertIsNone(sp_template.get_metric(ANALYTICS_SAMPLE_RATE_KEY))
         self.assertIsNone(sp_database.get_metric(ANALYTICS_SAMPLE_RATE_KEY))
 
-    @override_ddtrace_settings(ANALYTICS_ENABLED=True, ANALYTICS_SAMPLE_RATE=None)
+    @override_oteltrace_settings(ANALYTICS_ENABLED=True, ANALYTICS_SAMPLE_RATE=None)
     def test_analytics_global_off_integration_on_and_none(self):
         """
         When making a request
@@ -324,7 +323,7 @@ class DjangoMiddlewareTest(DjangoTraceTestCase):
         assert sp_request.parent_id == 42
         assert sp_request.get_metric(SAMPLING_PRIORITY_KEY) == 2
 
-    @override_ddtrace_settings(DISTRIBUTED_TRACING=False)
+    @override_oteltrace_settings(DISTRIBUTED_TRACING=False)
     def test_middleware_no_propagation(self):
         # ensures that we properly propagate http context
         url = reverse('users-list')
@@ -397,38 +396,6 @@ class DjangoMiddlewareTest(DjangoTraceTestCase):
         assert sp_request.get_tag(errors.ERROR_STACK) is None
         assert sp_request.get_tag(errors.ERROR_MSG) is None
         assert sp_request.get_tag(errors.ERROR_TYPE) is None
-
-    def test_middleware_trace_request_ot(self):
-        """OpenTracing version of test_middleware_trace_request."""
-        ot_tracer = init_tracer('my_svc', self.tracer)
-
-        # ensures that the internals are properly traced
-        url = reverse('users-list')
-        with ot_tracer.start_active_span('ot_span'):
-            response = self.client.get(url)
-        assert response.status_code == 200
-
-        # check for spans
-        spans = self.tracer.writer.pop()
-        assert len(spans) == 4
-        ot_span = spans[0]
-        sp_request = spans[1]
-        sp_template = spans[2]
-        sp_database = spans[3]
-
-        # confirm parenting
-        assert ot_span.parent_id is None
-        assert sp_request.parent_id == ot_span.span_id
-
-        assert ot_span.resource == 'ot_span'
-        assert ot_span.service == 'my_svc'
-
-        assert sp_database.get_tag('django.db.vendor') == 'sqlite'
-        assert sp_template.get_tag('django.template_name') == 'users_list.html'
-        assert sp_request.get_tag('http.status_code') == '200'
-        assert sp_request.get_tag(http.URL) == 'http://testserver/users/'
-        assert sp_request.get_tag('django.user.is_authenticated') == 'False'
-        assert sp_request.get_tag('http.method') == 'GET'
 
     def test_middleware_trace_request_404(self):
         """

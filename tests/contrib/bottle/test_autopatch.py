@@ -1,11 +1,11 @@
 import bottle
-import ddtrace
+import oteltrace
 import webtest
 
 from unittest import TestCase
 from tests.test_tracer import get_dummy_tracer
 
-from ddtrace import compat
+from oteltrace import compat
 
 
 SERVICE = 'bottle-app'
@@ -18,14 +18,14 @@ class TraceBottleTest(TestCase):
     def setUp(self):
         # provide a dummy tracer
         self.tracer = get_dummy_tracer()
-        self._original_tracer = ddtrace.tracer
-        ddtrace.tracer = self.tracer
+        self._original_tracer = oteltrace.tracer
+        oteltrace.tracer = self.tracer
         # provide a Bottle app
         self.app = bottle.Bottle()
 
     def tearDown(self):
         # restore the tracer
-        ddtrace.tracer = self._original_tracer
+        oteltrace.tracer = self._original_tracer
 
     def _trace_app(self, tracer=None):
         self.app = webtest.TestApp(self.app)

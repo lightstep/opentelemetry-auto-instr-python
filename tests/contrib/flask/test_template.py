@@ -1,7 +1,7 @@
 import flask
 
-from ddtrace import Pin
-from ddtrace.contrib.flask import unpatch
+from oteltrace import Pin
+from oteltrace.contrib.flask import unpatch
 
 from . import BaseFlaskTestCase
 

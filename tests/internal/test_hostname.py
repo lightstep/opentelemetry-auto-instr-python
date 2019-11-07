@@ -1,6 +1,6 @@
 import mock
 
-from ddtrace.internal.hostname import get_hostname
+from oteltrace.internal.hostname import get_hostname
 
 
 @mock.patch('socket.gethostname')

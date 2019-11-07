@@ -6,7 +6,7 @@ import sys
 import pytest
 
 # Project
-from ddtrace.compat import to_unicode, PY3, reraise, get_connection_response
+from oteltrace.compat import to_unicode, PY3, reraise, get_connection_response
 
 
 if PY3:

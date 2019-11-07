@@ -7,12 +7,11 @@ import aiopg
 from psycopg2 import extras
 
 # project
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.aiopg.patch import patch, unpatch
-from ddtrace import Pin
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.aiopg.patch import patch, unpatch
+from oteltrace import Pin
 
 # testing
-from tests.opentracer.utils import init_tracer
 from tests.contrib.config import POSTGRES_CONFIG
 from tests.test_tracer import get_dummy_tracer
 from tests.contrib.asyncio.utils import AsyncioTestCase, mark_asyncio
@@ -76,28 +75,6 @@ class AiopgTestCase(AsyncioTestCase):
         assert span.span_type == 'sql'
         assert start <= span.start <= end
         assert span.duration <= end - start
-
-        # Ensure OpenTracing compatibility
-        ot_tracer = init_tracer('aiopg_svc', tracer)
-        with ot_tracer.start_active_span('aiopg_op'):
-            cursor = yield from db.cursor()
-            yield from cursor.execute(q)
-            rows = yield from cursor.fetchall()
-            assert rows == [('foobarblah',)]
-        spans = writer.pop()
-        assert len(spans) == 2
-        ot_span, dd_span = spans
-        # confirm the parenting
-        assert ot_span.parent_id is None
-        assert dd_span.parent_id == ot_span.span_id
-        assert ot_span.name == 'aiopg_op'
-        assert ot_span.service == 'aiopg_svc'
-        assert dd_span.name == 'postgres.query'
-        assert dd_span.resource == q
-        assert dd_span.service == service
-        assert dd_span.meta['sql.query'] == q
-        assert dd_span.error == 0
-        assert dd_span.span_type == 'sql'
 
         # run a query with an error and ensure all is well
         q = 'select * from some_non_existant_table'

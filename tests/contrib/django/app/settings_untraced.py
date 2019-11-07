@@ -99,7 +99,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
 ]
 
-DATADOG_TRACE = {
+OPENTELEMETRY_TRACE = {
     # tracer with a DummyWriter
     'TRACER': 'tests.contrib.django.utils.tracer',
     'ENABLED': True,

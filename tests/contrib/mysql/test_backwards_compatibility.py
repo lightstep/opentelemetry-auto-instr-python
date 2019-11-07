@@ -1,5 +1,5 @@
 
-from ddtrace.contrib.mysql import get_traced_mysql_connection
+from oteltrace.contrib.mysql import get_traced_mysql_connection
 from tests.test_tracer import get_dummy_tracer
 from tests.contrib import config
 

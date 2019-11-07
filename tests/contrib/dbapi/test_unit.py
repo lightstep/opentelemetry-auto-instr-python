@@ -1,9 +1,9 @@
 import mock
 
-from ddtrace import Pin
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.dbapi import FetchTracedCursor, TracedCursor, TracedConnection
-from ddtrace.span import Span
+from oteltrace import Pin
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.dbapi import FetchTracedCursor, TracedCursor, TracedConnection
+from oteltrace.span import Span
 from ...base import BaseTracerTestCase
 
 

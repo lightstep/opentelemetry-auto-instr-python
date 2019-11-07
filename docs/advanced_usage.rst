@@ -1,24 +1,21 @@
 Advanced Usage
 ==============
 
-Agent Configuration
--------------------
+Sending traces to different backends
+------------------------------------
 
-If the Datadog Agent is on a separate host from your application, you can modify
-the default ``ddtrace.tracer`` object to utilize another hostname and port. Here
-is a small example showcasing this::
+`oteltrace` can export traces to different backends by using different api implementations, it
+can be controlled by passing an `api` object to :func:`oteltrace.Tracer.configure`.
 
-    from ddtrace import tracer
+The :class:`oteltrace.api_otel_exporter.APIOtel` class uses an OpenTelemetry exporters as backend.
 
-    tracer.configure(hostname=<YOUR_HOST>, port=<YOUR_PORT>, https=<True/False>)
+Sending traces to different backends
+------------------------------------
 
-By default, these will be set to ``localhost``, ``8126``, and ``False`` respectively.
+`oteltrace` can export traces to different backends by using different api implementations, it
+can be controlled by passing an `api` object to :func:`oteltrace.Tracer.configure`.
 
-You can also use a Unix Domain Socket to connect to the agent::
-
-    from ddtrace import tracer
-
-    tracer.configure(uds_path="/path/to/socket")
+The :class:`oteltrace.api_otel_exporter.APIOtel` class uses an OpenTelemetry exporters as backend.
 
 
 Distributed Tracing
@@ -29,7 +26,7 @@ To trace requests across hosts, the spans on the secondary hosts must be linked 
 - On the server side, it means to read propagated attributes and set them to the active tracing context.
 - On the client side, it means to propagate the attributes, commonly as a header/metadata.
 
-`ddtrace` already provides default propagators but you can also implement your own.
+`oteltrace` already provides default propagators (``w3c``, ``b3`` and ``datadog``) but you can also implement your own.
 
 Web Frameworks
 ^^^^^^^^^^^^^^
@@ -72,8 +69,8 @@ on the other side, the metadata is retrieved and the trace can continue.
 To propagate the tracing information, HTTP headers are used to transmit the
 required metadata to piece together the trace.
 
-.. autoclass:: ddtrace.propagation.http.HTTPPropagator
-    :members:
+:func:`oteltrace.propagation.http.HTTPPropagator` returns an instance of the configured
+propagator.
 
 Custom
 ^^^^^^
@@ -159,7 +156,7 @@ stored and remain incomplete.
 If you change the priority, we recommend you do it as soon as possible, when the
 root span has just been created::
 
-    from ddtrace.ext.priority import USER_REJECT, USER_KEEP
+    from oteltrace.ext.priority import USER_REJECT, USER_KEEP
 
     context = tracer.context_provider.active()
 
@@ -176,7 +173,7 @@ dropped in the client.
 
 The ``RateSampler`` randomly samples a percentage of traces::
 
-    from ddtrace.sampler import RateSampler
+    from oteltrace.sampler import RateSampler
 
     # Sample rate is between 0 (nothing sampled) to 1 (everything sampled).
     # Keep 20% of the traces.
@@ -189,7 +186,7 @@ Trace Search & Analytics
 
 Use `Trace Search & Analytics <https://docs.datadoghq.com/tracing/visualization/search/>`_ to filter application performance metrics and APM Events by user-defined tags. An APM event is generated every time a trace is generated.
 
-Enabling APM events for all web frameworks can be accomplished by setting the environment variable ``DD_TRACE_ANALYTICS_ENABLED=true``:
+Enabling APM events for all web frameworks can be accomplished by setting the environment variable ``OTEL_TRACE_ANALYTICS_ENABLED=true``:
 
 * :ref:`aiohttp`
 * :ref:`bottle`
@@ -203,54 +200,54 @@ Enabling APM events for all web frameworks can be accomplished by setting the en
 * :ref:`tornado`
 
 
-For most libraries, APM events can be enabled with the environment variable ``DD_{INTEGRATION}_ANALYTICS_ENABLED=true``:
+For most libraries, APM events can be enabled with the environment variable ``OTEL_{INTEGRATION}_ANALYTICS_ENABLED=true``:
 
 +----------------------+----------------------------------------+
 |       Library        |          Environment Variable          |
 +======================+========================================+
-| :ref:`aiobotocore`   | ``DD_AIOBOTOCORE_ANALYTICS_ENABLED``   |
+| :ref:`aiobotocore`   | ``OTEL_AIOBOTOCORE_ANALYTICS_ENABLED``   |
 +----------------------+----------------------------------------+
-| :ref:`aiopg`         | ``DD_AIOPG_ANALYTICS_ENABLED``         |
+| :ref:`aiopg`         | ``OTEL_AIOPG_ANALYTICS_ENABLED``         |
 +----------------------+----------------------------------------+
-| :ref:`boto`          | ``DD_BOTO_ANALYTICS_ENABLED``          |
+| :ref:`boto`          | ``OTEL_BOTO_ANALYTICS_ENABLED``          |
 +----------------------+----------------------------------------+
-| :ref:`botocore`      | ``DD_BOTOCORE_ANALYTICS_ENABLED``      |
+| :ref:`botocore`      | ``OTEL_BOTOCORE_ANALYTICS_ENABLED``      |
 +----------------------+----------------------------------------+
-| :ref:`bottle`        | ``DD_BOTTLE_ANALYTICS_ENABLED``        |
+| :ref:`bottle`        | ``OTEL_BOTTLE_ANALYTICS_ENABLED``        |
 +----------------------+----------------------------------------+
-| :ref:`cassandra`     | ``DD_CASSANDRA_ANALYTICS_ENABLED``     |
+| :ref:`cassandra`     | ``OTEL_CASSANDRA_ANALYTICS_ENABLED``     |
 +----------------------+----------------------------------------+
-| :ref:`elasticsearch` | ``DD_ELASTICSEARCH_ANALYTICS_ENABLED`` |
+| :ref:`elasticsearch` | ``OTEL_ELASTICSEARCH_ANALYTICS_ENABLED`` |
 +----------------------+----------------------------------------+
-| :ref:`falcon`        | ``DD_FALCON_ANALYTICS_ENABLED``        |
+| :ref:`falcon`        | ``OTEL_FALCON_ANALYTICS_ENABLED``        |
 +----------------------+----------------------------------------+
-| :ref:`flask`         | ``DD_FLASK_ANALYTICS_ENABLED``         |
+| :ref:`flask`         | ``OTEL_FLASK_ANALYTICS_ENABLED``         |
 +----------------------+----------------------------------------+
-| :ref:`flask_cache`   | ``DD_FLASK_CACHE_ANALYTICS_ENABLED``   |
+| :ref:`flask_cache`   | ``OTEL_FLASK_CACHE_ANALYTICS_ENABLED``   |
 +----------------------+----------------------------------------+
-| :ref:`grpc`          | ``DD_GRPC_ANALYTICS_ENABLED``          |
+| :ref:`grpc`          | ``OTEL_GRPC_ANALYTICS_ENABLED``          |
 +----------------------+----------------------------------------+
-| :ref:`httplib`       | ``DD_HTTPLIB_ANALYTICS_ENABLED``       |
+| :ref:`httplib`       | ``OTEL_HTTPLIB_ANALYTICS_ENABLED``       |
 +----------------------+----------------------------------------+
-| :ref:`kombu`         | ``DD_KOMBU_ANALYTICS_ENABLED``         |
+| :ref:`kombu`         | ``OTEL_KOMBU_ANALYTICS_ENABLED``         |
 +----------------------+----------------------------------------+
-| :ref:`molten`        | ``DD_MOLTEN_ANALYTICS_ENABLED``        |
+| :ref:`molten`        | ``OTEL_MOLTEN_ANALYTICS_ENABLED``        |
 +----------------------+----------------------------------------+
-| :ref:`pylibmc`       | ``DD_PYLIBMC_ANALYTICS_ENABLED``       |
+| :ref:`pylibmc`       | ``OTEL_PYLIBMC_ANALYTICS_ENABLED``       |
 +----------------------+----------------------------------------+
-| :ref:`pylons`        | ``DD_PYLONS_ANALYTICS_ENABLED``        |
+| :ref:`pylons`        | ``OTEL_PYLONS_ANALYTICS_ENABLED``        |
 +----------------------+----------------------------------------+
-| :ref:`pymemcache`    | ``DD_PYMEMCACHE_ANALYTICS_ENABLED``    |
+| :ref:`pymemcache`    | ``OTEL_PYMEMCACHE_ANALYTICS_ENABLED``    |
 +----------------------+----------------------------------------+
-| :ref:`pymongo`       | ``DD_PYMONGO_ANALYTICS_ENABLED``       |
+| :ref:`pymongo`       | ``OTEL_PYMONGO_ANALYTICS_ENABLED``       |
 +----------------------+----------------------------------------+
-| :ref:`redis`         | ``DD_REDIS_ANALYTICS_ENABLED``         |
+| :ref:`redis`         | ``OTEL_REDIS_ANALYTICS_ENABLED``         |
 +----------------------+----------------------------------------+
-| :ref:`rediscluster`  | ``DD_REDISCLUSTER_ANALYTICS_ENABLED``  |
+| :ref:`rediscluster`  | ``OTEL_REDISCLUSTER_ANALYTICS_ENABLED``  |
 +----------------------+----------------------------------------+
-| :ref:`sqlalchemy`    | ``DD_SQLALCHEMY_ANALYTICS_ENABLED``    |
+| :ref:`sqlalchemy`    | ``OTEL_SQLALCHEMY_ANALYTICS_ENABLED``    |
 +----------------------+----------------------------------------+
-| :ref:`vertica`       | ``DD_VERTICA_ANALYTICS_ENABLED``       |
+| :ref:`vertica`       | ``OTEL_VERTICA_ANALYTICS_ENABLED``       |
 +----------------------+----------------------------------------+
 
 For datastore libraries that extend another, use the setting for the underlying library:
@@ -258,17 +255,17 @@ For datastore libraries that extend another, use the setting for the underlying 
 +------------------------+----------------------------------+
 |        Library         |       Environment Variable       |
 +========================+==================================+
-| :ref:`mongoengine`     | ``DD_PYMONGO_ANALYTICS_ENABLED`` |
+| :ref:`mongoengine`     | ``OTEL_PYMONGO_ANALYTICS_ENABLED`` |
 +------------------------+----------------------------------+
-| :ref:`mysql-connector` | ``DD_DBAPI2_ANALYTICS_ENABLED``  |
+| :ref:`mysql-connector` | ``OTEL_DBAPI2_ANALYTICS_ENABLED``  |
 +------------------------+----------------------------------+
-| :ref:`mysqldb`         | ``DD_DBAPI2_ANALYTICS_ENABLED``  |
+| :ref:`mysqldb`         | ``OTEL_DBAPI2_ANALYTICS_ENABLED``  |
 +------------------------+----------------------------------+
-| :ref:`psycopg2`        | ``DD_DBAPI2_ANALYTICS_ENABLED``  |
+| :ref:`psycopg2`        | ``OTEL_DBAPI2_ANALYTICS_ENABLED``  |
 +------------------------+----------------------------------+
-| :ref:`pymysql`         | ``DD_DBAPI2_ANALYTICS_ENABLED``  |
+| :ref:`pymysql`         | ``OTEL_DBAPI2_ANALYTICS_ENABLED``  |
 +------------------------+----------------------------------+
-| :ref:`sqllite`         | ``DD_DBAPI2_ANALYTICS_ENABLED``  |
+| :ref:`sqllite`         | ``OTEL_DBAPI2_ANALYTICS_ENABLED``  |
 +------------------------+----------------------------------+
 
 Where environment variables are not used for configuring the tracer, the instructions for configuring trace analytics is provided in the library documentation:
@@ -282,7 +279,7 @@ Where environment variables are not used for configuring the tracer, the instruc
 Resolving deprecation warnings
 ------------------------------
 Before upgrading, it’s a good idea to resolve any deprecation warnings raised by your project.
-These warnings must be fixed before upgrading, otherwise the ``ddtrace`` library
+These warnings must be fixed before upgrading, otherwise the ``oteltrace`` library
 will not work as expected. Our deprecation messages include the version where
 the behavior is altered or removed.
 
@@ -318,7 +315,7 @@ discarded depending on the output.
 The library comes with a ``FilterRequestsOnUrl`` filter that can be used to
 filter out incoming requests to specific urls:
 
-.. autoclass:: ddtrace.filters.FilterRequestsOnUrl
+.. autoclass:: oteltrace.filters.FilterRequestsOnUrl
     :members:
 
 **Write a custom filter**
@@ -345,7 +342,7 @@ next step of the pipeline or ``None`` if the trace should be discarded::
 Logs Injection
 --------------
 
-.. automodule:: ddtrace.contrib.logging
+.. automodule:: oteltrace.contrib.logging
 
 HTTP layer
 ----------
@@ -360,7 +357,7 @@ Configuration can be provided both at the global level and at the integration le
 
 Examples::
 
-    from ddtrace import config
+    from oteltrace import config
 
     # Global config
     config.http.trace_query_string = True
@@ -380,7 +377,7 @@ Configuration can be provided both at the global level and at the integration le
 
 Examples::
 
-    from ddtrace import config
+    from oteltrace import config
 
     # Global config
     config.trace_headers([
@@ -422,180 +419,89 @@ structure like in the following example::
     }
 
 
-.. _adv_opentracing:
+.. _oteltracerun:
 
-OpenTracing
------------
-
-
-The Datadog opentracer can be configured via the ``config`` dictionary
-parameter to the tracer which accepts the following described fields. See below
-for usage.
-
-+---------------------+----------------------------------------+---------------+
-|  Configuration Key  |              Description               | Default Value |
-+=====================+========================================+===============+
-| `enabled`           | enable or disable the tracer           | `True`        |
-+---------------------+----------------------------------------+---------------+
-| `debug`             | enable debug logging                   | `False`       |
-+---------------------+----------------------------------------+---------------+
-| `agent_hostname`    | hostname of the Datadog agent to use   | `localhost`   |
-+---------------------+----------------------------------------+---------------+
-| `agent_https`       | use https to connect to the agent      | `False`       |
-+---------------------+----------------------------------------+---------------+
-| `agent_port`        | port the Datadog agent is listening on | `8126`        |
-+---------------------+----------------------------------------+---------------+
-| `global_tags`       | tags that will be applied to each span | `{}`          |
-+---------------------+----------------------------------------+---------------+
-| `sampler`           | see `Sampling`_                        | `AllSampler`  |
-+---------------------+----------------------------------------+---------------+
-| `priority_sampling` | see `Priority Sampling`_               | `True`        |
-+---------------------+----------------------------------------+---------------+
-| `settings`          | see `Advanced Usage`_                  | `{}`          |
-+---------------------+----------------------------------------+---------------+
-
-
-Usage
-^^^^^
-
-**Manual tracing**
-
-To explicitly trace::
-
-  import time
-  import opentracing
-  from ddtrace.opentracer import Tracer, set_global_tracer
-
-  def init_tracer(service_name):
-      config = {
-        'agent_hostname': 'localhost',
-        'agent_port': 8126,
-      }
-      tracer = Tracer(service_name, config=config)
-      set_global_tracer(tracer)
-      return tracer
-
-  def my_operation():
-    span = opentracing.tracer.start_span('my_operation_name')
-    span.set_tag('my_interesting_tag', 'my_interesting_value')
-    time.sleep(0.05)
-    span.finish()
-
-  init_tracer('my_service_name')
-  my_operation()
-
-**Context Manager Tracing**
-
-To trace a function using the span context manager::
-
-  import time
-  import opentracing
-  from ddtrace.opentracer import Tracer, set_global_tracer
-
-  def init_tracer(service_name):
-      config = {
-        'agent_hostname': 'localhost',
-        'agent_port': 8126,
-      }
-      tracer = Tracer(service_name, config=config)
-      set_global_tracer(tracer)
-      return tracer
-
-  def my_operation():
-    with opentracing.tracer.start_span('my_operation_name') as span:
-      span.set_tag('my_interesting_tag', 'my_interesting_value')
-      time.sleep(0.05)
-
-  init_tracer('my_service_name')
-  my_operation()
-
-See our tracing trace-examples_ repository for concrete, runnable examples of
-the Datadog opentracer.
-
-.. _trace-examples: https://github.com/DataDog/trace-examples/tree/master/python
-
-See also the `Python OpenTracing`_ repository for usage of the tracer.
-
-.. _Python OpenTracing: https://github.com/opentracing/opentracing-python
-
-
-**Alongside Datadog tracer**
-
-The Datadog OpenTracing tracer can be used alongside the Datadog tracer. This
-provides the advantage of providing tracing information collected by
-``ddtrace`` in addition to OpenTracing.  The simplest way to do this is to use
-the :ref:`ddtrace-run<ddtracerun>` command to invoke your OpenTraced
-application.
-
-
-**Opentracer API**
-
-.. autoclass:: ddtrace.opentracer.Tracer
-    :members:
-    :special-members: __init__
-
-
-.. _ddtracerun:
-
-``ddtrace-run``
+``oteltrace-run``
 ---------------
 
-``ddtrace-run`` will trace :ref:`supported<Supported Libraries>` web frameworks
+``oteltrace-run`` will trace :ref:`supported<Supported Libraries>` web frameworks
 and database modules without the need for changing your code::
 
-  $ ddtrace-run -h
+  $ oteltrace-run -h
 
   Execute the given Python program, after configuring it
-  to emit Datadog traces.
+  to emit OpenTelemetry traces.
 
   Append command line arguments to your program as usual.
 
-  Usage: [ENV_VARS] ddtrace-run <my_program>
+  Usage: [ENV_VARS] oteltrace-run <my_program>
 
 
-The available environment variables for ``ddtrace-run`` are:
+The available environment variables for ``oteltrace-run`` are:
 
-* ``DATADOG_TRACE_ENABLED=true|false`` (default: true): Enable web framework and
+* ``OPENTELEMETRY_TRACE_ENABLED=true|false`` (default: true): Enable web framework and
   library instrumentation. When false, your application code will not generate
   any traces.
-* ``DATADOG_ENV`` (no default): Set an application's environment e.g. ``prod``,
+* ``OPENTELEMETRY_ENV`` (no default): Set an application's environment e.g. ``prod``,
   ``pre-prod``, ``stage``
-* ``DATADOG_TRACE_DEBUG=true|false`` (default: false): Enable debug logging in
+* ``OPENTELEMETRY_TRACE_DEBUG=true|false`` (default: false): Enable debug logging in
   the tracer
-* ``DATADOG_SERVICE_NAME`` (no default): override the service name to be used
+* ``OPENTELEMETRY_SERVICE_NAME`` (no default): override the service name to be used
   for this program. This value is passed through when setting up middleware for
   web framework integrations (e.g. pylons, flask, django). For tracing without a
   web integration, prefer setting the service name in code.
-* ``DATADOG_PATCH_MODULES=module:patch,module:patch...`` e.g.
+* ``OPENTELEMETRY_PATCH_MODULES=module:patch,module:patch...`` e.g.
   ``boto:true,redis:false``: override the modules patched for this execution of
   the program (default: none)
-* ``DATADOG_TRACE_AGENT_HOSTNAME=localhost``: override the address of the trace
+* ``OPENTELEMETRY_TRACE_AGENT_HOSTNAME=localhost``: override the address of the trace
   agent host that the default tracer will attempt to submit to  (default:
   ``localhost``)
-* ``DATADOG_TRACE_AGENT_PORT=8126``: override the port that the default tracer
+* ``OPENTELEMETRY_TRACE_AGENT_PORT=8126``: override the port that the default tracer
   will submit to  (default: 8126)
-* ``DATADOG_PRIORITY_SAMPLING`` (default: true): enables :ref:`Priority
+* ``OPENTELEMETRY_PRIORITY_SAMPLING`` (default: true): enables :ref:`Priority
   Sampling`
-* ``DD_LOGS_INJECTION`` (default: false): enables :ref:`Logs Injection`
+* ``OTEL_LOGS_INJECTION`` (default: false): enables :ref:`Logs Injection`
 
-``ddtrace-run`` respects a variety of common entrypoints for web applications:
+Exporter Configuration
+^^^^^^^^^^^^^^^^^^^^^^
 
-- ``ddtrace-run python my_app.py``
-- ``ddtrace-run python manage.py runserver``
-- ``ddtrace-run gunicorn myapp.wsgi:application``
-- ``ddtrace-run uwsgi --http :9090 --wsgi-file my_app.py``
+``oteltrace-run`` uses OpenTelemetry SDK exporters to send the traces to
+different backends.
+The exporter to be used is configured using the following env variables:
+
+* ``OTEL_EXPORTER_MODULE`` specifies the python module where the exporter is implemented.
+* ``OTEL_EXPORTER_FACTORY`` defines a function to be called to get an instance of the exporter.
+
+The specific configuration for each type of exporter is defined by using the
+``OTEL_EXPORTER_OPTIONS_*`` env variables.
+The text after ``OTEL_EXPORTER_OPTIONS_`` will be passed to
+``OTEL_EXPORTER_FACTORY`` as kwargs.
+
+Propagator Configuration
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+``oteltrace-run`` supports different formats to distribute the trace context.
+The propagator used is defined by the ``OTEL_TRACER_PROPAGATOR`` env variable.
+Currently ``w3c`` (default), ``b3`` and ``datadog`` are supported.
+
+``oteltrace-run`` respects a variety of common entrypoints for web applications:
+
+- ``oteltrace-run python my_app.py``
+- ``oteltrace-run python manage.py runserver``
+- ``oteltrace-run gunicorn myapp.wsgi:application``
+- ``oteltrace-run uwsgi --http :9090 --wsgi-file my_app.py``
 
 
 Pass along command-line arguments as your program would normally expect them::
 
-$ ddtrace-run gunicorn myapp.wsgi:application --max-requests 1000 --statsd-host localhost:8125
+$ oteltrace-run gunicorn myapp.wsgi:application --max-requests 1000 --statsd-host localhost:8125
 
 If you're running in a Kubernetes cluster and still don't see your traces, make
 sure your application has a route to the tracing Agent. An easy way to test
 this is with a::
 
 $ pip install ipython
-$ DATADOG_TRACE_DEBUG=true ddtrace-run ipython
+$ OPENTELEMETRY_TRACE_DEBUG=true oteltrace-run ipython
 
 Because iPython uses SQLite, it will be automatically instrumented and your
 traces should be sent off. If an error occurs, a message will be displayed in
@@ -607,20 +513,26 @@ API
 
 ``Tracer``
 ^^^^^^^^^^
-.. autoclass:: ddtrace.Tracer
+.. autoclass:: oteltrace.Tracer
     :members:
     :special-members: __init__
 
 
 ``Span``
 ^^^^^^^^
-.. autoclass:: ddtrace.Span
+.. autoclass:: oteltrace.Span
     :members:
     :special-members: __init__
 
 ``Pin``
 ^^^^^^^
-.. autoclass:: ddtrace.Pin
+.. autoclass:: oteltrace.Pin
+    :members:
+    :special-members: __init__
+
+``APIOtel``
+^^^^^^^^^^^
+.. autoclass:: oteltrace.api_otel_exporter.APIOtel
     :members:
     :special-members: __init__
 
@@ -629,11 +541,11 @@ API
 ``patch_all``
 ^^^^^^^^^^^^^
 
-.. autofunction:: ddtrace.monkey.patch_all
+.. autofunction:: oteltrace.monkey.patch_all
 
 ``patch``
 ^^^^^^^^^
-.. autofunction:: ddtrace.monkey.patch
+.. autofunction:: oteltrace.monkey.patch
 
 .. toctree::
    :maxdepth: 2

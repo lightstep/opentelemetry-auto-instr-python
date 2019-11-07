@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# ddtrace documentation build configuration file, created by
+# oteltrace documentation build configuration file, created by
 # sphinx-quickstart on Thu Jul  7 17:25:05 2016.
 #
 # This file is execfile()d with the current directory set to its
@@ -22,7 +22,7 @@ import sys
 from datetime import datetime
 
 
-# append the ddtrace path to syspath
+# append the oteltrace path to syspath
 sys.path.insert(0, os.path.abspath('..'))
 
 
@@ -58,9 +58,9 @@ master_doc = 'index'
 
 # General information about the project.
 year = datetime.now().year
-project = u'ddtrace'
-copyright = u'2016-{}, Datadog, Inc.'.format(year)
-author = u'Datadog, Inc.'
+project = u'oteltrace'
+copyright = u'2016-{}, DataDog, Inc.'.format(year)
+author = u'DataDog, Inc.'
 
 # document in order of source
 autodoc_member_order = 'bysource'
@@ -144,7 +144,7 @@ html_theme = 'alabaster'
 # documentation.
 #
 html_theme_options = {
-    'description': 'Datadog\'s Python tracing client',
+    'description': 'OpenTelemetry\'s Python tracing client',
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
@@ -153,7 +153,7 @@ html_theme_options = {
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
 #
-# html_title = u'ddtrace v0.2'
+# html_title = u'oteltrace v0.2'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #
@@ -260,7 +260,7 @@ html_sidebars = {
 # html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'ddtracedoc'
+htmlhelp_basename = 'oteltracedoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -286,8 +286,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'ddtrace.tex', u'ddtrace Documentation',
-     u'Datadog, Inc', 'manual'),
+    (master_doc, 'oteltrace.tex', u'oteltrace Documentation',
+     u'DataDog, Inc', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -322,7 +322,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'ddtrace', u'ddtrace Documentation',
+    (master_doc, 'oteltrace', u'oteltrace Documentation',
      [author], 1)
 ]
 
@@ -337,8 +337,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'ddtrace', u'ddtrace Documentation',
-     author, 'ddtrace', 'One line description of project.',
+    (master_doc, 'oteltrace', u'oteltrace Documentation',
+     author, 'oteltrace', 'One line description of project.',
      'Miscellaneous'),
 ]
 

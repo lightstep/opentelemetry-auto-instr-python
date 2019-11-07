@@ -3,13 +3,11 @@ import requests
 from requests import Session
 from requests.exceptions import MissingSchema
 
-from ddtrace import config
-from ddtrace import Pin
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.requests import patch, unpatch
-from ddtrace.ext import errors, http
-
-from tests.opentracer.utils import init_tracer
+from oteltrace import config
+from oteltrace import Pin
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.requests import patch, unpatch
+from oteltrace.ext import errors, http
 
 from ...base import BaseTracerTestCase
 from ...util import override_global_tracer
@@ -29,7 +27,7 @@ class BaseRequestTestCase(object):
 
         patch()
         self.session = Session()
-        setattr(self.session, 'datadog_tracer', self.tracer)
+        setattr(self.session, 'opentelemetry_tracer', self.tracer)
 
     def tearDown(self):
         unpatch()
@@ -90,7 +88,7 @@ class TestRequests(BaseRequestTestCase, BaseTracerTestCase):
         # ensure that double patch doesn't duplicate instrumentation
         patch()
         session = Session()
-        setattr(session, 'datadog_tracer', self.tracer)
+        setattr(session, 'opentelemetry_tracer', self.tracer)
 
         out = session.get(URL_200)
         assert out.status_code == 200
@@ -344,33 +342,6 @@ class TestRequests(BaseRequestTestCase, BaseTracerTestCase):
         s = spans[0]
 
         assert s.service == 'httpbin.org:80'
-
-    def test_200_ot(self):
-        """OpenTracing version of test_200."""
-
-        ot_tracer = init_tracer('requests_svc', self.tracer)
-
-        with ot_tracer.start_active_span('requests_get'):
-            out = self.session.get(URL_200)
-            assert out.status_code == 200
-
-        # validation
-        spans = self.tracer.writer.pop()
-        assert len(spans) == 2
-
-        ot_span, dd_span = spans
-
-        # confirm the parenting
-        assert ot_span.parent_id is None
-        assert dd_span.parent_id == ot_span.span_id
-
-        assert ot_span.name == 'requests_get'
-        assert ot_span.service == 'requests_svc'
-
-        assert dd_span.get_tag(http.METHOD) == 'GET'
-        assert dd_span.get_tag(http.STATUS_CODE) == '200'
-        assert dd_span.error == 0
-        assert dd_span.span_type == http.TYPE
 
     def test_request_and_response_headers(self):
         # Disabled when not configured

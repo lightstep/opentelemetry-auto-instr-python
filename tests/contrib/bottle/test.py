@@ -1,14 +1,13 @@
 import bottle
-import ddtrace
+import oteltrace
 import webtest
 
-from tests.opentracer.utils import init_tracer
 from ...base import BaseTracerTestCase
 
-from ddtrace import compat
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.bottle import TracePlugin
-from ddtrace.ext import http
+from oteltrace import compat
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.bottle import TracePlugin
+from oteltrace.ext import http
 
 SERVICE = 'bottle-app'
 
@@ -21,14 +20,14 @@ class TraceBottleTest(BaseTracerTestCase):
         super(TraceBottleTest, self).setUp()
 
         # provide a dummy tracer
-        self._original_tracer = ddtrace.tracer
-        ddtrace.tracer = self.tracer
+        self._original_tracer = oteltrace.tracer
+        oteltrace.tracer = self.tracer
         # provide a Bottle app
         self.app = bottle.Bottle()
 
     def tearDown(self):
         # restore the tracer
-        ddtrace.tracer = self._original_tracer
+        oteltrace.tracer = self._original_tracer
 
     def _trace_app(self, tracer=None):
         self.app.install(TracePlugin(service=SERVICE, tracer=tracer))
@@ -61,7 +60,7 @@ class TraceBottleTest(BaseTracerTestCase):
         assert s.get_tag('http.status_code') == '200'
         assert s.get_tag('http.method') == 'GET'
         assert s.get_tag(http.URL) == 'http://localhost:80/hi/dougie'
-        if ddtrace.config.bottle.trace_query_string:
+        if oteltrace.config.bottle.trace_query_string:
             assert s.get_tag(http.QUERY_STRING) == query_string
         else:
             assert http.QUERY_STRING not in s.meta
@@ -309,39 +308,3 @@ class TraceBottleTest(BaseTracerTestCase):
             if span == root:
                 continue
             self.assertIsNone(span.get_metric(ANALYTICS_SAMPLE_RATE_KEY))
-
-    def test_200_ot(self):
-        ot_tracer = init_tracer('my_svc', self.tracer)
-
-        # setup our test app
-        @self.app.route('/hi/<name>')
-        def hi(name):
-            return 'hi %s' % name
-        self._trace_app(self.tracer)
-
-        # make a request
-        with ot_tracer.start_active_span('ot_span'):
-            resp = self.app.get('/hi/dougie')
-
-        assert resp.status_int == 200
-        assert compat.to_unicode(resp.body) == u'hi dougie'
-        # validate it's traced
-        spans = self.tracer.writer.pop()
-        assert len(spans) == 2
-        ot_span, dd_span = spans
-
-        # confirm the parenting
-        assert ot_span.parent_id is None
-        assert dd_span.parent_id == ot_span.span_id
-
-        assert ot_span.resource == 'ot_span'
-
-        assert dd_span.name == 'bottle.request'
-        assert dd_span.service == 'bottle-app'
-        assert dd_span.resource == 'GET /hi/<name>'
-        assert dd_span.get_tag('http.status_code') == '200'
-        assert dd_span.get_tag('http.method') == 'GET'
-        assert dd_span.get_tag(http.URL) == 'http://localhost:80/hi/dougie'
-
-        services = self.tracer.writer.pop_services()
-        assert services == {}

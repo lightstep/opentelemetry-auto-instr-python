@@ -1,8 +1,6 @@
-from ddtrace import config
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.ext import errors as errx, http as httpx
-
-from tests.opentracer.utils import init_tracer
+from oteltrace import config
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.ext import errors as errx, http as httpx
 
 
 class FalconTestCase(object):
@@ -203,34 +201,6 @@ class FalconTestCase(object):
         assert span.get_tag(httpx.STATUS_CODE) == '404'
         assert span.get_tag(errx.ERROR_TYPE) is None
         assert span.parent_id is None
-
-    def test_200_ot(self):
-        """OpenTracing version of test_200."""
-        ot_tracer = init_tracer('my_svc', self.tracer)
-
-        with ot_tracer.start_active_span('ot_span'):
-            out = self.simulate_get('/200')
-
-        assert out.status_code == 200
-        assert out.content.decode('utf-8') == 'Success'
-
-        traces = self.tracer.writer.pop_traces()
-        assert len(traces) == 1
-        assert len(traces[0]) == 2
-        ot_span, dd_span = traces[0]
-
-        # confirm the parenting
-        assert ot_span.parent_id is None
-        assert dd_span.parent_id == ot_span.span_id
-
-        assert ot_span.service == 'my_svc'
-        assert ot_span.resource == 'ot_span'
-
-        assert dd_span.name == 'falcon.request'
-        assert dd_span.service == self._service
-        assert dd_span.resource == 'GET tests.contrib.falcon.app.resources.Resource200'
-        assert dd_span.get_tag(httpx.STATUS_CODE) == '200'
-        assert dd_span.get_tag(httpx.URL) == 'http://falconframework.org/200'
 
     def test_falcon_request_hook(self):
         @config.falcon.hooks.on('request')

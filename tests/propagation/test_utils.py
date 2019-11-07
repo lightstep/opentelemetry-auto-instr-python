@@ -1,4 +1,4 @@
-from ddtrace.propagation.utils import get_wsgi_header
+from oteltrace.propagation.utils import get_wsgi_header
 
 
 class TestPropagationUtils(object):

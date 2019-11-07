@@ -2,15 +2,14 @@ import datetime
 import unittest
 
 # project
-from ddtrace import Pin
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.ext import http
-from ddtrace.contrib.elasticsearch import get_traced_transport
-from ddtrace.contrib.elasticsearch.elasticsearch import elasticsearch
-from ddtrace.contrib.elasticsearch.patch import patch, unpatch
+from oteltrace import Pin
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.ext import http
+from oteltrace.contrib.elasticsearch import get_traced_transport
+from oteltrace.contrib.elasticsearch.elasticsearch import elasticsearch
+from oteltrace.contrib.elasticsearch.patch import patch, unpatch
 
 # testing
-from tests.opentracer.utils import init_tracer
 from ..config import ELASTICSEARCH_CONFIG
 from ...test_tracer import get_dummy_tracer
 from ...base import BaseTracerTestCase
@@ -21,8 +20,8 @@ class ElasticsearchTest(unittest.TestCase):
     Elasticsearch integration test suite.
     Need a running ElasticSearch
     """
-    ES_INDEX = 'ddtrace_index'
-    ES_TYPE = 'ddtrace_type'
+    ES_INDEX = 'oteltrace_index'
+    ES_TYPE = 'oteltrace_type'
 
     TEST_SERVICE = 'test'
     TEST_PORT = str(ELASTICSEARCH_CONFIG['port'])
@@ -45,8 +44,8 @@ class ElasticsearchTest(unittest.TestCase):
         tracer = get_dummy_tracer()
         writer = tracer.writer
         transport_class = get_traced_transport(
-                datadog_tracer=tracer,
-                datadog_service=self.TEST_SERVICE)
+                opentelemetry_tracer=tracer,
+                opentelemetry_service=self.TEST_SERVICE)
 
         es = elasticsearch.Elasticsearch(transport_class=transport_class, port=ELASTICSEARCH_CONFIG['port'])
 
@@ -147,44 +146,6 @@ class ElasticsearchTest(unittest.TestCase):
         es.indices.delete(index=self.ES_INDEX, ignore=[400, 404])
         es.indices.delete(index=self.ES_INDEX, ignore=[400, 404])
 
-    def test_elasticsearch_ot(self):
-        """Shortened OpenTracing version of test_elasticsearch."""
-        tracer = get_dummy_tracer()
-        writer = tracer.writer
-        ot_tracer = init_tracer('my_svc', tracer)
-
-        transport_class = get_traced_transport(
-                datadog_tracer=tracer,
-                datadog_service=self.TEST_SERVICE)
-
-        es = elasticsearch.Elasticsearch(transport_class=transport_class, port=ELASTICSEARCH_CONFIG['port'])
-
-        # Test index creation
-        mapping = {'mapping': {'properties': {'created': {'type': 'date', 'format': 'yyyy-MM-dd'}}}}
-
-        with ot_tracer.start_active_span('ot_span'):
-            es.indices.create(index=self.ES_INDEX, ignore=400, body=mapping)
-
-        spans = writer.pop()
-        assert spans
-        assert len(spans) == 2
-        ot_span, dd_span = spans
-
-        # confirm the parenting
-        assert ot_span.parent_id is None
-        assert dd_span.parent_id == ot_span.span_id
-
-        assert ot_span.service == 'my_svc'
-        assert ot_span.resource == 'ot_span'
-
-        assert dd_span.service == self.TEST_SERVICE
-        assert dd_span.name == 'elasticsearch.query'
-        assert dd_span.span_type == 'elasticsearch'
-        assert dd_span.error == 0
-        assert dd_span.get_tag('elasticsearch.method') == 'PUT'
-        assert dd_span.get_tag('elasticsearch.url') == '/%s' % self.ES_INDEX
-        assert dd_span.resource == 'PUT /%s' % self.ES_INDEX
-
 
 class ElasticsearchPatchTest(BaseTracerTestCase):
     """
@@ -193,8 +154,8 @@ class ElasticsearchPatchTest(BaseTracerTestCase):
     Test cases with patching.
     Will merge when patching will be the default/only way.
     """
-    ES_INDEX = 'ddtrace_index'
-    ES_TYPE = 'ddtrace_type'
+    ES_INDEX = 'oteltrace_index'
+    ES_TYPE = 'oteltrace_type'
 
     TEST_SERVICE = 'test'
     TEST_PORT = str(ELASTICSEARCH_CONFIG['port'])

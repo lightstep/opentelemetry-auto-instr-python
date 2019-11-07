@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 import redis
 
-from ddtrace import Pin, compat
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.redis import get_traced_redis
-from ddtrace.contrib.redis.patch import patch, unpatch
+from oteltrace import Pin, compat
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.redis import get_traced_redis
+from oteltrace.contrib.redis.patch import patch, unpatch
 
-from tests.opentracer.utils import init_tracer
 from ..config import REDIS_CONFIG
 from ...test_tracer import get_dummy_tracer
 from ...base import BaseTracerTestCase
@@ -189,32 +188,3 @@ class TestRedisPatch(BaseTracerTestCase):
         spans = writer.pop()
         assert spans, spans
         assert len(spans) == 1
-
-    def test_opentracing(self):
-        """Ensure OpenTracing works with redis."""
-        ot_tracer = init_tracer('redis_svc', self.tracer)
-
-        with ot_tracer.start_active_span('redis_get'):
-            us = self.r.get('cheese')
-            assert us is None
-
-        spans = self.get_spans()
-        assert len(spans) == 2
-        ot_span, dd_span = spans
-
-        # confirm the parenting
-        assert ot_span.parent_id is None
-        assert dd_span.parent_id == ot_span.span_id
-
-        assert ot_span.name == 'redis_get'
-        assert ot_span.service == 'redis_svc'
-
-        assert dd_span.service == self.TEST_SERVICE
-        assert dd_span.name == 'redis.command'
-        assert dd_span.span_type == 'redis'
-        assert dd_span.error == 0
-        assert dd_span.get_tag('out.redis_db') == '0'
-        assert dd_span.get_tag('out.host') == 'localhost'
-        assert dd_span.get_tag('redis.raw_command') == u'GET cheese'
-        assert dd_span.get_metric('redis.args_length') == 2
-        assert dd_span.resource == 'GET cheese'

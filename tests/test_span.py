@@ -2,10 +2,10 @@ import time
 
 from unittest.case import SkipTest
 
-from ddtrace.context import Context
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.span import Span
-from ddtrace.ext import errors, priority
+from oteltrace.context import Context
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.span import Span
+from oteltrace.ext import errors, priority
 from .base import BaseTracerTestCase
 
 

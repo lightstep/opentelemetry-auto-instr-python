@@ -1,10 +1,10 @@
 import aiobotocore
 from botocore.errorfactory import ClientError
 
-from ddtrace.contrib.aiobotocore.patch import patch, unpatch
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.ext import http
-from ddtrace.compat import stringify
+from oteltrace.contrib.aiobotocore.patch import patch, unpatch
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.ext import http
+from oteltrace.compat import stringify
 
 from .utils import aiobotocore_client
 from ..asyncio.utils import AsyncioTestCase, mark_asyncio
@@ -236,82 +236,3 @@ class AIOBotocoreTest(AsyncioTestCase):
         traces = self.tracer.writer.pop_traces()
         self.assertEqual(len(traces), 1)
         self.assertEqual(len(traces[0]), 1)
-
-    @mark_asyncio
-    def test_opentraced_client(self):
-        from tests.opentracer.utils import init_tracer
-
-        ot_tracer = init_tracer('my_svc', self.tracer)
-
-        with ot_tracer.start_active_span('ot_outer_span'):
-            with aiobotocore_client('ec2', self.tracer) as ec2:
-                yield from ec2.describe_instances()
-
-        traces = self.tracer.writer.pop_traces()
-        print(traces)
-        self.assertEqual(len(traces), 1)
-        self.assertEqual(len(traces[0]), 2)
-        ot_span = traces[0][0]
-        dd_span = traces[0][1]
-
-        self.assertEqual(ot_span.resource, 'ot_outer_span')
-        self.assertEqual(ot_span.service, 'my_svc')
-
-        # confirm the parenting
-        self.assertEqual(ot_span.parent_id, None)
-        self.assertEqual(dd_span.parent_id, ot_span.span_id)
-
-        self.assertEqual(dd_span.get_tag('aws.agent'), 'aiobotocore')
-        self.assertEqual(dd_span.get_tag('aws.region'), 'us-west-2')
-        self.assertEqual(dd_span.get_tag('aws.operation'), 'DescribeInstances')
-        self.assertEqual(dd_span.get_tag('http.status_code'), '200')
-        self.assertEqual(dd_span.get_tag('retry_attempts'), '0')
-        self.assertEqual(dd_span.service, 'aws.ec2')
-        self.assertEqual(dd_span.resource, 'ec2.describeinstances')
-        self.assertEqual(dd_span.name, 'ec2.command')
-
-    @mark_asyncio
-    def test_opentraced_s3_client(self):
-        from tests.opentracer.utils import init_tracer
-
-        ot_tracer = init_tracer('my_svc', self.tracer)
-
-        with ot_tracer.start_active_span('ot_outer_span'):
-            with aiobotocore_client('s3', self.tracer) as s3:
-                yield from s3.list_buckets()
-                with ot_tracer.start_active_span('ot_inner_span1'):
-                    yield from s3.list_buckets()
-                with ot_tracer.start_active_span('ot_inner_span2'):
-                    pass
-
-        traces = self.tracer.writer.pop_traces()
-        self.assertEqual(len(traces), 1)
-        self.assertEqual(len(traces[0]), 5)
-        ot_outer_span = traces[0][0]
-        dd_span = traces[0][1]
-        ot_inner_span = traces[0][2]
-        dd_span2 = traces[0][3]
-        ot_inner_span2 = traces[0][4]
-
-        self.assertEqual(ot_outer_span.resource, 'ot_outer_span')
-        self.assertEqual(ot_inner_span.resource, 'ot_inner_span1')
-        self.assertEqual(ot_inner_span2.resource, 'ot_inner_span2')
-
-        # confirm the parenting
-        self.assertEqual(ot_outer_span.parent_id, None)
-        self.assertEqual(dd_span.parent_id, ot_outer_span.span_id)
-        self.assertEqual(ot_inner_span.parent_id, ot_outer_span.span_id)
-        self.assertEqual(dd_span2.parent_id, ot_inner_span.span_id)
-        self.assertEqual(ot_inner_span2.parent_id, ot_outer_span.span_id)
-
-        self.assertEqual(dd_span.get_tag('aws.operation'), 'ListBuckets')
-        self.assertEqual(dd_span.get_tag('http.status_code'), '200')
-        self.assertEqual(dd_span.service, 'aws.s3')
-        self.assertEqual(dd_span.resource, 's3.listbuckets')
-        self.assertEqual(dd_span.name, 's3.command')
-
-        self.assertEqual(dd_span2.get_tag('aws.operation'), 'ListBuckets')
-        self.assertEqual(dd_span2.get_tag('http.status_code'), '200')
-        self.assertEqual(dd_span2.service, 'aws.s3')
-        self.assertEqual(dd_span2.resource, 's3.listbuckets')
-        self.assertEqual(dd_span2.name, 's3.command')

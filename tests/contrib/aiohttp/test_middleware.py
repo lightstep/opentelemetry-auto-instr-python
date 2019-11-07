@@ -2,13 +2,11 @@ import asyncio
 
 from aiohttp.test_utils import unittest_run_loop
 
-from ddtrace.contrib.aiohttp.middlewares import trace_app, trace_middleware, CONFIG_KEY
-from ddtrace.ext import http
-from ddtrace.sampler import RateSampler
-from ddtrace.constants import SAMPLING_PRIORITY_KEY, ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.aiohttp.middlewares import trace_app, trace_middleware, CONFIG_KEY
+from oteltrace.ext import http
+from oteltrace.sampler import RateSampler
+from oteltrace.constants import SAMPLING_PRIORITY_KEY, ANALYTICS_SAMPLE_RATE_KEY
 
-from opentracing.scope_managers.asyncio import AsyncioScopeManager
-from tests.opentracer.utils import init_tracer
 from .utils import TraceTestCase
 from .app.web import setup_app, noop_middleware
 
@@ -345,7 +343,7 @@ class TestTraceMiddleware(TraceTestCase):
     @asyncio.coroutine
     def test_distributed_tracing_disabled(self):
         # pass headers for distributed tracing
-        self.app['datadog_trace']['distributed_tracing_enabled'] = False
+        self.app['opentelemetry_trace']['distributed_tracing_enabled'] = False
         tracing_headers = {
             'x-datadog-trace-id': '100',
             'x-datadog-parent-id': '42',
@@ -397,7 +395,7 @@ class TestTraceMiddleware(TraceTestCase):
     def _assert_200_parenting(self, traces):
         """Helper to assert parenting when handling aiohttp requests.
 
-        This is used to ensure that parenting is consistent between Datadog
+        This is used to ensure that parenting is consistent between OpenTelemetry
         and OpenTracing implementations of tracing.
         """
         assert 2 == len(traces)
@@ -426,23 +424,8 @@ class TestTraceMiddleware(TraceTestCase):
 
     @unittest_run_loop
     @asyncio.coroutine
-    def test_parenting_200_dd(self):
+    def test_parenting_200_otel(self):
         with self.tracer.trace('aiohttp_op'):
-            request = yield from self.client.request('GET', '/')
-            assert 200 == request.status
-            text = yield from request.text()
-
-        assert "What's tracing?" == text
-        traces = self.tracer.writer.pop_traces()
-        self._assert_200_parenting(traces)
-
-    @unittest_run_loop
-    @asyncio.coroutine
-    def test_parenting_200_ot(self):
-        """OpenTracing version of test_handler."""
-        ot_tracer = init_tracer('aiohttp_svc', self.tracer, scope_manager=AsyncioScopeManager())
-
-        with ot_tracer.start_active_span('aiohttp_op'):
             request = yield from self.client.request('GET', '/')
             assert 200 == request.status
             text = yield from request.text()
@@ -455,8 +438,8 @@ class TestTraceMiddleware(TraceTestCase):
     @asyncio.coroutine
     def test_analytics_integration_enabled(self):
         """ Check trace has analytics sample rate set """
-        self.app['datadog_trace']['analytics_enabled'] = True
-        self.app['datadog_trace']['analytics_sample_rate'] = 0.5
+        self.app['opentelemetry_trace']['analytics_enabled'] = True
+        self.app['opentelemetry_trace']['analytics_sample_rate'] = 0.5
         request = yield from self.client.request('GET', '/template/')
         yield from request.text()
 
@@ -480,7 +463,7 @@ class TestTraceMiddleware(TraceTestCase):
     @asyncio.coroutine
     def test_analytics_integration_disabled(self):
         """ Check trace has analytics sample rate set """
-        self.app['datadog_trace']['analytics_enabled'] = False
+        self.app['opentelemetry_trace']['analytics_enabled'] = False
         request = yield from self.client.request('GET', '/template/')
         yield from request.text()
 

@@ -6,14 +6,13 @@ from unittest.case import SkipTest
 import pylibmc
 
 # project
-from ddtrace import Pin
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.pylibmc import TracedClient
-from ddtrace.contrib.pylibmc.patch import patch, unpatch
-from ddtrace.ext import memcached
+from oteltrace import Pin
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.pylibmc import TracedClient
+from oteltrace.contrib.pylibmc.patch import patch, unpatch
+from oteltrace.ext import memcached
 
 # testing
-from ...opentracer.utils import init_tracer
 from ...contrib.config import MEMCACHED_CONFIG as cfg
 from ...base import BaseTracerTestCase
 
@@ -77,33 +76,6 @@ class PylibmcCore(object):
             self._verify_cache_span(s, start, end)
         expected_resources = sorted(['get', 'set', 'incr', 'decr'])
         resources = sorted(s.resource for s in spans)
-        assert expected_resources == resources
-
-    def test_incr_decr_ot(self):
-        """OpenTracing version of test_incr_decr."""
-        client, tracer = self.get_client()
-        ot_tracer = init_tracer('memcached', tracer)
-
-        start = time.time()
-        with ot_tracer.start_active_span('mc_ops'):
-            client.set('a', 1)
-            client.incr('a', 2)
-            client.decr('a', 1)
-            v = client.get('a')
-            assert v == 2
-        end = time.time()
-
-        # verify spans
-        spans = tracer.writer.pop()
-        ot_span = spans[0]
-
-        assert ot_span.name == 'mc_ops'
-
-        for s in spans[1:]:
-            assert s.parent_id == ot_span.span_id
-            self._verify_cache_span(s, start, end)
-        expected_resources = sorted(['get', 'set', 'incr', 'decr'])
-        resources = sorted(s.resource for s in spans[1:])
         assert expected_resources == resources
 
     def test_clone(self):

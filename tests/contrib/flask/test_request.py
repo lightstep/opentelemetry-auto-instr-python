@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from ddtrace.compat import PY2
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.flask.patch import flask_version
-from ddtrace.ext import http
-from ddtrace.propagation.http import HTTP_HEADER_TRACE_ID, HTTP_HEADER_PARENT_ID
+from oteltrace.compat import PY2
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.flask.patch import flask_version
+from oteltrace.ext import http
+from oteltrace.propagation.datadog import HTTP_HEADER_TRACE_ID, HTTP_HEADER_PARENT_ID
 from flask import abort
 
 from . import BaseFlaskTestCase

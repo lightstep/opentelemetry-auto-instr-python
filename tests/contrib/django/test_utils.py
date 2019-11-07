@@ -2,7 +2,7 @@
 from django.test import TestCase
 
 # project
-from ddtrace.contrib.django.utils import quantize_key_values
+from oteltrace.contrib.django.utils import quantize_key_values
 
 
 class DjangoUtilsTest(TestCase):

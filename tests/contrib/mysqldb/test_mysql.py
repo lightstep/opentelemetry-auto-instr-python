@@ -1,10 +1,9 @@
 import MySQLdb
 
-from ddtrace import Pin
-from ddtrace.constants import ANALYTICS_SAMPLE_RATE_KEY
-from ddtrace.contrib.mysqldb.patch import patch, unpatch
+from oteltrace import Pin
+from oteltrace.constants import ANALYTICS_SAMPLE_RATE_KEY
+from oteltrace.contrib.mysqldb.patch import patch, unpatch
 
-from tests.opentracer.utils import init_tracer
 from ..config import MYSQL_CONFIG
 from ...base import BaseTracerTestCase
 from ...util import assert_dict_issuperset
@@ -274,75 +273,6 @@ class MySQLCore(object):
             'db.user': u'test',
         })
         assert span.get_tag('sql.query') is None
-
-    def test_simple_query_ot(self):
-        """OpenTracing version of test_simple_query."""
-        conn, tracer = self._get_conn_tracer()
-        writer = tracer.writer
-        ot_tracer = init_tracer('mysql_svc', tracer)
-        with ot_tracer.start_active_span('mysql_op'):
-            cursor = conn.cursor()
-            cursor.execute('SELECT 1')
-            rows = cursor.fetchall()
-            assert len(rows) == 1
-
-        spans = writer.pop()
-        assert len(spans) == 2
-        ot_span, dd_span = spans
-
-        # confirm parenting
-        assert ot_span.parent_id is None
-        assert dd_span.parent_id == ot_span.span_id
-
-        assert ot_span.service == 'mysql_svc'
-        assert ot_span.name == 'mysql_op'
-
-        assert dd_span.service == self.TEST_SERVICE
-        assert dd_span.name == 'mysql.query'
-        assert dd_span.span_type == 'sql'
-        assert dd_span.error == 0
-        assert_dict_issuperset(dd_span.meta, {
-            'out.host': u'127.0.0.1',
-            'out.port': u'3306',
-            'db.name': u'test',
-            'db.user': u'test',
-        })
-
-    def test_simple_query_ot_fetchall(self):
-        """OpenTracing version of test_simple_query."""
-        with self.override_config('dbapi2', dict(trace_fetch_methods=True)):
-            conn, tracer = self._get_conn_tracer()
-            writer = tracer.writer
-            ot_tracer = init_tracer('mysql_svc', tracer)
-            with ot_tracer.start_active_span('mysql_op'):
-                cursor = conn.cursor()
-                cursor.execute('SELECT 1')
-                rows = cursor.fetchall()
-                assert len(rows) == 1
-
-            spans = writer.pop()
-            assert len(spans) == 3
-            ot_span, dd_span, fetch_span = spans
-
-            # confirm parenting
-            assert ot_span.parent_id is None
-            assert dd_span.parent_id == ot_span.span_id
-
-            assert ot_span.service == 'mysql_svc'
-            assert ot_span.name == 'mysql_op'
-
-            assert dd_span.service == self.TEST_SERVICE
-            assert dd_span.name == 'mysql.query'
-            assert dd_span.span_type == 'sql'
-            assert dd_span.error == 0
-            assert_dict_issuperset(dd_span.meta, {
-                'out.host': u'127.0.0.1',
-                'out.port': u'3306',
-                'db.name': u'test',
-                'db.user': u'test',
-            })
-
-            assert fetch_span.name == 'mysql.query.fetchall'
 
     def test_commit(self):
         conn, tracer = self._get_conn_tracer()

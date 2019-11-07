@@ -1,8 +1,8 @@
 from unittest import TestCase
 
-from ddtrace import config
-from ddtrace.pin import Pin
-from ddtrace.settings import IntegrationConfig
+from oteltrace import config
+from oteltrace.pin import Pin
+from oteltrace.settings import IntegrationConfig
 
 
 class InstanceConfigTestCase(TestCase):

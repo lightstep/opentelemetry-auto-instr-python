@@ -33,9 +33,9 @@ class Tox(TestCommand):
 
 
 long_description = """
-# dd-trace-py
+# otel-trace-py
 
-`ddtrace` is Datadog's tracing library for Python.  It is used to trace requests
+`oteltrace` is OpenTelemetry's tracing library for Python.  It is used to trace requests
 as they flow across web servers, databases and microservices so that developers
 have great visiblity into bottlenecks and troublesome requests.
 
@@ -57,10 +57,10 @@ documentation][visualization docs].
 
 # Base `setup()` kwargs without any C-extension registering
 setup_kwargs = dict(
-    name='ddtrace',
-    description='Datadog tracing code',
-    url='https://github.com/DataDog/dd-trace-py',
-    author='Datadog, Inc.',
+    name='oteltrace',
+    description='OpenTelemetry tracing code',
+    url='https://github.com/opentelemetry/otel-trace-py',
+    author='DataDog, Inc.',
     author_email='dev@datadoghq.com',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -68,18 +68,15 @@ setup_kwargs = dict(
     packages=find_packages(exclude=['tests*']),
     install_requires=[
         'psutil>=5.0.0',
+        'opentelemetry-api',
+        'opentelemetry-sdk',
     ],
-    extras_require={
-        # users can include opentracing by having:
-        # install_requires=['ddtrace[opentracing]', ...]
-        'opentracing': ['opentracing>=2.0.0'],
-    },
     # plugin tox
     tests_require=['tox', 'flake8'],
     cmdclass={'test': Tox},
     entry_points={
         'console_scripts': [
-            'ddtrace-run = ddtrace.commands.ddtrace_run:main'
+            'oteltrace-run = oteltrace.commands.oteltrace_run:main'
         ]
     },
     classifiers=[
@@ -91,14 +88,9 @@ setup_kwargs = dict(
         'Programming Language :: Python :: 3.7',
     ],
     use_scm_version=True,
-    setup_requires=['setuptools_scm'],
+    setup_requires=['setuptools_scm', 'opentelemetry-api', 'opentelemetry-sdk'],
 )
 
-
-# The following from here to the end of the file is borrowed from wrapt's and msgpack's `setup.py`:
-#   https://github.com/GrahamDumpleton/wrapt/blob/4ee35415a4b0d570ee6a9b3a14a6931441aeab4b/setup.py
-#   https://github.com/msgpack/msgpack-python/blob/381c2eff5f8ee0b8669fd6daf1fd1ecaffe7c931/setup.py
-# These helpers are useful for attempting build a C-extension and then retrying without it if it fails
 
 libraries = []
 if sys.platform == 'win32':
@@ -139,15 +131,8 @@ try:
     kwargs = copy.deepcopy(setup_kwargs)
     kwargs['ext_modules'] = [
         Extension(
-            'ddtrace.vendor.wrapt._wrappers',
-            sources=['ddtrace/vendor/wrapt/_wrappers.c'],
-        ),
-        Extension(
-            'ddtrace.vendor.msgpack._cmsgpack',
-            sources=['ddtrace/vendor/msgpack/_cmsgpack.cpp'],
-            libraries=libraries,
-            include_dirs=['ddtrace/vendor/'],
-            define_macros=macros,
+            'oteltrace.vendor.wrapt._wrappers',
+            sources=['oteltrace/vendor/wrapt/_wrappers.c'],
         ),
     ]
     # DEV: Make sure `cmdclass` exists

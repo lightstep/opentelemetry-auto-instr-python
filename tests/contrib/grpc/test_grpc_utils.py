@@ -1,4 +1,4 @@
-from ddtrace.contrib.grpc.utils import parse_method_path
+from oteltrace.contrib.grpc.utils import parse_method_path
 
 
 def test_parse_method_path_with_package():
