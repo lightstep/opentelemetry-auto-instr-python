@@ -110,6 +110,17 @@ jobs:
       - *persist_to_workspace_step
       - *save_cache_step
 
+  trace-context:
+    docker:
+      - *test_runner
+    resource_class: *resource_class
+    steps:
+      - checkout
+      - *restore_cache_step
+      - run: scripts/run-tox-scenario '^py..-trace-context'
+      - *persist_to_workspace_step
+      - *save_cache_step
+
   boto:
     docker:
       - *test_runner
@@ -901,6 +912,9 @@ workflows:
       - tracer:
           requires:
             - flake8
+      - trace-context:
+          requires:
+            - flake8
       - unit_tests:
           requires:
             - flake8
@@ -960,6 +974,7 @@ workflows:
             - test_logging
             - tornado
             - tracer
+            - trace-context
             - unit_tests
             - vertica
       - deploy_dev:
