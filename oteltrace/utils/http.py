@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 def normalize_header_name(header_name):
     """
     Normalizes an header name to lower case, stripping all its leading and trailing white spaces.
