@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 def parse_method_path(method_path):
     """ Returns (package, service, method) tuple from parsing method path """
     # unpack method path based on "/{package}.{service}/{method}"

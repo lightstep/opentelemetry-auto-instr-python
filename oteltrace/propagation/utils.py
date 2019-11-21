@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 def get_wsgi_header(header):
     """Returns a WSGI compliant HTTP header.
     See https://www.python.org/dev/peps/pep-3333/#environ-variables for

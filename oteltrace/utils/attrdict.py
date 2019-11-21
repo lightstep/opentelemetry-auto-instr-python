@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 class AttrDict(dict):
     """
     dict implementation that allows for item attribute access
@@ -30,6 +31,7 @@ class AttrDict(dict):
        data = AttrDict(dict(key='value'))
        print(data.key)
     """
+
     def __getattr__(self, key):
         if key in self:
             return self[key]
