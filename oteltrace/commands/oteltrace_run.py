@@ -14,13 +14,19 @@
 # limitations under the License.
 
 from distutils import spawn
-import os
+from os import environ, execl
+from os.path import dirname, pathsep, join, exists
+from pathlib import Path
 import sys
 import logging
 
-debug = os.environ.get('OPENTELEMETRY_TRACE_DEBUG')
-if debug and debug.lower() == 'true':
-    logging.basicConfig(level=logging.DEBUG)
+
+if exists(join(Path.home(), ".config", "oteltrace_run.cfg")):
+    pass
+
+
+# if debug and debug.lower() == 'true':
+#     logging.basicConfig(level=logging.DEBUG)
 
 # Do not use `oteltrace.internal.logger.get_logger` here
 # DEV: It isn't really necessary to use `OtelLogger` here so we want to
@@ -51,7 +57,7 @@ Available environment variables:
 
 def _oteltrace_root():
     from oteltrace import __file__
-    return os.path.dirname(__file__)
+    return dirname(__file__)
 
 
 def _add_bootstrap_to_pythonpath(bootstrap_dir):
@@ -59,13 +65,15 @@ def _add_bootstrap_to_pythonpath(bootstrap_dir):
     Add our bootstrap directory to the head of $PYTHONPATH to ensure
     it is loaded before program code
     """
-    python_path = os.environ.get('PYTHONPATH', '')
+    python_path = environ.get('PYTHONPATH', '')
 
     if python_path:
-        new_path = '%s%s%s' % (bootstrap_dir, os.path.pathsep, os.environ['PYTHONPATH'])
-        os.environ['PYTHONPATH'] = new_path
+        new_path = '%s%s%s' % (
+            bootstrap_dir, pathsep, environ['PYTHONPATH']
+        )
+        environ['PYTHONPATH'] = new_path
     else:
-        os.environ['PYTHONPATH'] = bootstrap_dir
+        environ['PYTHONPATH'] = bootstrap_dir
 
 
 def main():
@@ -78,11 +86,11 @@ def main():
     root_dir = _oteltrace_root()
     log.debug('oteltrace root: %s', root_dir)
 
-    bootstrap_dir = os.path.join(root_dir, 'bootstrap')
+    bootstrap_dir = join(root_dir, 'bootstrap')
     log.debug('oteltrace bootstrap: %s', bootstrap_dir)
 
     _add_bootstrap_to_pythonpath(bootstrap_dir)
-    log.debug('PYTHONPATH: %s', os.environ['PYTHONPATH'])
+    log.debug('PYTHONPATH: %s', environ['PYTHONPATH'])
     log.debug('sys.path: %s', sys.path)
 
     executable = sys.argv[1]
@@ -91,4 +99,4 @@ def main():
     executable = spawn.find_executable(executable)
     log.debug('program executable: %s', executable)
 
-    os.execl(executable, executable, *sys.argv[2:])
+    execl(executable, executable, *sys.argv[2:])

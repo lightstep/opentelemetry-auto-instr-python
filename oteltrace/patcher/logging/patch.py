@@ -29,7 +29,7 @@ config._add('logging', dict(
 ))
 
 
-def _w_makeRecord(func, instance, args, kwargs):
+def _w_make_record(func, instance, args, kwargs):
     record = func(*args, **kwargs)
 
     # add correlation identifiers to LogRecord
@@ -47,13 +47,23 @@ def _w_makeRecord(func, instance, args, kwargs):
 def patch():
     """
     Patch ``logging`` module in the Python Standard Library for injection of
-    tracer information by wrapping the base factory method ``Logger.makeRecord``
+    tracer information by wrapping the base factory method
+    ``Logger.makeRecord``
     """
+    # FIXME
+    # Make patching this plugin add formatting to the log format
+    OTEL_LOG_FORMAT = (
+        '%(asctime)s %(levelname)s [%(name)s]'
+        ' [%(filename)s:%(lineno)d] {}- %(message)s'
+    ).format(
+        '[otel.trace_id=%(otel.trace_id)s otel.span_id=%(otel.span_id)s] '
+        # if logging in patch_modules else ''
+    )
     if getattr(logging, '_opentelemetry_patch', False):
         return
     setattr(logging, '_opentelemetry_patch', True)
 
-    _w(logging.Logger, 'makeRecord', _w_makeRecord)
+    _w(logging.Logger, 'makeRecord', _w_make_record)
 
 
 def unpatch():

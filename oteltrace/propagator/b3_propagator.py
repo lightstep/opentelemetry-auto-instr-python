@@ -15,8 +15,10 @@
 from ..context import Context
 from ..ext import priority
 
+from oteltrace.propagator.base_propagator import BasePropagator
 
-class B3HTTPPropagator:
+
+class B3Propagator(BasePropagator):
     """b3 compatible propagator"""
 
     SINGLE_HEADER_KEY = 'b3'
@@ -37,7 +39,9 @@ class B3HTTPPropagator:
         # TODO: what should be a default value?
         sampled = '0'
         if span_context.sampling_priority is not None:
-            sampled = self._SAMPLING_PRIORITY_MAP[span_context.sampling_priority]
+            sampled = self._SAMPLING_PRIORITY_MAP[
+                span_context.sampling_priority
+            ]
 
         headers[self.TRACE_ID_KEY] = format_trace_id(span_context.trace_id)
         headers[self.SPAN_ID_KEY] = format_span_id(span_context.span_id)
@@ -94,3 +98,6 @@ def format_trace_id(trace_id: int) -> str:
 def format_span_id(span_id: int) -> str:
     """Format the span id according to b3 specification."""
     return format(span_id, '016x')
+
+
+__all__ = ["B3Propagator"]

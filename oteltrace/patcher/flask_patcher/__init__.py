@@ -13,9 +13,11 @@
 # limitations under the License.
 
 """
-The Flask__ integration will add tracing to all requests to your Flask application.
+The Flask__ integration will add tracing to all requests to your Flask
+application.
 
-This integration will track the entire Flask lifecycle including user-defined endpoints, hooks,
+This integration will track the entire Flask lifecycle including user-defined
+endpoints, hooks,
 signals, and templating rendering.
 
 To configure tracing manually::
@@ -47,7 +49,8 @@ Configuration
 
 .. py:data:: oteltrace.config.flask['distributed_tracing_enabled']
 
-   Whether to parse distributed tracing headers from requests received by your Flask app.
+   Whether to parse distributed tracing headers from requests received by
+   your Flask app.
 
    Default: ``True``
 
@@ -55,7 +58,8 @@ Configuration
 
    Whether to generate APM events for Flask in Trace Search & Analytics.
 
-   Can also be enabled with the ``OTEL_FLASK_ANALYTICS_ENABLED`` environment variable.
+   Can also be enabled with the ``OTEL_FLASK_ANALYTICS_ENABLED`` environment
+   variable.
 
    Default: ``None``
 
@@ -63,7 +67,8 @@ Configuration
 
    The service name reported for your Flask app.
 
-   Can also be configured via the ``OPENTELEMETRY_SERVICE_NAME`` environment variable.
+   Can also be configured via the ``OPENTELEMETRY_SERVICE_NAME`` environment
+   variable.
 
    Default: ``'flask'``
 
@@ -117,11 +122,13 @@ required_modules = ['flask']
 
 with require_modules(required_modules) as missing_modules:
     if not missing_modules:
-        # DEV: We do this so we can `@mock.patch('oteltrace.contrib.flask._patch.<func>')` in tests
-        from . import patch as _patch
+        # DEV: We do this so we can
+        # `@mock.patch('oteltrace.contrib.flask._patch.<func>')` in tests
+        # from . import flask_patcher as _patch
         from .middleware import TraceMiddleware
 
-        patch = _patch.patch
-        unpatch = _patch.unpatch
+        # patch = _patch.patch
+        # unpatch = _patch.unpatch
 
-        __all__ = ['TraceMiddleware', 'patch', 'unpatch']
+        # __all__ = ['TraceMiddleware', 'patch', 'unpatch']
+        __all__ = ['TraceMiddleware']

@@ -12,17 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .datadog import DatadogHTTPPropagator
-
-_PROGPAGATOR_FACTORY = DatadogHTTPPropagator
+from oteltrace.propagation.base_propagator import BasePropagator
 
 
-def set_http_propagator_factory(factory):
-    """Sets the propagator factory to be used globally"""
-    global _PROGPAGATOR_FACTORY
-    _PROGPAGATOR_FACTORY = factory
+class NoOpPropagator(BasePropagator):
+
+    def inject(self, span_context, headers):
+        return headers
+
+    def extract(self, headers):
+        return headers
 
 
-def HTTPPropagator():
-    """Returns and instance of the configured propagator"""
-    return _PROGPAGATOR_FACTORY()
+__all__ = ["NoOpPropagator"]

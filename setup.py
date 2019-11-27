@@ -17,9 +17,11 @@ import os
 import sys
 
 from distutils.command.build_ext import build_ext
-from distutils.errors import CCompilerError, DistutilsExecError, DistutilsPlatformError
+from distutils.errors import (
+    CCompilerError, DistutilsExecError, DistutilsPlatformError
+)
 from setuptools import setup, find_packages, Extension
-from setuptools.command.test import test as TestCommand
+from setuptools.command.test import test as TestCommand  # noqa
 
 
 class Tox(TestCommand):
@@ -49,9 +51,9 @@ class Tox(TestCommand):
 long_description = """
 # otel-trace-py
 
-`oteltrace` is OpenTelemetry's tracing library for Python.  It is used to trace requests
-as they flow across web servers, databases and microservices so that developers
-have great visiblity into bottlenecks and troublesome requests.
+`oteltrace` is OpenTelemetry's tracing library for Python.  It is used to trace
+requests as they flow across web servers, databases and microservices so that
+developers have great visiblity into bottlenecks and troublesome requests.
 
 ## Getting Started
 
@@ -91,7 +93,26 @@ setup_kwargs = dict(
     entry_points={
         'console_scripts': [
             'oteltrace-run = oteltrace.commands.oteltrace_run:main'
-        ]
+        ],
+        # FIXME: Probably these three following entry points belong in
+        # opentelemetry-python
+        'oteltrace_patcher': [
+            'no_op_patcher = oteltrace.patcher.'
+            'no_op_patcher.no_op_patcher:NoOpPatcher',
+            'flask_patcher = oteltrace.patcher.'
+            'flask_patcher.flask_patcher:FlaskPatcher'
+        ],
+        'oteltrace_exporter': [
+            'no_op_exporter = oteltrace.exporter.no_op_exporter:'
+            'NoOpExporter',
+        ],
+        'oteltrace_propagator': [
+            'no_op_propagator = oteltrace.propagator.no_op_propagator:'
+            'NoOpPropagator',
+            'b3_propagator = oteltrace.propagator.b3_propagator:B3Propagator',
+            'trace_context_propagator = oteltrace.propagator.'
+            'trace_context_propagator:B3Propagator',
+        ],
     },
     classifiers=[
         'Programming Language :: Python',
@@ -102,24 +123,35 @@ setup_kwargs = dict(
         'Programming Language :: Python :: 3.7',
     ],
     use_scm_version=True,
-    setup_requires=['setuptools_scm', 'opentelemetry-api', 'opentelemetry-sdk'],
+    setup_requires=[
+        'setuptools_scm', 'opentelemetry-api', 'opentelemetry-sdk'
+    ],
 )
 
 
 libraries = []
 if sys.platform == 'win32':
     libraries.append('ws2_32')
-    build_ext_errors = (CCompilerError, DistutilsExecError, DistutilsPlatformError, IOError, OSError)
+    build_ext_errors = (
+        CCompilerError,
+        DistutilsExecError,
+        DistutilsPlatformError,
+        IOError,
+        OSError
+    )
 else:
-    build_ext_errors = (CCompilerError, DistutilsExecError, DistutilsPlatformError)
+    build_ext_errors = (
+        CCompilerError, DistutilsExecError, DistutilsPlatformError
+    )
 
 
 class BuildExtFailed(Exception):
     pass
 
 
-# Attempt to build a C-extension, catch and throw a common/custom error if there are any issues
-class optional_build_ext(build_ext):
+# Attempt to build a C-extension, catch and throw a common/custom error if
+# there are any issues
+class OptionalBuildExt(build_ext):
     def run(self):
         try:
             build_ext.run(self)
@@ -140,7 +172,8 @@ else:
     macros = [('__LITTLE_ENDIAN__', '1')]
 
 
-# Try to build with C extensions first, fallback to only pure-Python if building fails
+# Try to build with C extensions first, fallback to only pure-Python if
+# building fails
 try:
     kwargs = copy.deepcopy(setup_kwargs)
     kwargs['ext_modules'] = [
@@ -151,12 +184,15 @@ try:
     ]
     # DEV: Make sure `cmdclass` exists
     kwargs.setdefault('cmdclass', dict())
-    kwargs['cmdclass']['build_ext'] = optional_build_ext
+    kwargs['cmdclass']['build_ext'] = OptionalBuildExt
     setup(**kwargs)
 except BuildExtFailed:
     # Set `DDTRACE_BUILD_TRACE=TRUE` in CI to raise any build errors
     if os.environ.get('DDTRACE_BUILD_RAISE') == 'TRUE':
         raise
 
-    print('WARNING: Failed to install wrapt/msgpack C-extensions, using pure-Python wrapt/msgpack instead')
+    print(
+        'WARNING: Failed to install wrapt/msgpack C-extensions, using '
+        'pure-Python wrapt/msgpack instead'
+    )
     setup(**setup_kwargs)

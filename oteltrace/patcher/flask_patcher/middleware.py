@@ -15,7 +15,7 @@
 from ... import compat
 from ...ext import http, errors
 from ...internal.logger import get_logger
-from ...propagation.http import HTTPPropagator
+from ...propagator.http import HTTPPropagator
 from ...utils.deprecation import deprecated
 
 import flask.templating

@@ -17,6 +17,8 @@ import re
 from ..context import Context
 from ..ext import priority
 
+from oteltrace.propagator.base_propagator import BasePropagator
+
 
 _KEY_WITHOUT_VENDOR_FORMAT = r'[a-z][_0-9a-z\-\*\/]{0,255}'
 _KEY_WITH_VENDOR_FORMAT = (
@@ -37,12 +39,13 @@ _MEMBER_FORMAT_RE = re.compile(_MEMBER_FORMAT)
 _TRACECONTEXT_MAXIMUM_TRACESTATE_KEYS = 32
 
 
-class W3CHTTPPropagator:
+class TraceContextPropagator(BasePropagator):
     """w3c compatible propagator"""
     _TRACEPARENT_HEADER_NAME = 'traceparent'
     _TRACESTATE_HEADER_NAME = 'tracestate'
     _TRACEPARENT_HEADER_FORMAT = (
-        '^[ \t]*([0-9a-f]{2})-([0-9a-f]{32})-([0-9a-f]{16})-([0-9a-f]{2})(-.*)?[ \t]*$'
+        '^[ \t]*([0-9a-f]{2})-([0-9a-f]{32})-'
+        '([0-9a-f]{16})-([0-9a-f]{2})(-.*)?[ \t]*$'
     )
     _TRACEPARENT_HEADER_FORMAT_RE = re.compile(_TRACEPARENT_HEADER_FORMAT)
     _SAMPLING_PRIORITY_MAP = {
@@ -56,7 +59,9 @@ class W3CHTTPPropagator:
         # TODO: what should be a default value?
         sampled = 0
         if span_context.sampling_priority is not None:
-            sampled = self._SAMPLING_PRIORITY_MAP[span_context.sampling_priority]
+            sampled = self._SAMPLING_PRIORITY_MAP[
+                span_context.sampling_priority
+            ]
 
         traceparent_string = '00-{:032x}-{:016x}-{:02x}'.format(
             span_context.trace_id, span_context.span_id, sampled
@@ -171,3 +176,6 @@ def _format_tracestate(tracestate):
         header format.
     """
     return ','.join(key + '=' + value for key, value in tracestate.items())
+
+
+__all__ = ["TraceContextPropagator"]

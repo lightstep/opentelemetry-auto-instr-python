@@ -43,7 +43,7 @@ POSSIBLE_HTTP_HEADER_ORIGIN = frozenset(
 )
 
 
-class DatadogHTTPPropagator(object):
+class DatadogPropagator(object):
     """A HTTP Propagator using HTTP headers as carrier."""
 
     def inject(self, span_context, headers):
@@ -163,3 +163,5 @@ class DatadogHTTPPropagator(object):
             except Exception:
                 log.debug(error)
             return Context()
+
+__all__ = ["DatadogPropagator"]

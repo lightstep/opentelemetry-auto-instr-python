@@ -26,7 +26,7 @@ from .context import Context
 from .sampler import AllSampler, OpenTelemetrySampler, RateSampler, RateByServiceSampler
 from .span import Span
 from .utils.deprecation import deprecated
-from .propagation import http as http_propagator_module
+from .propagator import http as http_propagator_module
 from . import compat
 
 

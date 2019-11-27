@@ -13,22 +13,22 @@
 # limitations under the License.
 
 """
-OpenTelemetry APM traces can be integrated with Logs by first having the tracing
-library patch the standard library ``logging`` module and updating the log
-formatter used by an application. This feature enables you to inject the current
-trace information into a log entry.
+OpenTelemetry APM traces can be integrated with Logs by first having the
+tracing library patch the standard library ``logging`` module and updating the
+log formatter used by an application. This feature enables you to inject the
+current trace information into a log entry.
 
 Before the trace information can be injected into logs, the formatter has to be
-updated to include ``otel.trace_id`` and ``otel.span_id`` attributes from the log
-record. The integration with Logs occurs as long as the log entry includes
+updated to include ``otel.trace_id`` and ``otel.span_id`` attributes from the
+log record. The integration with Logs occurs as long as the log entry includes
 ``otel.trace_id=%(otel.trace_id)s`` and ``otel.span_id=%(otel.span_id)s``.
 
 oteltrace-run
 -----------
 
-When using ``oteltrace-run``, enable patching by setting the environment variable
-``OTEL_LOGS_INJECTION=true``. The logger by default will have a format that
-includes trace information::
+When using ``oteltrace-run``, enable patching by setting the environment
+variable ``OTEL_LOGS_INJECTION=true``. The logger by default will have a format
+that includes trace information::
 
     import logging
     from oteltrace import tracer
@@ -53,9 +53,11 @@ log formatter as in the following example::
     import logging
     from oteltrace import tracer
 
-    FORMAT = ('%(asctime)s %(levelname)s [%(name)s] [%(filename)s:%(lineno)d] '
-              '[otel.trace_id=%(otel.trace_id)s otel.span_id=%(otel.span_id)s] '
-              '- %(message)s')
+    FORMAT = (
+        '%(asctime)s %(levelname)s [%(name)s] [%(filename)s:%(lineno)d] '
+        '[otel.trace_id=%(otel.trace_id)s otel.span_id=%(otel.span_id)s] '
+        '- %(message)s'
+    )
     logging.basicConfig(format=FORMAT)
     log = logging.getLogger()
     log.level = logging.INFO
